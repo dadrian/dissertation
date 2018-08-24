@@ -1,0 +1,153 @@
+\documentclass{thesis-umich}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathptmx}\renewcommand{\ttdefault}{cmtt}
+\usepackage{graphicx}
+
+%\usepackage{microtype}
+\usepackage{xspace}
+\usepackage[compact]{titlesec}
+\usepackage{color}
+\definecolor{azure}{rgb}{0.16, 0.32, 0.75}
+%\usepackage[%
+%    breaklinks=true,colorlinks=true,urlcolor=azure,
+%    citecolor=black,pdftex]{hyperref}
+%\thispagestyle{empty}\pagestyle{plain}
+\usepackage{url}\urlstyle{rm}
+
+\usepackage{amsmath,amssymb,amsbsy}
+
+\usepackage[margin=0pt]{caption}
+\usepackage{algorithm, algorithmic}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\usepackage{color}
+\usepackage{verbatim}
+%\usepackage[margin=1in]{geometry}
+%\usepackage{watermark}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{wasysym}
+\usepackage{paralist}
+\usepackage{balance}
+\usepackage{tabularx}
+\usepackage[protrusion=true,expansion=true,kerning]{microtype}
+\usepackage{multirow}
+\usepackage{placeins}
+\usepackage{pgfplots}
+\usepackage{wrapfig}
+\usepackage{colortbl}
+\usepackage{adjustbox}
+\usepackage{bigstrut}
+%\usepackage{subcaption}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\newcommand{\twolinecell}[2][r]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\newcommand{\twollinecell}[2][r]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+
+
+\newcommand*{\refname}{Bibliography}
+
+\usepackage{float}
+
+\newcommand{\ind}{\hspace*{1em}}
+\newif\ifex\extrue % for extended version
+\newif\ifredact\redactfalse
+\newcommand{\re}[1]{{#1}}
+\newcommand{\subpar}[1]{\medskip\noindent\textsl{#1}\enspace}
+\newcommand{\update}[1]{{\color{black}#1}\xspace}
+\newcommand{\mycaption}[2]{\caption{\textbf{#1.} #2}}
+\newcommand{\hostfont}[1]{\texttt{#1}}
+\newcommand{\starttls}{STARTTLS\@\xspace}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\color{red}{\ding{53}}}
+
+\usepackage{compactbib}
+%\usepackage[compress]{cite}
+%\renewcommand{\bibliorefname}[1]{\subsection*{#1}}
+\renewcommand{\paragraph}[1]{\medskip\noindent\textbf{#1}\,\,\,}
+
+\newcommand{\todo}[1]{{\color{red}{\textbf{\em [TODO: #1]}}}\xspace}
+\newcommand{\TODO}[1]{\todo{#1}}
+
+\begin{document}
+
+\chapter{Introduction}
+
+General introduction. Broad claims. Thesis statement.
+
+No one will actually read past here.
+
+\section{First Paper Class}
+
+Introduction and claim group. Cite something~\cite{weakkeys12}.
+
+\subsection{Paper One}
+
+Now we're cooking with gas!
+
+\paragraph{Important Note}
+This paper is more exciting and gets some breakout points.
+
+\paragraph{Another Note}
+All this stuff is made up anyway.
+
+\subsection{Another Paper}
+
+We talked about some stuff, and now we're gonna fly at left-field.
+
+\section{Second Paper Group}
+
+Let's cite a bunch of things that are related, then talk about them!
+
+\subsection{A paper}
+
+I published a thing.
+
+\subsection{Analyzing the HTTPS Certificate Ecosystem}
+
+And another thing
+
+\paragraph{Note}
+Another note.
+
+\paragraph{Site Certificates}
+A second note.
+
+\chapter{Paper 1}
+\input{zmap/zpaper}
+\chapter{Paper 2}
+\input{censys/zsearch}
+\chapter{Paper 3}
+\input{psandqs/paper3}
+\chapter{Paper 4}
+\input{httpsecosystem/imc13}
+\chapter{Paper 5}
+\input{mail/paper}
+\chapter{Paper 6}
+\input{heartbleed/heartbleed}
+
+\chapter{Conclusion and Future Work}
+
+Concluding thoughts.
+
+Future work
+
+\section{Future Idea A}
+Graduate.
+
+\section{Future Idea B}
+Startup.
+
+\section{Shaping security behavior}
+Cash money.
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
