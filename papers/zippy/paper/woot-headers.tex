@@ -1,0 +1,85 @@
+%ethertex-once:https://davidadrian.org/.well-known/usenix.sty
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{usenix,epsfig,footnote,url}\urlstyle{rm}
+\usepackage[T1]{fontenc}
+\usepackage[%
+    breaklinks=true,colorlinks=true,linkcolor=black,%
+     citecolor=black,urlcolor=black,bookmarks=true,bookmarksopen=false,%
+    pdfauthor={David Adrian, Zakir Durumeric, Gulshan Singh, and J. Alex Halderman},
+    pdftitle={Zippier ZMap: Internet-Wide Scanning at 10 Gbps}
+    ,pdftex]{hyperref}
+\usepackage{amsmath, amssymb, amsfonts, amsthm}
+\usepackage{mathptmx}\renewcommand{\ttdefault}{cmtt}
+\usepackage[margin=0pt,font=small]{caption}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{balance}
+\usepackage{cite}
+\usepackage[protrusion=true,expansion=true,kerning]{microtype}
+\SetExtraKerning % Add space around emdashes
+   { encoding = *,
+        font = * }
+   { \textemdash  = {120,120} }
+
+% Fix ugly USENIX subsection headings (AH 3/08)
+\makeatletter
+\renewcommand{\section}{\@startsection {section}{1}{\z@}%
+                                   {-3.5ex plus-1ex minus -.2ex}%
+                                   {2.3ex plus.2ex}%
+                                   {\normalfont\large\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
+                                     {-2.5ex plus-.7ex minus -.2ex}%
+                                     {1.5ex plus .2ex}%
+                                     {\normalfont\fontsize{11}{12.5}\bfseries}}
+\makeatother
+
+% Paragraph and subpar
+\renewcommand{\paragraph}[1]{\medskip\noindent\textbf{#1}\quad}
+\newcommand{\subpar}[1]{\medskip\noindent\textsl{#1}\enspace}
+
+% Stop URLs from hyphenating after  "http:" (AH 12/08)
+\def\UrlBreaks{\do-\do\.\do\@\do\\\do\!\do\_\do\|\do\;\do\>\do\]%
+ \do\)\do\,\do\?\do\'\do+\do\=\do\#}
+\def\UrlBigBreaks{\do\:\do\/}%
+
+% TODO, TK, etc. (AH 4/12)
+\usepackage{xspace}
+\newcommand{\todo}[1]{{\color{red}{\textbf{\em [TODO: #1]}}}\xspace}
+\newcommand{\TODO}[1]{\todo{#1}}
+\newcommand{\tk}{{\color{red}{\bf TK}}\xspace}
+\newcommand{\TK}{\tk}
+\newcommand{\comment}[1]{\relax} % comment out text
+\newcommand{\xcite}[1]{\relax} % comment out citation
+
+\newif\ifweb\webtrue
+\ifweb
+    \usepackage{watermark}
+    \thiswatermark{\parbox{\textwidth}{\vskip30pt\centering
+    \vspace*{-20pt}%
+     This paper appeared in \emph{Proceedings of the 8th {USENIX} Workshop on Offensive Technologies} (WOOT '14), August~2014.\\
+    \vskip6pt
+    \rule[\baselineskip]{\textwidth}{0.5pt}
+    }}
+\fi
+
+\begin{document}
+\pagenumbering{arabic}
+\thispagestyle{empty}
+
+% Some math stuff
+\newcommand{\bbZ}{\mathbb{Z}}
+
+%don't want date printed
+\date{}
+
+\title{\Large\bf Zippier ZMap: Internet-Wide Scanning at 10\,Gbps}
+
+\author{
+{\rm David Adrian, Zakir Durumeric, Gulshan Singh, and J.\,Alex Halderman}\smallskip\\
+University of Michigan\\
+\small\rm\{davadria,\,zakir,\,gulshan,\,jhalderm\}@umich.edu
+}
+ 
+
+\maketitle
+

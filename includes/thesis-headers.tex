@@ -1,0 +1,79 @@
+\documentclass{styles/thesis-umich}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathptmx}\renewcommand{\ttdefault}{cmtt}
+\usepackage{graphicx}
+
+%\usepackage{microtype}
+\usepackage{xspace}
+\usepackage[compact]{titlesec}
+\usepackage{color}
+\definecolor{azure}{rgb}{0.16, 0.32, 0.75}
+%\usepackage[%
+%    breaklinks=true,colorlinks=true,urlcolor=azure,
+%    citecolor=black,pdftex]{hyperref}
+%\thispagestyle{empty}\pagestyle{plain}
+\usepackage{url}\urlstyle{rm}
+
+\usepackage{amsmath,amssymb,amsbsy}
+
+\usepackage[margin=0pt]{caption}
+\usepackage{algorithm, algorithmic}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\usepackage{color}
+\usepackage{verbatim}
+%\usepackage[margin=1in]{geometry}
+%\usepackage{watermark}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{wasysym}
+\usepackage{paralist}
+\usepackage{balance}
+\usepackage{tabularx}
+\usepackage[protrusion=true,expansion=true,kerning]{microtype}
+\usepackage{multirow}
+\usepackage{placeins}
+\usepackage{pgfplots}
+\usepackage{wrapfig}
+\usepackage{colortbl}
+\usepackage{adjustbox}
+\usepackage{bigstrut}
+%\usepackage{subcaption}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\newcommand{\twolinecell}[2][r]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\newcommand{\twollinecell}[2][r]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+
+
+\newcommand*{\refname}{Bibliography}
+
+\usepackage{float}
+
+\newcommand{\ind}{\hspace*{1em}}
+\newif\ifex\extrue % for extended version
+\newif\ifredact\redactfalse
+\newcommand{\re}[1]{{#1}}
+\newcommand{\subpar}[1]{\medskip\noindent\textsl{#1}\enspace}
+\newcommand{\update}[1]{{\color{black}#1}\xspace}
+\newcommand{\mycaption}[2]{\caption{\textbf{#1.} #2}}
+\newcommand{\hostfont}[1]{\texttt{#1}}
+\newcommand{\starttls}{STARTTLS\@\xspace}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\color{red}{\ding{53}}}
+
+\usepackage{compactbib}
+%\usepackage[compress]{cite}
+%\renewcommand{\bibliorefname}[1]{\subsection*{#1}}
+\renewcommand{\paragraph}[1]{\medskip\noindent\textbf{#1}\,\,\,}
+
+\newcommand{\todo}[1]{{\color{red}{\textbf{\em [TODO: #1]}}}\xspace}
+\newcommand{\TODO}[1]{\todo{#1}}
+
+% Math Helpers
+\newcommand{\bbZ}{\mathbb{Z}}
