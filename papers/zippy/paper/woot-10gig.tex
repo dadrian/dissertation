@@ -15,12 +15,12 @@ applications.\looseness=1
 \label{sec:introduction}
 
 In August 2013, we released ZMap, an open-source network scanner designed to
-quickly perform Internet-wide network surveys~\cite{zmap}. From a single
+quickly perform Internet-wide network surveys~\cite{zmap-2013}. From a single
 machine, ZMap is capable of scanning at 1.44~million packets per second
 (Mpps), the theoretical limit of gigabit Ethernet. At this speed, ZMap can
 complete a scan targeting one TCP port across the entire public IPv4 address
 space in under 45~minutes---a dramatic improvement compared to
-weeks~\cite{zmap} or months~\cite{sslobservatory} required using Nmap. Yet
+weeks~\cite{zmap-2013} or months~\cite{ssl-observatory-2010} required using Nmap. Yet
 even at gigabit linespeed, ZMap does not utilize the full bandwidth of the
 fastest readily available connections: 10\,GigE uplinks are now offered by
 Amazon~EC2~\cite{amazon-10g} and at a growing number of research
@@ -73,12 +73,12 @@ to exploit vulnerabilities with alarming speed.
 \label{sec:relatedwork}
 
 Many network scanning tools have been
-introduced~\cite{scanrand,unicornscan,masscan-10g,nmap,zmap}, although until
+introduced~\cite{scanrand,unicornscan,masscan-10g,nmap,zmap-2013}, although until
 recently most were designed for scanning small networks. One of the most
 popular is Nmap~\cite{nmap}, a highly capable network exploration tool. Nmap
 is well suited for vertical scans of small networks or individual hosts, but
 the original ZMap implementation outperformed it on horizontal Internet-wide
-scans by a factor of 1300~\cite{zmap}. Our enhancements to ZMap improve its
+scans by a factor of 1300~\cite{zmap-2013}. Our enhancements to ZMap improve its
 performance by another factor of ten.
 
 ZMap is not the first Internet-wide scanner to use PF\_RING to send at speeds
@@ -95,7 +95,7 @@ Internet-wide scan conducted at 10\,GigE speeds.
 \label{sec:optimizations}
 
 ZMap achieves this performance based on a series of architectural choices
-that are geared towards very large, high-speed scans~\cite{zmap}. It avoids
+that are geared towards very large, high-speed scans~\cite{zmap-2013}. It avoids
 per-connection state by embedding tracking information in packet fields that
 will be echoed by the remote host, using an approach similar to
 SYN~cookies~\cite{bernstein1996syn}. It eschews timeouts and simplifies flow
@@ -108,7 +108,7 @@ fully reaching 10\,GigE speeds. ZMap's address generation is CPU intensive
 and requires a global lock, adding significant overhead. Blacklisting ranges
 of addresses is expensive and scales poorly. Sending each packet requires a
 context switch and unnecessary copies as packets are passed from userspace to
-the kernel and then to the NIC~\cite{multi-core-network}. We implement
+the kernel and then to the NIC~\cite{multi-core-network-2010}. We implement
 optimizations that reduce each of these bottlenecks.
 
 \subsection{Address Generation Sharding}
@@ -345,7 +345,7 @@ congestion and upstream network conditions.\looseness=1
 
 We performed all of our experiments using our local blacklist file. Our
 blacklist, which eliminates non-routable address space and networks that have
-requested exclusion from scanning~\cite{state-of-scanning}, consists of over
+requested exclusion from scanning~\cite{state-of-scanning-2014}, consists of over
 1,000 entries of various-sized network blocks. It results in 3.7~billion
 allowed addresses---with almost all the excluded space consisting of IANA
 reserved allocations.
@@ -354,7 +354,7 @@ reserved allocations.
 
 In our original ZMap study, we experimented with various scanning speeds up
 to gigabit Ethernet line speed (1.44~Mpps) and found no significant effect on
-the number of results ZMap found~\cite{zmap}. In other words, from our
+the number of results ZMap found~\cite{zmap-2013}. In other words, from our
 network, ZMap did not appear to miss any results when it ran faster up to
 gigabit speed.
 
@@ -390,7 +390,7 @@ ZMap.}
 
 We first investigate whether response packets are being dropped by ZMap or
 the network. In the original ZMap work, we found that 99\% of hosts respond
-within 1~second~\cite{zmap}. As such, we would expect that after 1~second,
+within 1~second~\cite{zmap-2013}. As such, we would expect that after 1~second,
 there would be negligible responses. However, as can be seen in
 Figure~\ref{fig:recvrate}, there is an unexpected spike in response packets
 after sending completes at 50~seconds for scans at 10 and 14~Mpps. This spike
@@ -514,7 +514,7 @@ moment.
 Similarly, the increased scan rate enables researchers to complete
 high-resolution scans when measuring temporal effects. For example, while
 researchers were able to complete comprehensive scans for the recent
-Heartbleed Vulnerability every few hours~\cite{zmap-heartbleed}, many sites
+Heartbleed Vulnerability every few hours~\cite{heartbleed-2014}, many sites
 were patched within the first minutes after disclosure. The ability to scan
 more rapidly could help shed light on patching behavior within this critical
 initial period.
@@ -546,7 +546,7 @@ time. Durumeric et~al.\ found that attackers began scanning for the
 Heartbleed vulnerability within 22~hours of its
 disclosure~\cite{zmap-heartbleed}. While attackers have utilized botnets and
 worms in order to complete distributed scans for vulnerabilities, recent
-work~\cite{state-of-scanning} has shown that attackers are now also using
+work~\cite{state-of-scanning-2014} has shown that attackers are now also using
 ZMap, Masscan, and other scanning technology from bullet-proof hosting
 providers in order to find vulnerable hosts. The increase in scan rates could
 allow attackers to complete Internet-wide vulnerability scans in minutes as
@@ -592,19 +592,19 @@ As faster network infrastructure becomes more widely available, 10\,GigE
 scanning will enable powerful new applications for both researchers and
 attackers.
 
-\section*{Acknowledgments}
-
-The authors thank the exceptional sysadmins at the University of Michigan for
-their help and support throughout this project. This research would not have
-been possible without Kevin Cheek, Chris Brenner, Laura Fink, Paul Howell,
-Don Winsor, and others from ITS, CAEN, and DCO\@. We are grateful to Michael
-Bailey for numerous productive discussions, to Luca Deri and ntop for
-providing a PF\_RING license, and to the many contributors to the ZMap open
-source project. We also thank Denis Bueno, Jakub Czyz, Henry Fanson, Pat
-Pannuto, and Eric Wustrow.
-
-This material is based upon work supported by the National Science Foundation
-under Grant No.~CNS-1255153 and No.~CNS-0964545. Any opinions, findings, and
-conclusions or recommendations expressed in this material are those of the
-authors and do not necessarily reflect the views of the National Science
-Foundation.
+%\section*{Acknowledgments}
+%
+%The authors thank the exceptional sysadmins at the University of Michigan for
+%their help and support throughout this project. This research would not have
+%been possible without Kevin Cheek, Chris Brenner, Laura Fink, Paul Howell,
+%Don Winsor, and others from ITS, CAEN, and DCO\@. We are grateful to Michael
+%Bailey for numerous productive discussions, to Luca Deri and ntop for
+%providing a PF\_RING license, and to the many contributors to the ZMap open
+%source project. We also thank Denis Bueno, Jakub Czyz, Henry Fanson, Pat
+%Pannuto, and Eric Wustrow.
+%
+%This material is based upon work supported by the National Science Foundation
+%under Grant No.~CNS-1255153 and No.~CNS-0964545. Any opinions, findings, and
+%conclusions or recommendations expressed in this material are those of the
+%authors and do not necessarily reflect the views of the National Science
+%Foundation.

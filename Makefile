@@ -1,6 +1,6 @@
 all: proposal.pdf 
 
-proposal.pdf: proposal/proposal.tex refs.bib
+proposal.pdf: proposal/proposal.tex papers/**/paper/*.tex refs.bib
 	pdflatex proposal/proposal
 	bibtex proposal
 	pdflatex proposal/proposal
