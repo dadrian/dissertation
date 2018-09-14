@@ -266,15 +266,14 @@
 
 %% ---- TITLE PAGE -----------------------------------------------------
 % The fields to be used for the title page
-\renewcommand{\@title}{A Data-Driven Approach to Security}
-\renewcommand{\@author}{Zakir Durumeric}
+\renewcommand{\@title}{Understanding Cryptography with Large-Scale Empiriscism and Engineering}
+\renewcommand{\@author}{David Adrian}
 \newcommand{\@degree}{Doctor of Philosophy}
 \newcommand{\@department}{Computer Science and Engineering}
 \newcommand{\@committee}{
 Professor J.~Alex Halderman, Chair\\
-Associate Professor Michael Bailey, University of Illinois Urbana-Champaign\\
 Research Professor Peter Honeyman\\
-Professor Vern Paxson, University of California, Berkeley\\
+Associate Professor Chris Peikert\\
 Assistant Professor Florian Schaub\\
 }
 \newcommand{\@chair}{Professor J.~Alex Halderman}
