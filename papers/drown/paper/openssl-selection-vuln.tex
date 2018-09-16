@@ -1,0 +1,12 @@
+\subsection{OpenSSL SSLv2 cipher suite selection bug}
+\label{sec:openssl-selection}
+The \ssltwo protocol is supported in OpenSSL by default in all versions under 1.1.0.
+OpenSSL removed \ssltwo cipher suites from the default cipher string in 2010 between versions 0.9.8n and 1.0.0; the changelog discusses this as being equivalent to disabling support for \ssltwo by default~\cite{opensslchangelog}.   Unfortunately, during our experiments we discovered that OpenSSL servers do not respect the cipher suites advertised in the \texttt{ServerHello} message.
+That is, the client can select an \textit{arbitrary} cipher suite in the \texttt{ClientMasterKey} message and force the use of export cipher suites even if they are explicitly disabled in the server configuration.
+The \ssltwo protocol itself was still enabled by default in the OpenSSL standalone server for the most recent OpenSSL versions prior to our disclosure. %(this was not necessarily the case when OpenSSL was used as a plugin in Apache or other webservers).
+%In addition to verifying this vulnerability in our lab, we have encountered several SSLv2 servers on the Internet which have apparently disabled export cipher suites (as judged by their \texttt{ServerHello} message), where we could indeed force the use of these cipher suites on those servers.
+
+We notified the OpenSSL team of this vulnerability, which was assigned CVE ID CVE-2015-3197. We have cooperated to develop a fix, which was included in OpenSSL releases 1.0.2f and 1.0.1r~\cite{opensslchangelog}. 
+%In addition, these versions by default disabled \ssltwo support.
+
+%\todo{Mention POP3 is likely vulnerable without any active attacks involving the client, since we expect to have a handshake every few minutes anyway}

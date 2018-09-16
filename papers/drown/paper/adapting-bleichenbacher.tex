@@ -1,0 +1,163 @@
+\label{sec:adapted-bb}
+
+\subsection{Calculating the success probability of a fraction}
+\label{sec:fraction-probability}
+
+For a given fraction $u/t$, we can compute the probability of success with a randomly chosen \tlsconform ciphertext.  Let $m_1 = m_0 \cdot u/t = m_1[1]||...||m_1[\ell]$ - i.e. $m_1[i]$ is the $i$th byte of $m_1$.  Let $k$ be the fixed byte length of the oracle response.  For $s = u/t \bmod N$ where $u$ and $t$ are coprime, $m_1$ will be \sslconform if the following conditions all hold:
+\begin{enumerate}
+	\item $m_0$ is divisible by $t$. For randomly generated $m_0$, this condition holds with probability $1/t$.  
+		\item $m_1[1] = 0$ and $m_1[2] = 2$, or the integer $m \cdot u/t \in [2B, 3B-1)$.
+		For a randomly generated $m_0$ divisible by $t$ and for a given fraction $u/t$, this condition holds with probability
+\begin{equation*}
+P = 
+\begin{cases}
+3 - 2 \cdot t/u & \text{for }   2/3 < u/t < 1 \\
+3 \cdot t/u - 2 & \text{for }   1 < u/t < 3/2 \\
+0 & \text{otherwise}
+\end{cases}
+\label{eq:oracle}
+\end{equation*} 
+\item $\forall i \in [3, \ell-(k+1)], m_1[i] \neq 0$, or all bytes between the first two bytes and the $(k+1)$ least significant bytes are non-zero.  This condition holds with probability $(1 - 1/256)^{\ell-(k+3)}$.
+\item $m_1[\ell-k] = 0$, or the $(k+1)$st least significant byte is 0.  This condition holds with probability $1/256$.
+\end{enumerate}
+As an example, let us assume a 2048-bit RSA ciphertext with $k = 5$, and consider the fraction $u = 7, t = 8$.  We have
+\begin{align*}
+P(t|m_0)= 1/t &= 1/8 \\
+P( m_1[1,2] = 00||02 \, \big\vert \, t|m_0) &= 0.71\\
+P(\forall i \in [3, \ell-6] \, m_1[i] \neq 0) = (1 - 1/256)^{248} &= 0.37\\
+P(m_1[\ell-5] = 0) &= 1/256
+\end{align*}
+The overall probability of success is $P = 1/8 \cdot 0.71 \cdot 0.37 \cdot 1/256 = 1 / 7,774$; thus we expect to find an \sslconform ciphertext after testing 7,774 randomly chosen \tlsconform ciphertexts.  We can decrease the number of \tlsconform ciphertexts needed by multiplying each candidate ciphertext by several fractions.
+
+\subsection{Optimizing the chosen set of fractions}
+\label{sec:fraction-optimization}
+%Section~\ref{sec:adapted-bb-compact} already introduced the optimization that allows us to narrow the key space for a single query by observing that, for example, using the fraction $u/t=8/7$ results in the new candidate message $m_1 = m_0 / t \cdot u$ is divisible by $u=8$, and the last three bits of $m_1$ (and thus \texttt{master\_key}) are zero.
+
+In order to deduce the validity of a single ciphertext, the attacker would have to perform a non-trivial brute-force search over all 5 byte \texttt{master\_key} values. This translates into $2^{40}$ encryption operations.
+
+The search space can be reduced by an additional optimization, which relies on the fractional multipliers used in the first step.
+Suppose the attacker uses a fraction $u/t=8/7$ to compute a new \sslconform candidate, and suppose that $m_0$ is indeed divisible by $t=7$. 
+This implies that the new candidate message $m_1 = m_0 / t \cdot u$ is divisible by $u=8$, and the last three bits of $m_1$ (and thus \texttt{$mk_{secret}$}) are zero. 
+This allows the attacker to reduce the searched \texttt{master\_key} space by selecting specific fractions.
+
+
+More generally, for an integer $u$, the largest power of 2 by which $u$ is divisible, is denoted by $v_2(u)$, and multiplying by a fraction $u/t$ saves us a factor of $v_2(u)$ in the required encryption attempts.
+With this observation, the trade-off between the 3 metrics: the required number of intercepted ciphertexts, the required number of queries, and the required number of encryption attempts, becomes non-trivial to analyze.
+
+Therefore, we have resorted to using simulations when evaluating the performance metrics for sets of fractions.
+The probability that multiplying a ciphertext by any fraction out of a given set of fractions results in an \sslconform message is difficult to compute, since the events are in fact inter-dependent: If $m \cdot 16/15$ is conforming, then $m$ is divisible by $5$, greatly increasing the probability that $m \cdot 4/5$ is also conforming.
+However, it is easy to perform a Monte Carlo simulation, where we randomly generate ciphertexts, and measure the probability that any fraction out of a given set produces a conforming message.
+The expected required number of intercepted ciphertexts is the inverse of that probability.
+
+Formally, if we denote the set of fractions as $F$, and the event that a message $m$ is conforming as $C(m)$, we perform a Monte Carlo estimation of the probability
+$ P_F = P(\exists f \in F: C(m \cdot f)) $, and the expected number of required intercepted ciphertexts equals $1/{P_F}$.
+
+The required number of oracle queries is simply $ 1/P_F \cdot |F| $: For each ciphertext, we need to query the oracle with each fraction.
+Accordingly, the required number connections to the server is $ 2 \cdot 1/P_F \cdot |F| $, since as explained earlier each logical query consists of two connections to the server.
+
+And as for the required number of encryption attempts, if we denote this number when querying with a given fraction $f = u/t$ as $E_f$, then
+$E_f = E_{u/t} = 2^{40-v_2(u)}$.
+If we further define the required encryption attempts when testing a single ciphertext with each fraction from a given set of fraction $F$ as
+$E_F = \sum_{f \in F} E_f$
+then the required number of encryption attempts throughout the attack for a given set of fractions is $(1/{P_F}) \cdot E_F$.
+
+Using this approach, we can now give precise figures for the expected number of required intercepted ciphertexts, connections to the targeted server, and encryption attempts.
+The results presented in Table~\ref{tab:reasonable_parameters} were obtained by using the monte-carlo estimation technique described above, with one billion random ciphertexts per tested fraction set $F$.
+
+\subsection{Efficiently computing rotations and multipliers}
+\label{sec:rotation-details}
+
+For a randomly chosen $s$, the probability that the two most significant bytes are $\hexb{00}{02}$ is $2^{-16}$; for a 2028-bit modulus $N$ the probability that the next $\ell - k - 3$ bytes of $m_2$ are all nonzero is about 0.37 as in the previous section, and the probability that the $k+1$ least significant delimiter byte is $\hex{00}$ is 1/256.  Thus a randomly chosen $s$ will work with probability $2^{-25.4}$ and we expect to need to try $2^{25.4}$ values of $s$ before succeeding.
+
+However, since we have already learned $k+3$ most significant bytes of $m_1 \cdot R^{-1} \bmod N$,
+for $k \ge 4$ and $s < 2^{30}$ we do not need to query the oracle to learn if the two most significant bytes are \sslconform; we can compute this ourselves from our knowledge of $\tilde{m_1} \cdot R^{-1}$.  We could simply iterate through values of $s$, test that the top two bytes of $\tilde{m_1} \cdot R^{-1} \bmod N$ are \sslconform, and only query the oracle $\Oracle$ for values of $s$ that satisfy this test; this means that for our 2048-bit modulus we expect to test $2^{16}$ values offline per oracle query.  The probability that our query is conformant is then $P = (1/256) * (255/256)^{249} \approx 1/678$ so we expect to perform 678 oracle queries before finding a fully \sslconform ciphertext $c_2 = (s \cdot R^{-1})^e c_1 \bmod N$.
+
+We can speed up the brute force testing of $2^{16}$ values of $s$ using algebraic lattices.  We are searching for values of $s$ satisfying $\tilde{m_1} R^{-1} s < 3 B \bmod N$, or given an offset $s_0$ we would like to find solutions $x$ and $z$ to the equation $\tilde{m_1} R^{-1} (s_0 + x) = 2 B + z \bmod N$ where $|x| < 2^{16}$ and $|z| < B$.  Let $X =  2^{15}$.  We can construct the lattice basis
+\[
+L = 
+\begin{bmatrix}
+-B & X\tilde{m_1} R^{-1} & \tilde{m_1} R^{-1} s_0 + B \\
+0 & XN & 0 \\
+0 & 0 & N
+\end{bmatrix}
+\]
+We then run the LLL algorithm~\cite{lll} on $L$ to obtain a reduced lattice basis $V$ containing vectors $v_1, v_2, v_3$.  We then construct the linear equations $f_1(x,z) = v_{1,1}/B \cdot z +v_{1,2}/X \cdot x + v_{1,3} = 0$ and $f_2(x,z) = v_{2,1}/B \cdot z +v_{2,2}/X \cdot x + v_{2,3} = 0$ and solve the system of equations to find a candidate integer solution $x = \tilde{s}$.  We then test $s = \tilde{s} + s_0$ as our candidate solution in this range.
+
+$\det L = XZN^2$ and $\dim L = 3$, thus we expect the vectors $v_i$ in $V$ to have length approximately $|v_i| \approx (XZN^2)^{1/3}$.  We will succeed if $|v_i| < N$, or in other words $XZ < N$.  $N \approx 2^{8\ell}$, so we expect to find short enough vectors. This approach works well in practice and is significantly faster than iterating through $2^{16}$ possible values of $\tilde{s}$ for each query.
+
+In summary, given an \sslconform ciphertext $c_1 = m_1^e \bmod N$, we can efficiently generate an \sslconform ciphertext $c_2 = m_2^e \bmod N$ where $m_2 = s \cdot m_1 \cdot R^{-1} \bmod N$ and we know several most significant bytes of $m_2$, using only a few hundred oracle queries in expectation.  We can iterate this process as many times as we like to continue generating \sslconform ciphertexts $c_i$ for which we know increasing numbers of most significant bytes, and which have a known multiplicative relationship to our original message $c_0$. 
+
+\subsection{Rotations in the general DROWN attack}
+\label{sec:general-rotations}
+After the first phase, we have learned an \sslconform ciphertext $c_1$, and we wish to shift known plaintext bytes from least to most significant bits.
+Since we learn the least significant 6 bytes of plaintext of $m_1$ from a successful oracle $\OracleSSLexp$ query, we could use a shift of $2^{-48}$ to transfer 48 bits of known plaintext to the most significant bits of a new ciphertext.  However, we perform a slight optimization here, to reduce the number of encryption attempts.  We instead use a shift of $2^{-40}$, so that the least significant byte of $m_1 \cdot 2^{-40}$ and $\tilde{m_1} \cdot 2^{-40}$ will be known.  This means that we can compute the least significant byte of $m_1 \cdot 2^{-40} \cdot s \bmod N$, so oracle queries now only require $2^{32}$ encryption attempts each. This brings the total expected number of encryption attempts for this phase to
+$2^{32} * 678 \approx 2^{41}$.
+
+We perform two such plaintext shifts in order to obtain an \sslconform message, $m_3$ that resides in a narrow interval of length at most $2^{8\ell-66}$. Then we can then obtain a multiplier $s_3$ such that $m_3 \cdot s_3$ is also \sslconform.
+Since $m_3$ lies in an interval of length is at most $2^{8\ell-66}$, with high probability for any $s_3 < 2^{30}$, $m_3 \cdot s_3$ lies in an interval whose length is at most $2^{8\ell-36} < B$, so we know the two most significant bytes of $m_3 \cdot s_3$.
+Furthermore, we know the exact value of the 6 least significant bytes even after multiplication.
+So we test possible values of $s_3$, and for values such that $m_3 \cdot s_3$ starts with the required 00 02 bytes, and the 6th least significant byte is zero, we query the oracle as to the validity of $c_3 \cdot s_3^e \bmod N$.
+The only condition for PKCS conformance which we haven't verified before querying the oracle is
+\[
+\forall i \in [3, \ell-6], (m_3 \cdot s_3)[i] \neq 0
+\]
+which holds with probability 0.37.
+So after roughly $1 / 0.37 = 2.72$ queries, we expect to get a positive answer from the oracle.
+
+Since we know the value of the 6 least significant bytes after multiplication, there's no component of breaking a symmetric cipher here - if the message is \sslconform after multiplication, we know the symmetric key, and can test whether it fits the received \texttt{ServerVerify} message.
+
+\subsection{General DROWN Bleichenbacher iterations}
+\label{sec:general-bleichenbacher}
+After we have bootstrapped the attack using rotations,, the original algorithm proposed by Bleichenbacher can be applied with minimal modifications.
+
+The original step obtains a message that starts with the required 00 02 bytes once in roughly every two queries on average, and requires the number of queries to be roughly double the number of bits in the RSA modulus.
+Since we know the value of the 6 least significant bytes after multiplying by any integer, we can only query the oracle for multipliers that cause the 6th least significant byte to be zero, and we don't need to break a symmetric key since we know the value of the 5 least significant bytes.
+However, we cannot ensure that the padding is non-zero when querying---we simply hope that is the case, which as usual happens with probability 0.37.
+
+Therefore, for a 2048-bit modulus, the overall expected number of queries for this phase is roughly $2048 * 2 / 0.37 = 11,000$. This is indeed the average number of queries we require in practice when running our implementation of the attack.
+
+\subsection{General DROWN attack performance}
+\label{sec:general-performance}
+
+For a given set of fractions, $F$,
+the required number of recorded client connections $A$ is a random variable distributed geometrically with a success probability $P = P_F$.
+For typical fraction sets, $1/13,000 < P_F < 1/600$.
+The required number of Bleichenbacher queries against the target server during the first step of the attack is a random variable, $B$, such that $B = |F| \cdot A$.
+As each query consists of two separate connections to the target server, the required number of connections is always  twice the number of queries.
+And last, the required keys to be tested overall is another random variable $C = k_F \cdot B; k_F \approx 2^{40}$.
+
+Summing the figures from the different phases for a 2048-bit RSA modulus, the attack requires in expectation $13,838 + 1,393 + 1,393 + 6 + 22,140 = 38,770$ connections to the target server, when optimizing for the number of queries in phase 1.  Each oracle query requires two connections to the server.
+
+Re-calculating the numbers for a 1024 bit modulus, the primary element that needs to change is $P_1 = P(\forall i \in [3, \ell-6]: m_i \neq 0) = (1 - 1/256)^{120} = 0.62$, which appears in phases 1, 2, 3 and 5. For phase 5, the number of queries is now in expectation $1024 * 2 / 0.62 = 3,303$. The total expected number of server connections is therefore $8,258 + 826 + 826 + 6 + 6,606 = 16,522$, again when optimizing for the number of queries in phase 1.
+
+Similarly, re-calculating the numbers for a 4096 bit modulus, $P_1 = (1 - 1/256)^{504} = 0.14$, and the number of queries in phase 5 is now roughly $4096 * 2 / 0.14 = 58,514$. The algorithm for phase 5 can be further optimized if that is the case of interest; we omit these optimizations for space reasons. Again, summing up yields $36,571 + 3,657 + 3,657 + 29 + 117,028 = 160,942$ required connections to the server.
+
+\balance
+
+\subsection{Special DROWN attack performance}
+\label{sec:special-performance}
+
+In the first step, we can use the same fraction analysis as before. The probability that the three padding bytes are correct remains unchanged. The probability that all the intermediate padding bytes are non-zero is now slightly higher, $P_1 = (1 - 1/256)^{229} = 0.41$, yielding an overall maximal success probability $P = 0.1 \cdot 0.41 \cdot \frac{1}{256} = 1/6,244$ per oracle query. Since we now only need to connect to the server once per oracle query, the expected number of connections in this step is the same, $6,243$. Phase~1 now yields a message with 3 known padding bytes and 24 known plaintext bytes.
+
+For the remaining rotation steps, each rotation requires an expected 630 oracle queries.  The attacker at this point could directly complete the original Bleichenbacher attack by performing 11,000 sequential queries in the final phase.  However, with this more powerful oracle it is more efficient for the attacker to apply a rotation 10 more times to recover the remaining bits of the plaintext. The number of queries required in this phase is now $10\cdot 256/0.41\approx 6,300$, and the queries for each of the 10 steps can be executed in parallel.
+
+\paragraph{Using multiple queries per fraction.}
+For the $\OracleSSLclear$ oracle, the attacker can increase his chances of success by querying the server multiple times per
+ciphertext and fraction, using different cipher suites with different key lengths. He can query DES and hope
+the 9th least significant byte is zero, then negotiate 128-bit RC4
+and hope the 17th least significant byte is zero, then negotiate
+3DES and hope the 25th least significant is zero. All three queries also require
+the intermediate padding bytes to be non-zero. This technique
+triples the success probability for a given pair of (ciphertext, fraction),
+at a cost of triple the queries. Its primary benefit is that fractions with smaller
+denominators (and thus higher probabilities of success) are now even more likely
+to succeed.
+
+For a random ciphertext, when choosing 70 fractions, the probability of the
+first zero delimiter byte being in one of these three positions is 0.01.
+% Nimrod: literally 0.01004702047755441
+Hence, the attacker can use only 100 recorded ciphertexts, and expect to use
+$100 * 70 * 3 = 21,000$ oracle queries. For the \tOracleSSLclear, each
+query requires one SSLv2 connection to the server.
+After obtaining the first positive response from the oracle, the attacker
+proceeds to phase 2 using 3DES.

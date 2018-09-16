@@ -1,0 +1,111 @@
+\label{sec:quic}
+An attacker can also use a Bleichenbacher-type attack to compute valid RSA signatures on arbitrary messages.  Mathematically, RSA signing and decryption are identical.  Such an attack could theoretically be used to forge a signed Server Key Exchange message for Diffie-Hellman cipher suites, thus allowing an attacker to perform a man-in-the-middle attack against all TLS versions up to TLSv1.3.~\cite{Jager:2015:STQ:2810103.2813657}  Since the server key exchange message includes the client and server randoms, the attacker must forge the signature online before the handshake times out. We are not able to use all of our optimizations for signature forgery, so such an attack does not seem feasible without additional improvements, even for special DROWN. %This is feasible with special DROWN but not with general DROWN\@.
+%Our \ssltwo attacks require too much computation for this to be feasible.
+
+\subsection{Extending the attack to QUIC}
+
+However, our attack can be extended to a feasible-time man-in-the-middle attack against QUIC~\cite{Jager:2015:STQ:2810103.2813657}.  QUIC~\cite{quic, langley2014quic} is a recent cryptographic protocol designed and implemented by Google that is intended to reduce the setup time to establish a secure connection while providing security guarantees analogous to TLS\@.  QUIC's security relies on a static ``server config'' message signed by the server's public key.  Jager et al.~\cite{Jager:2015:STQ:2810103.2813657} observe that an attacker who can forge a signature on a malicious QUIC server config once would be able to impersonate the server indefinitely.  In this section, we show an attacker with significant resources would be able to successfully mount such an attack against a server who exposed their RSA public keys via \ssltwo.
+
+A QUIC client receives a ``server config'' message enumerating connection parameters, a static elliptic curve Diffie-Hellman public value, and a validity period that is signed by the server's public key.  An attacker could generate a Diffie-Hellman public value for which he knows the private key, and set the expiration date far in the future in order to mount a man-in-the-middle attack against any client.
+
+\paragraph{Unauthenticated QUIC discovery.}
+In order to mount the attack, the attacker needs to present a forged QUIC config to the client.  This is straightforward, since QUIC discovery may happen over non-encrypted HTTP~\cite{QUICDiscovery}.  The server does not even need to support QUIC at all: an attacker could impersonate the attacked server over an unencrypted connection and falsely indicate that the server supports QUIC\@. The next time the client connects to the server, it will attempt to connect using QUIC, allowing the attacker to present the forged ``server config'' message and execute the attack.~\cite{Jager:2015:STQ:2810103.2813657}
+
+\paragraph{Signature forgery details.}
+The attack proceeds much as in Section~\ref{sec:adapted-bb-compact}, except that we are not able to use some of the optimizations so it is more expensive.  
+
+The first step is to discover a valid, PKCS conformant \ssltwo ciphertext.  In the case of TLS decryption, our input ciphertext was PKCS conformant to begin with; this is not the case for our QUIC message $c_0$.  
+Thus for the first phase, we iterate through possible multiplier values $s$ until the attacker randomly encounters a valid \ssltwo message in $c_0 \cdot s$. 
+For 2048-bit RSA keys, the probability of this random event is $P_{rnd} \approx 2^{-25}$; see Section~\ref{sec:adapted-bb-compact} for the computation.
+
+Once the first \sslconform message is found, the attacker proceeds with the signature forgery as he would in Step 2 of the attack against TLS\@. The required number of oracle queries for this step is roughly 12,468 for 2048-bit RSA keys.
+
+\paragraph{Attack cost.}
+The overall oracle query cost is dominated by the $2^{25} = 34$ million expected queries in the first phase, above.  At a rate of 388 queries/second, an attacker would finish in one day; at a rate of 12 queries/second an attacker would finish in one month.
+
+For the \ssltwo export padding oracle, the offline computation to break a 40-bit symmetric key for each query requires iterating over $2^{65}$ keys.
+At our optimized GPU implementation rate of 515 million keys per second, this would require 829,142 GPU days.
+Our experimental GPU hardware retails for \$400.  An investment of \$10 million to purchase 25,000 GPUs would reduce the wall clock time for the attack to 33 days.  Our implementation run on Amazon EC2 processed about 174 billion keys per \texttt{g2.2xlarge} instance-hour, so at a cost of \$0.09/instance-hour the full attack would cost \$9.5 million dollars and could be parallelized to Amazon's capacity.
+
+For the \tOracleSSLclear, there is only negligible computation per oracle query, so the computational cost for the first phase is $2^{25}$.
+
+\ifext
+\paragraph{Attack detectability.}
+\todo{A. Let's make it clear that Google and Wikipedia are not vulnerable.
+B. Not all queries require re-handshakes, so there will be likely an increase in server load that is proportionally higher than just increase in traffic.
+We'll address both points after the deadline.}
+
+A victim server might be expected to notice the large number of queries required to execute the attack.  However, our query complexity is dwarfed by the amount of traffic that large sites such as Google and Wikipedia receive daily.  
+Google is said to process 3.5 billion search queries a day.
+$2^{26}$ server connections performed over four days corresponds to about 1\% of this amount.
+Similarly, Wikipedia received 16 billion page views during January 2016~\cite{WikipediaStats}.
+An attacker who made $2^{26}$ connections over a period of twelve days would result in a 1\% increase in traffic.
+\fi
+
+\paragraph{Future changes to QUIC\@.}
+In addition to disabling QUIC support for non-whitelisted servers, Google have informed us that they plan to change the QUIC standard, so that the ``server config'' message will include a client nonce to prove freshness. They also plan to limit QUIC discovery to HTTPS.
+
+
+\subsection{SSLv2 servers with CA certificates} 
+Some web servers support \ssltwo while presenting a CA certificate,
+which can be used to issue further leaf certificates. In that case, an attacker
+could create his own certificate and use the vulnerable server to forge a CA
+signature over his certificate by executing an attack similar to the above.
+The number of queries is identical to the number of queries required for the
+attack against QUIC. This attack would allow the attacker to impersonate any
+website against any client trusting the CA certificate.
+
+% Nimrod: I wouldn't mention Zyxel, they might get angry and sue us
+We did not observe any trusted CA certificates used on vulnerable servers.
+We did, however, observe a number of routers that supported \ssltwo
+while presenting CA certificates that are untrusted by modern browsers.
+
+\if0
+\subsection{Attacking QUIC using the \tOracleSSLleaky}
+The primary obstacle in this attack is the task of "blinding",
+i.e. converting a non-\sslconform message $m$ into an \sslconform message $m'$.
+This task is made significantly less costly using the following approach,
+which the \tOracleSSLleaky enables.
+
+First, the attacker wishes to convert a ciphertext $c$, for which he assumes no knowledge,
+into a ciphertext $c'$ that decrypts to a correctly padded plaintext of any length.
+Indeed, a ciphertext will decrypt to such a plaintext if:
+\begin{equation*} 
+	\begin{split} 
+		m_1||m_2 \text{ } = &\text{ } \hex{00} || \hex{02}\\
+		\hex{00} \text{ } \not \in &\text{ } \{m_3, \ldots,m_{10}\}\\ 
+		\hex{00} \text{ } \in &\text{ } \{m_{11}, \ldots,m_{\ell}\}\\ 
+	\end{split}
+\end{equation*}
+
+For a 2048-bit RSA modulo, the probability of these properties holding for a random message is
+$P_{rnd} \approx (1/256)^2 * (255/256)^{8} * (1 - (255/256)^{246}) \approx 2^{-17}$.
+
+Therefore, in order to compute $c^d$, when $c$ is not \sslconform,
+the attacker randomly generates values for $s$ and tests
+$c \cdot s^{e}$ against the \tOracleSSLleaky.
+After roughly $2^{17} \approx 131,000$ queries, he obtains a positive response,
+and can deduce that $c^d \cdot s$ starts with bytes \hex{00}{02}.
+
+Na\"{\i}vely, it would seem the attacker can then apply one of the techniques
+presented in this work, but $\OracleSSLleaky$ does not provide knowledge of
+any least significant plaintext bytes when the plaintext is not of
+a length which is at most the correct one.
+Instead, he can then proceed directly according to the algorithm presented by
+Bardou \etal~\cite{bardou2012efficient}.
+Refering to Table 1 in~\cite{bardou2012efficient},
+this oracle is denoted with the term \texttt{FFT},
+as it returns a positive response for a correctly padded plaintext of any length,
+and the median number of required queries for this oracle is 14,501.
+This number of queries is dominated by the 131,000 queries the attacker has already executed.
+
+As for the cost of the attack, executing roughly 131,000 queries would require
+only three hours at a rate of 12 queries/second.
+The more costly requirement appears to be the offline work, which requires
+$ 2^{17} * 2^{40} = 2^{57}$ offline decryption operations.
+At our optimized GPU implementation rate of 515 million keys per second,
+this would require 3238 GPU days.
+Using 40 GPUs, as we did for the implementation run described in Section~\ref{sec:ec2_results}, would reduce the wall clock time for the attack to 81 days.
+This version of the attack against QUIC appears to bring the cost of the attack
+to within the means of even attackers with a modest budget.
+\fi

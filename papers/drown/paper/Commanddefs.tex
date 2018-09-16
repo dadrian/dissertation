@@ -1,0 +1,35 @@
+% General definitions and terms
+\newcommand{\PKCS}{PKCS\#1 v1.5\xspace}
+\newcommand{\PKCSconform}{\PKCS\ conformant\xspace}
+\newcommand{\sslconform}{SSLv2 conformant\xspace}
+\newcommand{\tlsconform}{TLS conformant\xspace}
+\newcommand{\Enc}{\mathsf{Enc}}
+\newcommand{\Dec}{\mathsf{Dec}}
+\newcommand{\OBleichenbacher}{\mathcal{O}_\textsf{BB}}
+\newcommand{\Oracle}{\mathcal{O}}
+\newcommand{\pms}{premaster secret\xspace}
+\newcommand{\ssltwo}{SSLv2\xspace}
+\newcommand{\sslthree}{SSLv3\xspace}
+\newcommand{\hashcomputation}{hash computation\xspace} % todo rename???
+
+% hex helpers
+\newcommand{\hexspace}{\hspace{0.06cm}}
+\newcommand{\hexhelp}[2]{#1\hexspace#2}
+\newcommand{\hexhelpb}[4]{\hexhelp{#1}{#2}\hexspace\hexhelp{#3}{#4}}
+\newcommand{\hex}[1]{{\tt 0x#1}}
+\newcommand{\hexb}[2]{{\tt 0x\hexhelp{#1}{#2}}}
+\newcommand{\hexc}[3]{{\tt 0x\hexhelp{#1}{#2}\hexspace#3}}
+\newcommand{\hexd}[4]{{\tt 0x\hexhelp{#1}{#2}\hexspace\hexhelp{#3}{#4}}}
+\newcommand{\hexh}[8]{{\tt 0x\hexhelpb{#1}{#2}{#3}{#4}\hexspace \hexhelpb{#5}{#6}{#7}{#8}}}
+
+% feel free to rename oracles 
+\newcommand{\OracleSSL}{\mathcal{O}_\textsf{SSLv2}}
+\newcommand{\OracleSSLexp}{\mathcal{O}_\textsf{SSLv2-export}}
+\newcommand{\OracleSSLclear}{\mathcal{O}_\textsf{SSLv2-extra-clear}}
+\newcommand{\OracleSSLleaky}{\mathcal{O}_\textsf{SSLv2-export-leaky}}
+
+\newcommand{\tOracleSSLexp}{SSLv2 export oracle\xspace}
+\newcommand{\tOracleSSLclear}{extra clear oracle\xspace}
+\newcommand{\tOracleSSLleaky}{Leaky export oracle\xspace}
+
+\newcommand{\pos}[1]{{[#1]}}

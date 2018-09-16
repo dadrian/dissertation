@@ -1,0 +1,153 @@
+In addition to the \tOracleSSLclear $\OracleSSLclear$ described in Section~\ref{sec:special},
+the same set of OpenSSL versions allow a different oracle,
+which we term \tOracleSSLleaky $\OracleSSLleaky$.
+This additional oracle is powerful in a different way than
+\tOracleSSLclear --- it still requires roughly $2^{40}$ offline computations
+per query, but it is more permissive when checking for conformant messages.
+
+\subsection{The OpenSSL \tOracleSSLleaky}
+In addition to the Extra clear implementation bug, these OpenSSL versions
+also contain a separate bug, where they do not follow the correct algorithm
+for their implementation of the Bleichenbacher countermeasure.
+
+We now describe this faulty implementation:
+\begin{itemize}
+	\item Observe the received buffer for the \texttt{ClientKeyExchange} message, $p$.
+	As per the \ssltwo standard, $p$ happens to contain the $mk_{clear}$
+	bytes immediately before the RSA ciphertext, $c$.
+	We slightly abuse notation and use $p$ to also refer to the buffer starting at the first
+	$mk_{clear}$ byte.
+
+	\item Decrypt $c$ in-place. If the decryption operation succeeds,
+	and $c$ decrypted to a plaintext of a correct padded length,
+	$p$ now contains the 11 $mk_{clear}$ bytes followed by the 5
+	$mk_{secret}$ bytes.
+
+	\item If $c$ decrypted to an unpadded plaintext $k$ of incorrect length,
+	the decryption operation overwrites the first $j = min(|k|, 5)$ bytes
+	of $c$ with the first $j$ bytes of $k$.
+
+	\item If $c$ decrypted to a plaintext of an incorrect unpadded length,
+	or if $c$ is not \sslconform and the decryption operation failed,
+	randomize the first five bytes of $p$, which are \textit{the first
+	five bytes of $mk_{clear}$}.
+\end{itemize}
+
+This behavior allows the attacker to distinguish between three cases.
+Suppose the attacker sends 11 null bytes as $mk_{clear}$.
+Then these are the possible cases:
+\begin{enumerate}
+	\item $c$ decrypts to a correctly padded plaintext $k$ of the expected length, 5 bytes.
+		In this case, the \texttt{master\_key} becomes:
+		$$[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k_{[1]}\ k_{[2]}\ k_{[3]}\ k\pos{4}\ k\pos{5}]$$
+%   		$$ mk = \hex{00}^{\left[11\right]} || k $$
+%		where $|k| = 5$.
+	\item $c$ decrypts to a correctly padded plaintext $k$ of a wrong length.
+		Let $r$ be the five random bytes the server generated.
+		If $|k| > 5$,
+		then the vulnerable OpenSSL version constructs the following \texttt{master\_key}:
+		$$[r\pos{1}\ r\pos{2}\ r\pos{3}\ r\pos{4}\ r\pos{5}\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}\ k\pos{3}\ k\pos{4}\ k\pos{5}]$$
+		and if $|k| < 5$, using $|k| = 3$ as an example,
+		then the vulnerable OpenSSL version constructs the following \texttt{master\_key},
+
+		\todo{Change from example to a formal phrasing}
+
+		$$[r\pos{1}\ r\pos{2}\ r\pos{3}\ r\pos{4}\ r\pos{5}\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}\ k\pos{3}\ c\pos{4}\ c\pos{5}]$$
+
+		where $c\pos{1}, \ldots, c\pos{5}$ denote the first five bytes of the RSA ciphertext $c$.
+		\todo{Fix indentation}
+%		$$ mk = r || \hex{00}^{\left[6\right]} || k $$
+	\item $c$ is not \sslconform,
+		and hence the decryption operation failed. In this case, the \texttt{master\_key} becomes:
+		$$[r\pos{1}\ r\pos{2}\ r\pos{3}\ r\pos{4}\ r\pos{5}\ 00\ 00\ 00\ 00\ 00\ 00\ c\pos{1}\ c\pos{2}\ c\pos{3}\ c\pos{4}\ c\pos{5}]$$
+%		$$ mk = r || \hex{00}^{\left[6\right]} || c_{1..5} $$
+\end{enumerate}
+
+The attacker can detect case (3) by performing an exhaustive search over the $2^{40}$ possibilities for $r$,
+and checking whether any of the resulting values for the \texttt{master\_key} correctly 
+decrypts the observed \texttt{ServerVerify} message.
+If no $r$ value satisfies this property, then
+the decrypted plaintext $c^d$ starts with bytes \hexb{00}{02}.
+The attacker can then distinguish between cases (1) and (2) by 
+performing an exhaustive search over the five bytes of $k$,
+and checking whether any of the resulting values for $mk$ correctly 
+decrypts the observed \texttt{ServerVerify} message.
+
+In conclusion, $\OracleSSLleaky$ allows an attacker to obtain a valid oracle response
+for all ciphertexts which decrypt to a correctly-padded plaintext of \textit{any} length. This is in contrary to the previous oracles $\OracleSSLclear$ and $\OracleSSLexp$, which required the plaintext to be of a specific length.
+Each oracle query requires one \ssltwo connection to the server,
+and at most $2^{40}$ offline work.
+
+
+\subsection{Combining the two oracles}
+When combining the \tOracleSSLclear and \tOracleSSLleaky, a new technique
+presents itself.
+The attacker can now first test a \tlsconform ciphertext for divisors
+using the \tOracleSSLleaky,
+and then use only fractions for which the denominator divides the plaintext
+with both oracles.
+
+Using the \tOracleSSLleaky, the probability that a fraction $u/t$ will result
+in a positive response, is $P = P_0 * P_3$, where the formula for
+computing $P_0 = P((m \cdot u/t)[1,2] = 00||02)$ was provided in Section~\ref{sec:trimmers},
+and $P_3$ is, for a 2048-bit modulo:
+\begin{equation}
+\begin{aligned}
+P_3 = P(
+\hex{00} \text{ } \not \in \text{ } \{m_3, \ldots,m_{10}\} \wedge \\
+\hex{00} \text{ } \in \text{ } \{m_{11}, \ldots,m_{\ell}\}) \\
+ = (1 - 1/256)^{8} * (1 - (1 - 1/256)^{246}) = 0.60
+\end{aligned}
+\end{equation}
+
+Since $P_0$ is also non-negligible for small fractions, the overall probability of
+obtaining a positive response is now also non-negligible.
+
+\paragraph{Phase 1.}
+Our goal for this phase is to obtain a divisor $t$ as large as possible,
+such that $t|m$. We generate a list of small
+fractions, sorted descendingly by their probability of
+resulting in a positive response from $\OracleSSLleaky$. For a given ciphertext $c$, we then query with
+the 50 fractions in the list with the highest probability,
+until we obtain a first positive response for a fraction $u_0/t_0$.
+We can now deduce that $t_0|m$.
+We then generate a list of fractions $u/t$ where $t$ is a multiple of $t_0$, sort them again
+by success probability, and again query with the 50 most probable fractions, until a positive answer is obtained,
+or the list is exhausted.
+If a positive answer is obtained, we iteratively re-apply this process,
+until the list is exhausted, resulting in a final fraction $u^*/t^*$.
+
+\paragraph{Phase 2.}
+We then query with all fractions
+denominated by $t^*$, and hope the ciphertext decrypts to a plaintext of
+one of seven possible lengths: $\{2, 3, 4, 5, 8, 16, 24\}$.
+These lengths all result in knowledge of at least three least significant bytes,
+which allows us to use the shifting technique in order to continue the attack.
+Detecting plaintext lengths 8, 16 and 24 can be accomplished using three \tOracleSSLclear
+queries, as explained above.
+Detecting plaintext lengths 2, 3, 4 and 5 can be accomplishing by using a single
+\tOracleSSLleaky query, which requires at most $2^{40}$ offline computation.
+In fact, the optimization over the key search space described in
+Section~\ref{sec:trimmers} is applicable here and can slightly reduce the required computation.
+Therefore, by initiating four SSLv2 connections and performing at most $2^{40}$ offline
+work, the attacker can test for this much more probable property.
+
+In practice, choosing 50 fractions per iteration as described above,
+results in a success probability of 0.066 for a single ciphertext.
+Hence, the expected number of required ciphertexts is merely $1/0.066 = 15$.
+The expected number of fractions per ciphertext for phase 1 is 60, as in most cases, phase 1
+consists of just a few successful iterations.
+Since each fraction requires a single query to $\OracleSSLleaky$,
+the overall number of queries for this stage is
+$15 * 60 = 900$, and the required offline computation is at most
+$900 * 2^{40} \approx 2^{50}$, which is similar to General DROWN\@.
+The expected number of queries for phase 2 is 16.
+Each query consists of three queries to $\OracleSSLclear$, and one query
+to $\OracleSSLleaky$, which requires at most $2^{40}$ computation.
+therefore the attacker has to perform at most $2^{44}$ offline computation for phase 2.
+
+The attack can then continue in the same manner as the \tOracleSSLclear attack,
+using 6,300 queries. This brings the overall numer of queries to
+$ 900 + 16 * 4 + 6,300 = 7,264 $.
+The parameter choices presented above for this attack variant are not necessarily optimal.
+

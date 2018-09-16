@@ -1,0 +1,84 @@
+\label{sec:scans}
+
+\tabSpecialAll
+
+We performed Internet-wide scans to analyze the number of systems vulnerable to
+DROWN\@. A host is directly vulnerable to general DROWN if it supports \ssltwo.
+Similarly, a host is directly vulnerable to special DROWN if it supports
+\ssltwo and has the extra clear bug. These directly vulnerable hosts can be
+used as oracles to attack any other host with the same key. Hosts that do not
+support \ssltwo are still vulnerable to general or special DROWN if their RSA
+key pair is exposed by any general or special DROWN oracle, respectively. The
+oracles may be on an entirely different host or port.  Additionally, any host
+serving a browser-trusted certificate is vulnerable to a special DROWN
+man-in-the-middle if any name on the certificate appears on any other
+certificate containing a key that is exposed by a special DROWN oracle.
+
+We used ZMap~\cite{zmap13} to perform full IPv4 scans on eight different ports
+during late January and February 2016.  We examined port 443 (HTTPS), and
+common email ports 25 (SMTP with STARTTLS), 110 (POP3 with STARTTLS), 143 (IMAP
+with STARTTLS), 465 (SMTPS), 587 (SMTP with STARTTLS), 993 (IMAPS), and 995
+(POP3S).  For each open port, we attempted three complete handshakes: one
+normal handshake with the highest available SSL/TLS version; one \ssltwo
+handshake requesting an export RC2 cipher suite; and one \ssltwo handshake with
+a non-export cipher and sixteen bytes of plaintext key material sent during key
+exchange, which we used to detect if a host has the extra clear bug.
+
+We summarize our general DROWN results in Table~\ref{table:general}. The
+fraction of SSL/TLS hosts that directly supported \ssltwo varied substantially
+across ports. 28\% of SMTP servers on port 25 supported \ssltwo, likely due to
+the opportunistic encryption model for email transit. Since SMTP fails-open to
+plaintext, many servers are configured with support for the largest possible
+set of protocol versions and cipher suites, under the assumption that even bad
+or obsolete encryption is better than plaintext~\cite{better-crypto}. The other
+email ports ranged from 8\% for SMTPS to 20\% for POP3S and IMAPS. We found
+17\% of all HTTPS servers, and 10\% of those with a browser-trusted
+certificate, are directly vulnerable to General DROWN\@.
+
+\paragraph{Widespread public key reuse.}
+Reuse of RSA key material across hosts and certificates is widespread, as has
+been documented
+in~\cite{2016holz_analysis_tls-based_protocols_electronic_communication,DBLP:journals/corr/MayerZSH15}. In many
+cases this is benign: many organizations issue multiple TLS certificates for
+distinct domains (e.g.~one for each TLD) with the same public key; reusing the
+same key simplifies the use of SSL acceleration hardware and load balancing.
+However, there is also evidence that system administrators may not entirely
+understand the role of the public key in certificates. For example, in the wake
+of the Heartbleed vulnerability, a substantial fraction of compromised
+certificates were reissued with the same public
+key~\cite{Durumeric:2014:MH:2663716.2663755}.  
+
+There are many reasons why the same public key or certificate would be reused
+across different ports and services within an organization. For example a mail
+server that serves SMTP, POP3, and IMAP from the same daemon would likely share
+the same TLS configuration.  Additionally, an organization might choose to
+purchase a single wildcard TLS certificate, and use it on both web servers and
+mail servers. Public keys have also been observed to be widely shared across
+independent organizations due to default certificates and public keys that are
+shipped with networked devices and software, improperly configured virtual
+machine images, and random number generation flaws.
+
+The number of hosts vulnerable to DROWN rises significantly when we take RSA
+key reuse into account. For HTTPS, 17\% of hosts are vulnerable to general
+DROWN because they support both TLS and \ssltwo on the HTTPS port, but the
+number of vulnerable hosts rises to 33\% when considering RSA keys used by
+another service that is vulnerable to DROWN\@. Appendix~\ref{sec:pub_key_reuse}
+gives more detailed statistics on the reuse of RSA key material across hosts
+and ports.
+
+\paragraph{Special DROWN\@.}
+As shown in Table~\ref{table:special}, 9.1\,M HTTPS servers (26\%) are
+vulnerable to special DROWN, as are 2.5\,M HTTPS servers with browser-trusted
+certificates~(14\%). 66\% as many HTTPS hosts are vulnerable to special DROWN
+as to general DROWN\@ (70\% for browser-trusted servers). While there are 
+2.7\,M public keys that are vulnerable to general DROWN, we find 1.1\,M
+vulnerable to special DROWN (41\% as many). Vulnerability among Alexa Top Million
+domains is lower, with only 9\% of Alexa domains vulnerable (7\% for
+browser-trusted domains).
+
+Since special DROWN enables active man-in-the-middle attacks, any host serving
+a browser-trusted certificate with at least one name that appears on any
+certificate with a key exposed by a special DROWN oracle is vulnerable to a
+impersonation attacks. Extending our search to account for shared names, we
+find 3.8\,M~(22\%) of hosts with browser-trusted certificates are vulnerable to
+man-in-the-middle, as well as 19\% of the browser-trusted Alexa Top Million.

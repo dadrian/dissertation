@@ -1,0 +1,18 @@
+%\section{Brute Forcing Keys with Amazon EC2} 
+\label{sec:ec2-details}
+
+%Amazon Elastic Cloud Compute (EC2)~\cite{ec2} is a service that provides on-demand virtualized compute resources to customers. 
+%This is an affordable alternative to provisioning one's own local cluster.
+
+Amazon EC2 billing is based on the \textit{instance-hour}. An \textit{instance} represents a single virtualized machine and its associated cores, memory, and storage. For our experiments we used \texttt{g2} instances, which are equipped with high-performance NVIDIA GPUs, each with 1,536 CUDA cores. The two available models for this instance type are the \texttt{g2.2xlarge} and the \texttt{g2.8xlarge}, containing one and four GPUs, respectively.
+
+It is possible to request instances at a fixed on-demand rate, or bid on instances at the discounted spot instance rate. Spot instances may be terminated depending on demand, but the savings in cost are significant compared to the on-demand rate. 
+When we ran our experiments in January 2016, the on-demand rate for the \texttt{g2.2xlarge} model was \$0.65/hr and the rate for the \texttt{g2.8xlarge} model was \$2.65/hr, while the average spot rates we paid were \$0.09/hr and \$0.83/hr respectively.
+
+We used a cluster composed of 200 spot instances: 150 \texttt{g2.2xlarge} which contain one GPU and 50 \texttt{g2.8xlarge}, each containing four GPUs, spread across multiple availability zones within the US-East region.
+This distribution was determined by price: we were not able to launch more than 50 \texttt{g2.8xlarge} instances without a sharp spike in spot prices. We used the optimized Hashcat implementation on the same workload of key requests as the experiments run on the Hashcat servers.  We used Slurm~\cite{yoo2003slurm} to distribute jobs across compute nodes.
+
+The GPU breaking experiment completed successfully, with two minor caveats. First, the 150 \texttt{g2.2xlarge} nodes completed their workloads at the 6h26m mark, while the other 50 \texttt{g2.8xlarge} nodes did not finish until the 7h41m mark. More careful job distribution would ensure that all nodes completed at approximately the same time, reducing the overall runtime. Second, in this particular run, $7.2\%$ of the jobs that we expected to complete were terminated early due to overheating GPUs.  The attack was successful despite the failed jobs, so we did not rerun them. In a more carefully engineered implementation, the unfinished jobs could have been reallocated to the unused GPU capacity without increasing the overall runtime.
+
+The total cost of the experiment was \$440, and terminated in under 8 hours including startup and shutdown.
+

@@ -1,0 +1,41 @@
+\label{sec:gpu}
+
+\GPUTable
+
+The most computationally expensive part of our general DROWN attack is breaking the 40-bit symmetric key.  We wanted to find the platform that would have the best tradeoff of cost and speed for the attack, so we performed some preliminary experiments comparing performance of symmetric key breaking on CPUs, GPUs, and FPGAs.  These experiments used a na\"{\i}ve version of the attack using the OpenSSL implementation of MD5 and RC2.
+
+The CPU machine contained four Intel Xeon E7-4820 CPUs with a total of 32 cores (64 concurrent threads). The GPU system was equipped with a ZOTAC GeForce GTX TITAN and an Intel Xeon E5-1620 host CPU\@. The FPGA setup consisted of 64 Spartan-6 LX150 FPGAs.
+
+We benchmarked the performance of the CPU and GPU implementations over a large corpus of randomly generated keys, and then extrapolated to the full attack.
+For the FPGAs, we tested the functionality in simulation and estimated the actual runtime by theoretically filling the FPGA up to 90\% with the design, including communication.
+Table~\ref{perf_comparison} compares the three platforms.
+
+While the FPGA implementation was the fastest in our test setup, the speed-to-cost ratio of GPUs was the most promising. Therefore, we decided to focus on optimizing the attack on the GPU platform.
+We developed several optimizations:
+
+\paragraph{Generating key candidates on GPUs.} Our na\"{\i}ve implementation generated key candidates on the CPUs. For each \hashcomputation, a key candidate was transmitted to the GPU, and the GPU responded with the key validity. The bottleneck in this approach was the PCI-E Bus. Even newer boards with PCI-E 3.0 or even PCI-E 4.0 are too slow to handle the large amount of data required to keep the GPUs busy. We solved this problem by generating the key candidates directly on the GPUs.
+	
+\paragraph{Generating memory blocks of keys.}
+Our hash computation kernel had to access different candidate keys from the GPU memory. Accessing global memory is typically a slow operation and we needed to keep memory access as minimal as possible. Ideally we would be able to access the candidate keys on a register level or from a constant memory block, which is almost as fast as a register. However, there are not enough registers or constant memory available to store all the key values. 
+
+We decided to divide each key value into two parts $k_H$ and $k_L$, where $|k_H|=1$ byte and $|k_L|=4$ bytes. We stored all possible $2^8$ $k_H$ values in the constant read-only memory, and all possible $2^{32}$  $k_L$ values in the global memory. 
+Next we used an in-kernel loop. We loaded the latter 4 bytes from the slow global memory and stored it in registers. Inside the inner loop we iterated through our first byte $k_H$ by accessing the fast constant memory. The resulting key candidate was computed as $k=k_H||k_L$. 
+	
+\paragraph{Using 32-bit data types.}
+Although modern GPUs support several data types ranging in size from 8 to 64 bits, many instructions are designed for 32-bit data types. This fits the design of MD5 perfectly, because it uses 32-bit data types. RC2, however, uses both 8-bit and 16-bit data types, which are not suitable for 32-bit instruction sets. This forced us to rewrite the original RC2 algorithm to use 32-bit instructions.
+% to prevent casting from different datatypes which would typically involve a additional bitfield extraction call.
+	
+\paragraph{Avoiding loop branches.} Our kernel has to concatenate several inputs to generate the \texttt{server\_write\_key} needed for the encryption as described in Section~\ref{sec:ssl2}. Using loops to move this data generates branches because there is always an if() inside a for() loop. To avoid these branches, which always slow down a GPU implementation, we manually shifted the input bytes into the 32-bit registers for MD5. This was possible since the \hashcomputation inputs,
+$(mk_{clear} || mk_{secret} || ``0" || r_c || r_s)$,
+have constant length.
+
+\paragraph{Optimizing MD5 computation.} Our MD5 inputs have known input length and block structure, allowing us to use the so-called zero-based optimizations.  Given the known input length (49 bytes) and the fact that MD5 uses zero padding, in our case the MD5 input block included four 0x00 bytes. These \hex{00} bytes are read four times per MD5 computation which allowed us to drop in total 16 ADD operations per MD5 computation. In addition, we applied the Initial-step optimizations used in the Hashcat implementation~\cite{hashcat-talk}.
+
+\paragraph{Skipping the second encryption block.} The input of the brute-force computation is a 16-byte client challenge $r_c$ and the resulting ciphertext from the \texttt{ServerVerify} message which is computed with an RC2 cipher. As RC2 is an 8-byte block cipher the RC2 input is split into two blocks and two RC2 encryptions are performed. In our verification algorithm, we skipped the second decryption step as soon as we saw the key candidate does not decrypt the first plaintext block correctly. This resulted in a speedup of about a factor of 1.5.
+
+\paragraph{RC2 permutation table in constant memory.}
+The RC2 algorithm uses a 256-byte permutation table which is constant for all RC2 computations. Hence, this table is a good candidate to be put into the constant memory, which is nearly as fast as registers and makes it easy to address the table elements. When finally using the values, we copied them into the even faster shared memory. Although this copy operation has to be repeated, it still led to a speed up of approximately a factor of 2.
+
+\paragraph{RC2 key setup without keysize checks.}
+The key used for RC2 encryption is generated using MD5, thus the key size is always 128 bits. Therefore, we do not have to check for the input key size, and can simply skip the size verification branch completely.
+

@@ -1,0 +1,37 @@
+\label{sec:special}
+
+We discovered a vulnerability in recent
+(but not current) versions of the OpenSSL SSLv2 handshake code that
+creates a powerful Bleichenbacher oracle, and drastically reduces the amount
+of computation required to implement our attack.  
+The vulnerability, which has been designated CVE-2016-0703, was
+present in the OpenSSL codebase from at least the start of the repository,
+in 1998, until it was unknowingly fixed on March 4, 2015 by a
+patch~\cite{openssl-clear-patch} designed to correct an unrelated
+problem~\cite{CVE-2015-0293}.
+By adapting DROWN to
+exploit this special case, we can cut the number of connections
+required by more than 50\% and reduce the computational work to a negligible amount.
+
+%To distinguish the two, we call the attack developed so far
+%\emph{general} DROWN and refer to the variant that
+%exploits the OpenSSL bug as \emph{special} DROWN\@.  General DROWN is
+%a protocol-level attack that makes few assumptions about the SSLv2
+%server, other than that it allows export cipher handshakes.  Special
+%DROWN exploits a specific implementation bug, but it is highly practical.
+%It may be the first widespread Bleichenbacher vulnerability within reach of ``script-kiddies'' and other low-resource
+%attackers.
+
+%% This dramatic discovery came too late to fully incorporate into the
+%% body of our submission, so for now we confine the bulk of the
+%% discussion to this section.
+
+\input{sections/clear-vuln}
+
+\tabDrownAll
+
+\input{sections/clear-analysis}
+
+
+
+

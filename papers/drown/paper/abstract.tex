@@ -1,0 +1,32 @@
+We present DROWN, a novel cross-protocol attack that can decrypt
+passively collected TLS sessions from up-to-date clients
+by using a server supporting SSLv2 as a Bleichenbacher RSA
+padding oracle.  We present two versions of the attack.  The more
+general form exploits a combination of thus-far unnoticed protocol
+flaws in SSLv2 to develop a new and stronger variant of the
+Bleichenbacher attack.  A typical scenario requires the attacker to
+observe 1,000 TLS handshakes, then initiate 40,000 \ssltwo connections
+and perform $2^{50}$ offline work to decrypt a 2048-bit RSA TLS
+ciphertext.  (The victim client never initiates \ssltwo connections.)
+We implemented the attack and can decrypt a TLS 1.2
+handshake using 2048-bit RSA in under 8 hours using Amazon EC2, at a
+cost of \$440.  Using Internet-wide scans, we find that 33\% of all HTTPS servers and
+22\% of those with browser-trusted certificates are vulnerable to this
+protocol-level attack, due to widespread key and certificate reuse.
+
+For an even cheaper attack, we apply our new
+techniques together with a newly discovered vulnerability in OpenSSL that
+was present in releases from 1998 to early 2015.  
+Given an unpatched SSLv2 server to use as an oracle, we can
+decrypt a TLS ciphertext in one minute on a single CPU---fast
+enough to enable man-in-the-middle attacks against modern browsers.
+26\% of HTTPS servers are vulnerable to this attack.
+
+We further observe that the QUIC protocol is vulnerable to a variant
+of our attack that allows an attacker to impersonate a server
+indefinitely after performing as few as 
+%$2^{19}$ \ssltwo connections and $2^{57}$ offline work. %%% This is leaky so removing for the moment.
+$2^{25}$ \ssltwo connections and $2^{65}$ offline work.
+
+We conclude that \ssltwo is not only weak, but actively harmful to the TLS ecosystem.
+

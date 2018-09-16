@@ -1,0 +1,68 @@
+\vspace{-2pt}
+\subsection{Vulnerability measurements}
+
+We performed additional scans from the University of Michigan of the public
+IPv4 address space between February 16, 2016 and February 22, 2016, to measure
+vulnerability to special DROWN\@. 
+
+%% % Direct adaptation of David's raw numbers
+%% \begin{table}[ht!]
+%%   \newcommand{\sdrotate}[1]{\rotatebox[origin=l]{90}{#1}}
+%%   \newcommand{\sdTrue}{Yes}
+%%   \newcommand{\sdFalse}{No}
+%%   \centering\small
+%%   \begin{tabular}{rcccccc}
+%%     \toprule
+%%     \multicolumn{1}{c}{\sdrotate{IPv4 HTTPS hosts that \ldots}} & 
+%%     \sdrotate{Support SSLv2} &
+%%     \sdrotate{Allow SSLv2 export ciphers} &
+%%     \sdrotate{Have OpenSSL extra\_clear bug} &
+%%     \sdrotate{Support SSLv3 or later} &
+%%     \sdrotate{Have browser-trusted certificates} &
+%%     \sdrotate{Use keys vulnerable to Special DROWN\ } \\
+%%     \midrule
+%%     9919486 & \sdFalse & \sdFalse & \sdFalse & \sdTrue & \sdFalse & \sdFalse \\
+%%     4840401 & \sdFalse & \sdFalse & \sdFalse & \sdTrue & \sdFalse & \sdTrue \\
+%%     13040553 & \sdFalse & \sdFalse & \sdFalse & \sdTrue & \sdTrue & \sdFalse \\
+%%     1405843 & \sdFalse & \sdFalse & \sdFalse & \sdTrue & \sdTrue & \sdTrue \\
+%%     53996 & \sdTrue & \sdFalse & \sdFalse & \sdFalse & \sdFalse & \sdFalse \\
+%%     534873 & \sdTrue & \sdFalse & \sdFalse & \sdTrue & \sdFalse & \sdFalse \\
+%%     5403 & \sdTrue & \sdFalse & \sdFalse & \sdTrue & \sdFalse & \sdTrue \\
+%%     638334 & \sdTrue & \sdFalse & \sdFalse & \sdTrue & \sdTrue & \sdFalse \\
+%%     12933 & \sdTrue & \sdFalse & \sdFalse & \sdTrue & \sdTrue & \sdTrue \\
+%%     160 & \sdTrue & \sdFalse & \sdTrue & \sdFalse & \sdFalse & \sdFalse \\
+%%     7 & \sdTrue & \sdFalse & \sdTrue & \sdTrue & \sdFalse & \sdFalse \\
+%%     4591 & \sdTrue & \sdFalse & \sdTrue & \sdTrue & \sdFalse & \sdTrue \\
+%%     5 & \sdTrue & \sdFalse & \sdTrue & \sdTrue & \sdTrue & \sdFalse \\
+%%     588 & \sdTrue & \sdFalse & \sdTrue & \sdTrue & \sdTrue & \sdTrue \\
+%%     21212 & \sdTrue & \sdTrue & \sdFalse & \sdFalse & \sdFalse & \sdFalse \\
+%%     466319 & \sdTrue & \sdTrue & \sdFalse & \sdTrue & \sdFalse & \sdFalse \\
+%%     32515 & \sdTrue & \sdTrue & \sdFalse & \sdTrue & \sdFalse & \sdTrue \\
+%%     325878 & \sdTrue & \sdTrue & \sdFalse & \sdTrue & \sdTrue & \sdFalse \\
+%%     80985 & \sdTrue & \sdTrue & \sdFalse & \sdTrue & \sdTrue & \sdTrue \\
+%%     51266 & \sdTrue & \sdTrue & \sdTrue & \sdFalse & \sdFalse & \sdFalse \\
+%%     123 & \sdTrue & \sdTrue & \sdTrue & \sdTrue & \sdFalse & \sdFalse \\
+%%     3138719 & \sdTrue & \sdTrue & \sdTrue & \sdTrue & \sdFalse & \sdTrue \\
+%%     74 & \sdTrue & \sdTrue & \sdTrue & \sdTrue & \sdTrue & \sdFalse \\
+%%     834207 & \sdTrue & \sdTrue & \sdTrue & \sdTrue & \sdTrue & \sdTrue \\
+%%     \bottomrule
+%%   \end{tabular}
+%%   \caption{Scan results indicate widespread vulnerability to the
+%%     Special DROWN attack.}
+%% \end{table}
+
+As shown in Table~\ref{table:special}, 9.1\,M HTTPS servers (26\%) are
+vulnerable to special DROWN, as are 2.5\,M HTTPS servers with browser-trusted
+certificates~(14\%). 66\% as many HTTPS hosts are vulnerable to special DROWN
+as to general DROWN\@ (70\% for browser-trusted servers). While there are
+2,704,201 public keys that are vulnerable to general DROWN, we found 1,133,906
+vulnerable to special DROWN (41\% as many). Vulnerability among Alexa 1M domains is lower, with only 9\% of Alexa domains vulnerable (7\% for browser-trusted domains).
+
+Since special DROWN enables active man-in-the-middle attacks, any host serving
+a browser-trusted certificate with at least one name that appears on any
+certificate with a key exposed by a special DROWN oracle is vulnerable to a
+man-in-the-middle attack. Extending our search to account for shared names, we find
+3.8\,M~(22\%) of hosts with browser-trusted certificates are vulnerable to
+man-in-the-middle, as well as 19\% of browser-trusted Alexa 1M.
+
+

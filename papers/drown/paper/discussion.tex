@@ -1,0 +1,78 @@
+\subsection{Lessons for protocol design}
+A natural question is to ask whether SSLv3 or later versions of TLS could also be vulnerable.
+Our attack exploits two properties of the \ssltwo protocol:
+
+\paragraph{Server authenticates first.} 
+First, the fact that in \ssltwo the server responds to the \texttt{ClientMasterKey} message before the client proves it has knowledge of the RSA plaintext, provides a direct message side channel. In SSLv3 and later, the client must demonstrate knowledge of the RSA plaintext first via a valid \texttt{ClientFinished} message before the server sends a message derived from the RSA plaintext.  In order to perform a similar attack in this case, the client would need to perform an online brute-force attack\ifext, significantly increasing the workload\fi.
+
+\ifext
+We characterize this behavior of \ssltwo as a protocol vulnerability and not an implementation vulnerability, although this behavior is not rigorously determined by the standard itself.  The standard's presentation of message ordering is contradictory: the prose states that the \texttt{ServerVerify} message is sent immediately after the server receives the \texttt{ClientMasterKey} message, while the diagrams in Section 5.2, "Typical Protocol Message Flow", depict the server waiting for \texttt{ClientFinished} message before sending its own \texttt{ServerVerify}.  The three widely-used implementations of the protocol that we examined, OpenSSL, Microsoft IIS, and NSS, all took the former interpretation, and responded immediately with a \texttt{ServerVerify} message after the \texttt{ClientMasterKey}, rendering them vulnerable in this respect. \fi
+
+\paragraph{Short secrets.} Second, \ssltwo allows RSA plaintexts that are short enough to be vulnerable to a feasible-time brute force search.  For export ciphers, the unpadded RSA plaintext is five bytes long.  In SSLv3 and later versions of TLS, the RSA plaintexts and \pms length is 48 bytes, even for export ciphers with 40-bit strength.  For later protocol versions, an attacker can perform a brute-force search over the derived 40-bit key if a client negotiates an export cipher suite, but the 48-byte \pms length appears to prevent an attacker from escalating the weakness of the export cipher strength into a similar protocol vulnerability.
+
+\subsection{Implications for modern protocols}
+Modern TLS versions are not vulnerable to the precise attack given in this paper, but they have similar properties that might allow a related \ifext direct message side-channel Bleichenbacher \fi attack.  \ifext We are unaware of a modern cryptographic protocol susceptible to such an attack, but modern protocols do exhibit properties that when combined, would render a protocol susceptible to such an attack. \fi
+
+Although we do not present concrete attacks on modern protocols, we argue that modern practices of cryptographic protocol design do not include a systematic analysis to prevent direct message side channel Bleichenbacher attacks.  A hypothesized protocol with modern parameters would be vulnerable to such an attack if it has the following properties:
+
+\begin{enumerate}
+	\item RSA key exchange. TLS 1.2~\cite{rfc5246} allows this.
+	\item It allows re-use of server-side nonce by the client. QUIC~\cite{langley2014quic} allows this.
+	\item The server sends the first message encrypted using a key derived from the asymmetric key exchange. QUIC, TLS 1.3~\cite{TLS1_3}, and TLS False Start~\cite{FalseStart} exhibit this property.
+\end{enumerate}
+
+When all three properties are combined, a natural adaptation of our attack presents itself.
+The attacker obtains a Bleichenbacher oracle by connecting to the server twice with the same RSA ciphertext and the same server-side nonce, and comparing the messages sent by the server.
+If the RSA ciphertext is PKCS conformant, the two messages will be identical.
+Otherwise, they will differ.
+Note that we also assumed that all symmetric cipher parameters, including IVs for block ciphers, are deterministically generated from the \pms and nonces; this is the case for TLS 1.0.
+If that is not the case, in most realistic configurations, the attacker can choose a stream cipher.
+\looseness=-1
+
+\ifext
+
+% NA: I'm pretty sure the following argument is wrong, after discussing this with Juraj.
+% Basically, even if the attacker correctly guesses the encryption and MAC keys,
+% he needs to also guess the *contents* of the ClientFinished message.
+% The length of this content is independent of the chosen MAC and cipher, and is usually unfeasibly long to guess.
+%
+% Even if the third property above does not hold, an attacker may reduce the session strength to the weakest symmetric cipher plus the weakest MAC supported by the server.
+% The attacker proceeds as follows:
+% \begin{itemize}
+%	\item Choose arbitrary server and client nonces, $r_s$ and $r_c$\ifext, which will be used throughout the attack\fi.
+	%\item Connect to the server with $c$ as the RSA ciphertext, $r_s$ and $r_c$ as the nonces, and choose the symmetric cipher and MAC with the smallest key size out of those supported. Denote these key sizes $L_1$ and $L_2$ respectively.
+%	\item Generate random symmetric encryption and MAC keys of these sizes, denoted by $k_1$ and $k_2$ respectively, and hope they are identical to the correct keys computed by the server.  The probability that both $k_1$ and $k_2$ are identical to the correct keys is $2^{-(L_1 + L_2)}$.
+%	\item Send a \texttt{Finished} message encrypted and MACed using $k_1$ and $k_2$.
+%	If the RSA ciphertext was valid, the same keys $k_1$ and $k_2$ will produce two identical \texttt{ServerFinished} messages in two TLS handshakes. Otherwise, the two \texttt{ServerFinished} message will be invalid.
+%\end{itemize}
+
+XML Encryption in Web Services~\cite{Jager2012} was vulnerable to such an attack: Web Service message exchanges are static, so the server does not generate a nonce.
+\fi
+
+An attacker can use False Start to cause a victim client to perform TLS handshakes using RSA for key exchange\ifext, and send secret application layer data after these handshakes\fi, even if the server supports other key exchange methods which provide Perfect Forward Secrecy. The attacker masquerades as the server and indicates support for RSA key exchange only. The client will then handshake using RSA, and send application layer data, before the server authenticates by sending the \texttt{Finished} message. The False Start standard indeed discourages the use of RSA as the key exchange method, but does not explicitly forbid it, leaving the security of the protocol dependent on correct choices in the client configuration. Our attacks show that relying on such assumptions is extremely brittle protocol design.
+
+\subsection{Lessons for key reuse}
+
+Our attacks also illustrate another important cryptographic principle: that keys should be single use.  For public keys we think of this principle as applying primarily to keys that are used to both sign and decrypt, but our attacks illustrate that using keys \emph{for different protocol versions} can also be a serious security risk.  Unfortunately, the TLS certificate authority funding model produces a financial incentive for users to purchase as few certificates as necessary to protect their infrastructure.  However, even without this financial incentive in place, the sheer number of SSL/TLS protocol versions in use would make key management difficult.
+
+\subsection{Harms from obsolete cryptography}
+
+Recent years have seen a significant number of serious attacks exploiting outdated and obsolete cryptography.  Many of these protocols and cryptographic primitives are surprisingly common in deployed systems even decades after they were demonstrated to be weak.
+
+
+% BEAST Lucky13 TLS truncation
+
+The attack described in this paper exploits a modification of an 18-year-old attack against a combination of protocols and ciphers that have long been superseded by better options: the \ssltwo protocol, export cipher suites, and PKCS \#1 v1.5 RSA padding.  In fact, support for RSA as a key exchange method, including the use of PKCS \#1 v1.5, is mandatory even for TLS 1.2. The attack is made more severe by implementation flaws in rarely-used code.
+
+Our work serves as yet another reminder of the importance of removing deprecated technologies before they become exploitable vulnerabilities.  In response to many of the vulnerabilities listed above, browser vendors have been aggressively warning end users when TLS connections are negotiated with unsafe cryptographic parameters, including SHA-1 certificates, small RSA and Diffie-Hellman parameters, and SSLv3 connections.  This process is currently happening in a piecemeal fashion, primitive by primitive.  Vendors and developers rightly prioritize usability and backward compatibility, and are willing to sacrifice these only for practical attacks.  This standard works less well for cryptographic vulnerabilities, where the first sign of a weakness, while far from being practically exploitable, can signal trouble in the future.
+Communication issues between academic researchers and vendors and developers have been voiced by many in the community, including Green~\cite{green2015secure} and Jager et~al.\@~\cite{jager2013one}.
+
+The long-term solution is to proactively remove these obsolete technologies.  There has been a movement towards this already: TLS 1.3 has removed RSA key exchange entirely and has restricted Diffie-Hellman key exchange to a few groups large enough to withstand cryptanalytic attacks long in the future.  The CA/Browser forum will remove support for SHA-1 certificates this year.  And resources such as the SSL Labs SSL Reports have gathered information about best practices and vulnerabilities in one place, in order to encourage administrators to make the best choices.
+
+\subsection{Harms from deliberately weakening cryptography}
+
+Export-grade cipher suites for TLS deliberately weakened three primitives to the point that they are broken even to enthusiastic amateurs today: 512-bit RSA key exchange, 512-bit Diffie-Hellman key exchange, and 40-bit symmetric encryption.
+All three deliberately-weakened primitives have been cornerstones of high-profile attacks: FREAK attack against export RSA, Logjam against Diffie-Hellman, and our DROWN attack against export-grade symmetric cryptography.
+
+Our results illustrate, like FREAK and Logjam, the continued harm that a legacy of deliberately weakened export-grade cryptography inflicts on the security of modern systems, even decades after the regulations influencing the original design were lifted.  The attacks described in this paper are fully feasible against export cipher suites today; against even DES they would be at the limits of the computational power available to an attacker.  The technical debt induced by cryptographic ``front doors'' has left implementations vulnerable for decades.  Together with the slow rate at which obsolete protocols and primitives entirely disappear, we can expect some fraction of hosts to continue to be vulnerable for years to come.
+

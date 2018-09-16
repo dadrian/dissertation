@@ -1,0 +1,115 @@
+\newcommand{\DrownPaper}{papers/drown/paper}
+\newcommand{\DrownFigures}{papers/drown/figures}
+
+\input{\DrownFigures/figs}
+
+\section*{Abstract}
+\input{\DrownPaper/abstract}
+
+\section{Introduction}
+\input{\DrownPaper/intro}
+
+\section{Background}
+\input{\DrownPaper/background}
+
+\section{Breaking TLS with SSLv2}
+\input{\DrownPaper/attack}
+
+\subsection{Implementing general DROWN with GPUs} 
+\input{\DrownPaper/results}
+
+\section{Special DROWN}
+\input{\DrownPaper/clear}
+
+\section{Measurements}
+\input{\DrownPaper/statistics}
+
+\section{Signature forgery attacks and QUIC}
+\input{\DrownPaper/quic}
+
+\section{Related work}
+\input{\DrownPaper/related}
+
+\section{Discussion}
+\input{\DrownPaper/discussion}
+
+%\section*{Acknowledgements}
+%
+%The authors thank team Hashcat for making their GPUs available for the execution of the attack,
+%Ralph Holz for providing early scan data, Adam Langley for insights about QUIC, Graham Steel for insights about TLS False Start, the OpenSSL team for their help with disclosure, Ivan Ristic for comments on session resumption in a BEAST-styled attack, and Tibor Jager and Christian Mainka for further helpful comments. %The authors also would like to thank Sarah Madden for DROWN logo and web site design and Christian Dresen for additional website development.
+%
+%This material is based upon work supported by the U.S. National Science Foundation under Grants No.\@ CNS-1345254, CNS-1408734, CNS-1409505, CNS-1505799, CNS-1513671, and CNS-1518888, an AWS Research Education grant, a scholarship from the Israeli Ministry of Science, Technology and Space, a grant from the Blavatnik Interdisciplinary Cyber Research Center (ICRC) at Tel Aviv University, a gift from Cisco, and an Alfred P. Sloan Foundation research fellowship.
+%Any opinions, findings, and conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the U.S. National Science Foundation. % Required by NSF until we've completed peer review
+
+\appendix
+\section{Public key reuse}
+\label{sec:pub_key_reuse}
+
+Reuse of RSA keys among different services was identified as a huge
+amplification to the number of services vulnerable to DROWN\@.
+Table~\ref{amount_shared_keys} describes the number of reused RSA keys among
+different protocols. The two clusters 110-143 and 993-995 stick out as they
+share the majority of public keys. This is expected, as most of these ports
+are served by the same IMAP/POP3 daemon. The rest of the ports also share a
+substantial fraction of public keys, usually between 21\% and 87\%. The
+numbers for HTTPS (port 443) differ as there are four times as many public
+keys in HTTPS as in the second largest protocol.
+
+\begin{table*}[th]
+\centering\footnotesize
+ \begin{tabular}{rrrrrrrrr} 
+\toprule
+
+\textbf{Port} & \textbf{25 (SMTP)} & \textbf{110 (POP3)} & \textbf{143 (IMAP)} & \textbf{443 (HTTPS)} & \textbf{465 (SMTPS)} & \textbf{587 (SMTP)} & \textbf{993 (IMAPS)} & \textbf{995 (POP3S)}\smallskip\\
+\textbf{ 25} &  1,115 (100\%) &           331 (32\%) &       318 (32\%) &       196 (4\%) &        403 (47\%) &       307 (48\%) &       369 (33\%) &       321 (32\%) \\
+\textbf{110} &    331 (30\%) &         1,044 (100\%) &      795 (79\%) &       152 (3\%) &        337 (39\%) &       222 (35\%) &       819 (72\%) &       877 (87\%) \\
+\textbf{143} &    318 (29\%) &           795 (76\%) &     1,003 (100\%) &      149 (3\%) &        321 (38\%) &       220 (35\%) &       878 (78\%) &       755 (75\%) \\
+\textbf{443} &    196 (18\%) &           152 (15\%) &       149 (15\%) &     4,579 (100\%) &      129 (15\%) &        94 (15\%) &       175 (16\%) &       151 (15\%) \\
+\textbf{465} &    403 (36\%) &           337 (32\%) &       321 (32\%) &       129 (3\%) &        857 (100\%) &      463 (73\%) &       396 (35\%) &       364 (36\%) \\
+\textbf{587} &    307 (28\%) &           222 (21\%) &       220 (22\%) &        94 (2\%) &        463 (54\%) &       637 (100\%) &      259 (23\%) &       229 (23\%) \\
+\textbf{993} &    369 (33\%) &           819 (78\%) &       878 (88\%) &       175 (4\%) &        396 (46\%) &       259 (41\%) &     1,131 (100\%) &      859 (85\%) \\
+\textbf{995} &    321 (29\%) &           877 (84\%) &       755 (75\%) &       151 (3\%) &        364 (42\%) &       229 (36\%) &       859 (76\%) &     1,010 (100\%) \\
+
+\bottomrule
+ \end{tabular}
+ \caption{\textbf{Impact of key reuse across ports.} Number of shared public keys among two ports, in thousands.
+          Each column states what number and percentage of keys from the port in the header row are used on other ports.
+          For example, 18\% of keys used on port 25 are also used on port 443, but only 4\% of keys used on port 443 are also used on port 25. }
+ \label{amount_shared_keys}
+\end{table*}
+
+% \begin{figure*}[th]
+% \small
+%  \begin{tabular}{r|rr|rr} 
+% \toprule
+% \textbf{Port} & \textbf{DROWN}      & \textbf{\dots with Trusted} & \textbf{CVE-2015-3197} & \textbf{\dots with Trusted} \\
+%               & \textbf{Handshakes} & \textbf{Certificate}        &                        & \textbf{Certificate}\\
+% \midrule
+%    25 &    910,585  &   178,726 (20\%) &   256,436 (28\%) &  69,131 (8\%)\\ 
+%   110 &    399,105  &   229,727 (58\%) &   308,724 (77\%) & 190,631 (48\%)\\
+%   143 &    469,029  &   222,431 (47\%) &   400,646 (85\%) & 199,877 (43\%)\\
+%   443 &  5,652,105  & 1,726,373 (31\%) & 1,356,030 (24\%) & 364,134 (6\%)\\
+% Alexa &  tba (xx\%) & tba (xx\%)      &   tba     (xx\%) & tba (xx\%)\\
+%   465 &    287,431  &    38,831 (14\%) &   176,419 (61\%) &  22,117 (8\%)\\
+%   587 &    407,591  &   122,628 (30\%) &   179,048 (44\%) &  59,703 (15\%)\\
+%   993 &    846,005  &   258,192 (31\%) &   652,485 (77\%) & 235,895 (28\%)\\
+%   995 &    878,553  &   302,775 (35\%) &   664,364 (76\%) & 258,710 (30\%)\\
+% \bottomrule
+%  \end{tabular}
+%  \label{amount_cve_2015_3197}
+%  \caption{\textbf{Hosts vulnerable to OpenSSL's cipher suite selection bug (CVE 2015-3197)}}
+% \end{figure*}
+
+\section{Adaptations to Bleichenbacher's attack}
+\input{\DrownPaper/adapting-bleichenbacher}
+
+\balance
+
+\section{Highly optimized GPU implementation}
+\input{\DrownPaper/gpu}
+
+\section{Amazon EC2 evaluation}
+\input{\DrownPaper/ec2}
+
+\section{A brief history of obsolete cryptography}
+\input{\DrownPaper/rant}
