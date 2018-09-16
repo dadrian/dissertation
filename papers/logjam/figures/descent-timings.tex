@@ -1,0 +1,27 @@
+\documentclass[10pt]{standalone}
+\usepackage{mathptmx}
+\usepackage{pgfplots}
+\usepackage{standalone}
+\pgfplotsset{compat=newest}
+
+\pgfplotsset{
+%    width=6.5in,
+width=3in,
+    height=2in,
+    every axis legend/.append style={nodes={right}}
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+\begin{axis}[
+xmax=190,
+xtick={30,60,90,120,150,180},
+tick align=center,
+]
+
+\addplot [hist={data=x,bins=100},blue!80!black,fill=blue!70!white,fill opacity=0.7] file [x] {descent-timings.dat};
+\end{axis}
+\end{tikzpicture}
+
+\end{document}

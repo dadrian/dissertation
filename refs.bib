@@ -1,5 +1,14 @@
 % ARTICLES
 
+@Article{discrete-log-nfs-1993,
+  title = {Discrete Logarithms in {$\mathrm{GF}(p)$} Using the Number Field Sieve},
+  author = {Gordon, Daniel M},
+  journal = {SIAM J. Discrete Math.},
+  volume = {6},
+  number = {1},
+  year = {1993},
+}
+
 @Article{patricia,
   title={{PATRICIA} --- practical algorithm to retrieve information coded in alphanumeric},
   author={Morrison, Donald R},
@@ -27,25 +36,85 @@
     note = {\url{http://www.zdnet.com/blog/networking/here-comes-the-100gige-internet/334}}
 }
 
+@Article{nfs-prime-field-2003,
+  title = {Improvements to the general number field sieve for discrete logarithms 
+           in prime fields. {A} comparison with the {G}aussian integer method},
+  author = {Joux, Antoine and Lercier, Reynald},
+  journal = {Math. Comp.},
+  volume = {72},
+  number = {242},
+  pages = {953--967},
+  publisher = {AMS},
+  year = 2003
+}
+
+@Article{virtual-logarithms-2005,
+  title = {Virtual logarithms},
+  author = {Schirokauer, Oliver},
+  journal = {J. Algorithms},
+  volume = {57},
+  number = {2},
+  pages = {140--147},
+  publisher = {Elsevier},
+  year = 2005
+}
+
 % BOOKS
+
+@Book{nfs-1993,
+  title = {The Development of the {N}umber {F}ield {S}ieve},
+  editor = {A. K. Lenstra and H. W. {Lenstra, Jr.}},
+  publisher = {Springer},
+  year = 1993
+}
 
 @Book{nmap,
  author = {Lyon, Gordon Fyodor},
  title = {Nmap Network Scanning: The Official Nmap Project Guide to Network Discovery and Security Scanning},
- year = {2009},
  publisher = {Insecure},
  address = {USA},
+ year = 2009
+}
+
+@Book{primes-computation-2001,
+  title = {Prime Numbers: A Computational Perspective},
+  author = {Crandall, Richard and Pomerance, Carl B.},
+  publisher = {Springer},
+  year = 2001
 }
 
 % PROCEEDINGS
 
 @InProceedings{heartbleed-2014,
-    author = {Zakir Durumeric and Frank Li and James Kasten and Johanna Amann and Jethro Beekman and Mathias Payer and Nicolas Weaver and David Adrian and Vern Paxson and Michael Bailey and J. Alex Halderman},
-    title = {The {M}atter of {H}eartbleed},
-    booktitle = {Proc.\ 14th ACM {I}nternet Measurement Conference ({IMC})},
-    month = nov,
-    year = 2014
+  author = {Zakir Durumeric and Frank Li and James Kasten and Johanna Amann and Jethro Beekman and Mathias Payer and Nicolas Weaver and David Adrian and Vern Paxson and Michael Bailey and J. Alex Halderman},
+  title = {The {M}atter of {H}eartbleed},
+  booktitle = {Proc.\ 14th ACM {I}nternet Measurement Conference ({IMC})},
+  month = nov,
+  year = 2014
 }
+
+@InProceedings{heuristic-discrete-log-2014,
+  title = {A heuristic quasi-polynomial algorithm for discrete logarithm in finite fields of small characteristic},
+  author = {Barbulescu, Razvan and Gaudry, Pierrick and Joux, Antoine and Thom{\'e}, Emmanuel},
+  booktitle = {Eurocrypt},
+  year = 2014
+}
+
+@InProceedings{ike-nrl-1999, 
+  author = {Meadows, C.}, 
+  booktitle = {IEEE Symposium on Security and Privacy}, 
+  title = {Analysis of the {I}nternet Key Exchange protocol using the {NRL} Protocol Analyzer}, 
+  year = 1999 
+}
+
+@InProceedings{ike-security-2002,
+  author = {Ran Canetti and Hugo Krawczyk},
+  title = {Security Analysis of {IKE}'s Signature-based Key-Exchange Protocol},
+  booktitle = {Crypto},
+  year = {2002}
+}
+
+
 
 @InProceedings{multi-core-network-2010,
   title = {High speed network traffic analysis with commodity multi-core systems},
@@ -71,12 +140,26 @@
     year = 2010
 }
 
+@InProceedings{ssl-v3-1996,
+  title = {Analysis of the {SSL 3.0} Protocol},
+  author = {David Wagner and Bruce Schneier},
+  booktitle = {2nd Usenix Workshop on Electronic Commerce},
+  year = 1996
+}
+
 @InProceedings{state-of-scanning-2014,
     author = {Zakir Durumeric and Michael Bailey and J. Alex Halderman},
     title = {An {I}nternet-wide View of {I}nternet-wide Scanning},
     booktitle = {Proc.\ 23rd {USENIX} Security Symposium},
     month = aug,
     year = 2014
+}
+
+@InProceedings{trapdoors-discrete-log-1992,
+  title = {Designing and detecting trapdoors for discrete log cryptosystems},
+  author = {Gordon, Daniel M},
+  booktitle = {Crypto},
+  year = 1992,
 }
 
 @InProceedings{weak-keys-12,
@@ -167,4 +250,31 @@
     title={Unicornscan},
     author={Lee, Robert E.},
     note = {\url{http://unicornscan.org}}
+}
+
+@misc{smooth-parts-djb-2004,
+  title = {How to find smooth parts of integers},
+  author = {Daniel J. Bernstein},
+  note = {\url{http://cr.yp.to/factorization/smoothparts-20040510.pdf}},
+  year = 2004
+}
+
+@misc{gmp-ecm-zimmerman-2012,
+  title = {{GMP-ECM}},
+  author = {Zimmermann, P. and others},
+  note = {\url{https://gforge.inria.fr/projects/ecm}},
+  year = 2012
+}
+
+@Misc{fips186,
+  title = {{FIPS PUB 186-4}: Digital Signature Standard},
+  author= {{NIST}},
+  doi = {10.6028/NIST.FIPS.186-4},
+  year = 2013
+}
+
+@Misc{fips180,
+  title = {{FIPS PUB 180-4}: Secure Hash Standard ({SHS})},
+  author = {{National Institute of Standards and Technology}},
+  year = 2012
 }

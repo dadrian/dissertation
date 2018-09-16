@@ -1,0 +1,82 @@
+\documentclass{standalone}
+
+% Requires MSC >= 1.18
+\usepackage{msc5} 
+
+\renewcommand{\msckeyword}{}
+\setlength{\instdist}{4\instdist}
+\setlength{\instwidth}{1.25\instwidth}
+\setlength{\topheaddist}{0pt}
+\setlength{\envinstdist}{0pt}
+\drawframe{no}
+
+\def\ClientHello#1{\texttt{ClientHello}(\ensuremath{#1})}
+\def\ServerHello#1{\texttt{ServerHello}(\ensuremath{#1})}
+\def\ServerCertificate#1{\texttt{ServerCertificate}(\ensuremath{#1})}
+\def\ServerKeyExchange#1{\texttt{ServerKeyExchange}(\ensuremath{#1})}
+\def\CertificateRequest{\texttt{CertificateRequest}}
+\def\ServerHelloDone{\texttt{ServerHelloDone}}
+\def\ClientKeyExchange#1{\texttt{ClientKeyExchange}(\ensuremath{#1})}
+\def\ClientCertificate#1{\texttt{ClientCertificate}(\ensuremath{#1})}
+\def\CertificateVerify#1{\texttt{CertificateVerify}(\ensuremath{#1})}
+\def\ClientCCS{\texttt{ClientCCS}}
+\def\ClientFinished#1{\texttt{ClientFinished}(\ensuremath{#1})}
+\def\ServerCCS{\texttt{ServerCCS}}
+\def\ServerFinished#1{\texttt{ServerFinished}(\ensuremath{#1})}
+\def\CloseNotify{\texttt{CloseNotifyAlert}}
+\def\HTTPRequest#1{\texttt{HTTP\_Request}(\ensuremath{#1})}
+\def\HTTPResponse#1{\texttt{HTTP\_Response}(\ensuremath{#1})}
+\def\vd#1#2{\mathsf{verifydata}(#2,#1)}
+
+\begin{document}
+
+\begin{msc}{}
+\declinst{C}{Client}{curl}
+\declinst{M}{Attacker}{MitM}
+\declinst{S}{Server}{www.tcl.tk}
+
+\mess{\ClientHello{cr,[\texttt{DHE},\ldots]}}{C}{M}
+\nextlevel
+\mess{\ClientHello{cr,[\texttt{DHE\_EXPORT}]}}{M}{S}
+\nextlevel
+\nextlevel
+\mess{\ServerHello{sr,sid,[\texttt{DHE\_EXPORT}],\ldots}}{S}{M}
+\nextlevel
+\mess{\ServerHello{sr,sid,[\texttt{DHE}],\ldots}}{M}{C}
+\nextlevel
+\mess{\ServerCertificate{cert_S,pk_S}}{S}[0.25]{C}
+\setlength{\levelheight}{30pt}
+\nextlevel
+\setlength{\levelheight}{15pt}
+\mess{\ServerKeyExchange{p_{512},g,g^y}}{S}[0.25]{C}
+\mscmark[tl]{Start computing $\mathsf{dlog}(g^y)$}{M}
+%\action{$\mathsf{dlog}(g^y)?$}{M}
+%\nextlevel
+\measure[r]{$\approx 10m$}{M}{M}[7]
+\nextlevel
+\mess{\ServerHelloDone}{S}[0.25]{C}
+\nextlevel
+\mess{\CloseNotify}{M}{S}
+\nextlevel
+\stop*{S}
+\mess{\ClientKeyExchange{g^x}}{C}{M}
+\nextlevel
+\mess{\ClientCCS}{C}{M}
+\nextlevel
+\mess{\ClientFinished{\vd{ms}{log_1}}}{C}{M}
+\nextlevel
+%% \mess{\ClientFinished{\vd{ms}{log_1'}}}{M}{S}
+%% \nextlevel
+%% \mess{\ServerFinished{\vd{ms}{log_2}}}{S}{M}
+%% \nextlevel
+\mess{\ServerCCS}{M}{C}
+\nextlevel
+\mess{\ServerFinished{\vd{ms}{log_2}}}{M}{C}
+\mscmark[br]{Got $\mathsf{dlog}(g^y)$, compute $ms$ and derive keys}{M}
+\nextlevel
+\mess{\HTTPRequest{\texttt{GET}\ \textsf{script.sh}}}{C}{M}
+\nextlevel
+\mess{\HTTPResponse{\textsf{malicious script}}}{M}{C}
+\end{msc}
+
+\end{document}

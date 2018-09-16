@@ -1,0 +1,57 @@
+\begin{table*}
+\centering\small
+\begin{tabular}{rrrrrrl@{}}
+\toprule
+  & \multicolumn{2}{c}{Sieving} & \multicolumn{2}{c}{Linear Algebra} & \multicolumn{1}{c}{Descent} \\
+ \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(){6-6}
+ & $\log_2B$ & core-years  & rows & core-years  & core-time   \\
+\midrule
+% timings below from CADO-NFS revision 580f1f1 on a catrel node
+% with tasks.sieve.qmin=15470309
+% Info:Lattice Sieving: Total CPU time: 9.53745e+06s -> 0.30 cpu year
+% Info:Filtering - Merging: Merged matrix has 4146413 rows and total weight 704890615 (170.0 entries per row on average)
+% Info:Linear Algebra: Krylov: WCT time 21706.76
+% Info:Linear Algebra: Lingen CPU time 4834.58, WCT time 218.43
+% Info:Linear Algebra: Mksol: WCT time 11599.56
+% Linear Algebra: total WCT = 33524.75
+% thus cpu <= 32*WCT <= 1.072792e6 (32 threads) <= 0.03 cpu year
+\multicolumn{1}{r}{RSA-512} &
+29 & 0.3 &  4.2M & 0.03 &  
+& \scriptsize\quad Timings with default CADO-NFS parameters.\\
+\multicolumn{1}{r}{DH-512} &
+27& 2.5 &  2.2M & 1.1 &  10\,mins
+& \scriptsize\quad For the computations in this paper; may be suboptimal.\\
+\cmidrule{1-7}
+\multicolumn{1}{r}{RSA-768} & 
+37& 800 & 250M & 100 &
+& \scriptsize\quad Est.\ based on~\cite{rsa768} with less sieving.  \\
+%\multicolumn{1}{r}{DH-768} &
+%  35 & 8,000 & 150M & 28,500 & 2\,days
+%& \scriptsize\quad Est.\ based on~\cite{rsa768,dlp180} and our own experiments. \\
+\multicolumn{1}{r}{DH-768} &
+36 & 4,000 & 24M & 920 & 43\,hours
+    & \scriptsize\quad Data from~\cite[Table 1]{Kleinjung2017}.\\
+\cmidrule{1-7}
+\multicolumn{1}{r}{RSA-1024} &
+42& $\approx$1,000,000  & $\approx$8.7B & $\approx$120,000 & 
+& \scriptsize\quad Crude estimate based on complexity formula. \\
+%\multicolumn{1}{r}{DH-1024} &
+%   40 & 10,000,000 & 5.2B & 35,000,000 & 30\,days
+%& \scriptsize\quad Est.\ based on complexity formula and our experiments. \\
+\multicolumn{1}{r}{DH-1024} &
+   40 & $\approx$5,000,000 & $\approx$0.8B & $\approx$1,100,000 & 30\,days
+& \scriptsize\quad Crude estimate based on formula and our experiments. \\
+\bottomrule
+\end{tabular}
+
+\caption{\textbf{Estimating costs for factoring and discrete log}.
+For sieving, we give one important parameter, which is the number of bits of the
+smoothness bound
+{\tt B}.
+For linear algebra, all costs for DH are for
+safe primes; for DSA primes with $q$ of 160 bits, this should be
+divided by 6.4 for 1024 bits, 4.8 for 768 bits, and 3.2 for 512 bits.}
+
+\label{Tab:costs}
+\end{table*}
+

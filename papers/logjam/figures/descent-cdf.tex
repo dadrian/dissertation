@@ -1,0 +1,29 @@
+\documentclass[9pt]{standalone}
+%\usepackage{mathptmx}
+\usepackage{pgfplots}
+\usepackage{standalone}
+\pgfplotsset{compat=newest}
+
+\pgfplotsset{
+%    width=6.5in,
+width=20pc,
+    height=1.5in,
+    every axis legend/.append style={nodes={right}}
+}
+
+\begin{document}
+
+\begin{tikzpicture}
+\begin{axis}[
+xmax=160,
+xtick={30,60,90,120,150},
+tick align=center,
+xlabel=Seconds,
+ylabel=CDF of keys
+]
+
+\addplot [hist={data=x,bins=100,cumulative,density,handler/.style={sharp plot}},blue!80!black,very thick] file [x] {descent-timings.dat};
+\end{axis}
+\end{tikzpicture}
+
+\end{document}

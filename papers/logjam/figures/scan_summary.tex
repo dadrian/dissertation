@@ -1,0 +1,26 @@
+\begin{table*}[t]
+\small
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+              & \multicolumn{4}{c}{\emph{Vulnerable servers, if the attacker can precompute for \ldots}} \\
+\cmidrule{2-5}
+%\multicolumn{1}{r}{\emph{If the attacker can precompute \ldots.}}
+              & all 512-bit groups & all 768-bit groups & one 1024-bit group & ten 1024-bit groups\\  
+\midrule
+HTTPS Top~1M w/ active downgrade\qquad\strut & 45,100 (8.4\%) & 45,100 (8.4\%) & 205,000 (37.1\%) & 309,000 (56.1\%) \\
+HTTPS Top~1M & 118 (0.0\%) & 407 (0.1\%) & 98,500 (17.9\%) & 132,000 (24.0\%) \\
+HTTPS Trusted w/ active downgrade & 489,000 (3.4\%) & 556,000 (3.9\%) & 1,840,000 (12.8\%) & 3,410,000 (23.8\%) \\ 
+HTTPS Trusted &  1,000 (0.0\%) & 46,700 (0.3\%) & 939,000 (6.56\%) & 1,430,000 (10.0\%)\medskip\\
+IKEv1 IPv4  & -- & 64,700 (2.6\%) & 1,690,000 (66.1\%)& 1,690,000 (66.1\%) \\
+IKEv2 IPv4  & -- & 66,000 (5.8\%) & 726,000 (63.9\%) & 726,000 (63.9\%)\medskip \\
+SSH   IPv4  & -- & -- & 3,600,000 (25.7\%) & 3,600,000 (25.7\%) \\
+\bottomrule
+
+\end{tabular}
+\caption{\textbf{Estimated impact of Diffie-Hellman attacks in early 2015.}
+We used Internet-wide scanning to estimate the number of real-world servers for which 
+typical connections could be compromised by attackers with various levels of computational
+resources. For HTTPS, we provide figures with and without downgrade attacks on the chosen ciphersuite. All others are passive attacks.
+}
+\end{table*}
