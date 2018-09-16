@@ -21,180 +21,165 @@ second group would allow decryption of traffic to 66\% of IPsec VPNs and 26\%
 of SSH servers. A close reading of published NSA leaks shows that the
 agency's attacks on VPNs are consistent with having achieved such a break. We
 conclude that moving to stronger key exchange methods should be a priority
-for the Internet community.\looseness=-1
+for the Internet community.
+%\looseness=-1
 
 \end{abstract}
 
 \section{Introduction}
 
-Diffie-Hellman key exchange is a popular cryptographic algorithm
-that allows Internet protocols to agree on a shared key and negotiate
-a secure connection.  
-It is fundamental to protocols such as
-HTTPS, SSH, IPsec, SMTPS, and other protocols that rely on TLS\@.
-Many protocols use Diffie-Hellman to achieve \emph{perfect forward secrecy},
-the property that a compromise of the long-term keys used for authentication
-does not compromise sessions keys for past connections.
-We examine how
-Diffie-Hellman is commonly implemented and deployed with common
-protocols and find that, in practice, it frequently offers less
-security than widely believed.
+Diffie-Hellman key exchange is a popular cryptographic algorithm that allows
+Internet protocols to agree on a shared key and negotiate a secure
+connection. It is fundamental to protocols such as HTTPS, SSH, IPsec, SMTPS,
+and other protocols that rely on TLS\@. Many protocols use Diffie-Hellman to
+achieve \emph{perfect forward secrecy}, the property that a compromise of the
+long-term keys used for authentication does not compromise sessions keys for
+past connections. We examine how Diffie-Hellman is commonly implemented and
+deployed with common protocols and find that, in practice, it frequently
+offers less security than widely believed.
 
-There are two reasons for this. First, a surprising number of servers
-use weak Diffie-Hellman parameters or maintain support for obsolete
-1990s-era ``export-grade'' crypto. More critically, the common practice of
-using standardized, hard-coded, or widely shared Diffie-Hellman
-parameters has the effect of dramatically reducing the cost of
-large-scale attacks, bringing some within range of feasibility
-today.
+There are two reasons for this. First, a surprising number of servers use
+weak Diffie-Hellman parameters or maintain support for obsolete 1990s-era
+``export-grade'' crypto. More critically, the common practice of using
+standardized, hard-coded, or widely shared Diffie-Hellman parameters has the
+effect of dramatically reducing the cost of large-scale attacks, bringing
+some within range of feasibility today.
 
 The current best technique for attacking Diffie-Hellman relies on
-compromising one of the private exponents ($a$, $b$) by
-computing the discrete logarithm of the corresponding public value ($g^a
-\bmod p$, $g^b \bmod p$).  With state-of-the-art number field sieve
-algorithms, computing a single discrete log is more difficult than
-factoring an RSA modulus of the same size.
-However, an adversary who performs
-a large precomputation for a prime $p$ can then quickly calculate
-arbitrary discrete logs in that group, amortizing the cost over all
-targets that share this parameter.
-Although this fact is well known
-among mathematical cryptographers, it seems to have been lost among
-practitioners deploying cryptosystems.  We exploit it to
+compromising one of the private exponents ($a$, $b$) by computing the
+discrete logarithm of the corresponding public value ($g^a \bmod p$, $g^b
+\bmod p$). With state-of-the-art number field sieve algorithms, computing a
+single discrete log is more difficult than factoring an RSA modulus of the
+same size. However, an adversary who performs a large precomputation for a
+prime $p$ can then quickly calculate arbitrary discrete logs in that group,
+amortizing the cost over all targets that share this parameter. Although this
+fact is well known among mathematical cryptographers, it seems to have been
+lost among practitioners deploying cryptosystems. We exploit it to
 obtain the following results:
 
-\subpar{Active attacks on export ciphers in TLS\@.}  We introduce Logjam, a new
-attack on TLS by which a man-in-the-middle attacker can downgrade a
-connection to export-grade cryptography. This attack is reminiscent of
-the FREAK attack~\cite{beurdouche2015messy} but applies to the
-ephemeral Diffie-Hellman ciphersuites and is a TLS protocol flaw
-rather than an implementation vulnerability.
-We present measurements that show that this attack applies
-to 8.4\% of Alexa Top Million HTTPS sites and 3.4\% of all
-HTTPS servers that have browser-trusted certificates.
+\paragraph{Active attacks on export ciphers in TLS\@.}
+We introduce Logjam, a new attack on TLS by which a man-in-the-middle
+attacker can downgrade a connection to export-grade cryptography. This attack
+is reminiscent of the FREAK attack~\cite{tls-state-of-the-union-2015} but
+applies to the ephemeral Diffie-Hellman ciphersuites and is a TLS protocol
+flaw rather than an implementation vulnerability. We present measurements
+that show that this attack applies to 8.4\% of Alexa Top Million HTTPS sites
+and 3.4\% of all HTTPS servers that have browser-trusted certificates.
 
-To exploit this attack, we implemented the number field sieve discrete log algorithm
-and carried out precomputation for two 512-bit
-Diffie-Hellman groups used by more than 92\% of the vulnerable servers.
-This allows us to compute individual discrete logs in about a minute.
-Using our discrete log oracle, we can compromise connections
-to over 7\% of Top Million HTTPS sites.
+To exploit this attack, we implemented the number field sieve discrete log
+algorithm and carried out precomputation for two 512-bit Diffie-Hellman
+groups used by more than 92\% of the vulnerable servers. This allows us to
+compute individual discrete logs in about a minute. Using our discrete log
+oracle, we can compromise connections to over 7\% of Top Million HTTPS sites.
 Discrete logs over larger groups have been computed before~\cite{dlp180},
 but, as far as we are aware, this is the first time they have been exploited
 to expose concrete vulnerabilities in real-world systems.
-\looseness=-1
+%\looseness=-1
 
 
 \begin{figure*}[ht]
 \centering\includegraphics[width=\linewidth]{\LogjamFigures/nfs}
-\caption{\label{fig:nfs}\textbf{Number field sieve for
-    discrete log.} This algorithm consists of a precomputation stage that depends only
-  on the prime $p$ and a descent stage that computes individual logarithms.
-  With sufficient precomputation, an attacker can
-  quickly break any Diffie-Hellman instances that use a particular
-  $p$.}
+
+\caption{\textbf{Number field sieve for discrete log}\,---\,%
+This algorithm consists of a precomputation stage that depends only on the
+prime $p$ and a descent stage that computes individual logarithms. With
+sufficient precomputation, an attacker can quickly break any Diffie-Hellman
+instances that use a particular $p$.
+}
+\label{fig:nfs}
 \end{figure*}
 
-\subpar{Risks from common 1024-bit groups.} We explore the implications
-of precomputation attacks for 768- and 1024-bit groups, which are widely
-used in practice and still considered secure.  We estimate the computational resources necessary to compute
-discrete logs in groups of these sizes, concluding that 768-bit
-groups are within range of academic teams, and 1024-bit groups
-may plausibly be within range of nation-state adversaries.  In both cases,
-individual logarithms can be quickly computed after the initial precomputation.
+\paragraph{Risks from common 1024-bit groups.}
+We explore the implications of precomputation attacks for 768- and 1024-bit
+groups, which are widely used in practice and still considered secure. We
+estimate the computational resources necessary to compute discrete logs in
+groups of these sizes, concluding that 768-bit groups are within range of
+academic teams, and 1024-bit groups may plausibly be within range of
+nation-state adversaries. In both cases, individual logarithms can be quickly
+computed after the initial precomputation.
 
-We then examine evidence
-from published Snowden documents that suggests NSA may already
-be exploiting 1024-bit Diffie-Hellman to decrypt VPN
-traffic.  We perform measurements to understand the implications
-of such an attack for popular protocols, finding that an attacker
-who could perform precomputations for ten 1024-bit groups could
-passively decrypt traffic to about 66\% of IKE VPNs,
-26\% of SSH servers, and 24\% of popular HTTPS sites.
+We then examine evidence from published Snowden documents that suggests NSA
+may already be exploiting 1024-bit Diffie-Hellman to decrypt VPN traffic. We
+perform measurements to understand the implications of such an attack for
+popular protocols, finding that an attacker who could perform precomputations
+for ten 1024-bit groups could passively decrypt traffic to about 66\% of IKE
+VPNs, 26\% of SSH servers, and 24\% of popular HTTPS sites.
 
-\subpar{Mitigations and lessons.} In response to the Logjam attack, mainstream
-browsers have implemented a more restrictive policy on the size of
-Diffie-Hellman groups they accept, and Chrome has discontinued support for finite field key exchanges. We further recommend that TLS servers
-disable export-grade cryptography and
-carefully vet the Diffie-Hellman
-groups they use. In the longer term, we advocate that protocols
-migrate to elliptic curve Diffie-Hellman.
+\paragraph{Mitigations and lessons.}
+In response to the Logjam attack, mainstream browsers have implemented a more
+restrictive policy on the size of Diffie-Hellman groups they accept, and
+Chrome has discontinued support for finite field key exchanges. We further
+recommend that TLS servers disable export-grade cryptography and carefully
+vet the Diffie-Hellman groups they use. In the longer term, we advocate that
+protocols migrate to elliptic curve Diffie-Hellman.
 
 \section{Diffie-Hellman Cryptanalysis}
 \label{sec:dl}
 
 Diffie-Hellman key exchange was the first published public-key
-algorithm~\cite{diffie1976new}.  In the simple case of prime groups,
-Alice and Bob agree on a prime $p$ and a generator $g$ of a
-multiplicative subgroup modulo $p$.  Then each generates
-a random private exponent, $a$ and $b$. Alice sends $g^a \bmod p$, Bob
-sends $g^b \bmod p$, and each computes a shared secret $g^{ab} \bmod
-p$. While there is also a Diffie-Hellman exchange over elliptic curve
-groups, we address only the ``mod $p$'' case.
+algorithm~\cite{new-directions-in-crypto-1976}. In the simple case of prime
+groups, Alice and Bob agree on a prime $p$ and a generator $g$ of a
+multiplicative subgroup modulo $p$. Then each generates a random private
+exponent, $a$ and $b$. Alice sends $g^a \bmod p$, Bob sends $g^b \bmod p$,
+and each computes a shared secret $g^{ab} \bmod p$. While there is also a
+Diffie-Hellman exchange over elliptic curve groups, we address only the ``mod
+$p$'' case.
 
-The security of Diffie-Hellman is not known to be equivalent to
-the discrete logarithm problem, but
-computing discrete logs remains the best known cryptanalytic
-attack. An attacker who can find the discrete log $x$ from $y = g^x \bmod p$ can
-easily find the shared secret.
+The security of Diffie-Hellman is not known to be equivalent to the discrete
+logarithm problem, but computing discrete logs remains the best known
+cryptanalytic attack. An attacker who can find the discrete log $x$ from $y =
+g^x \bmod p$ can easily find the shared secret.
 
 Textbook descriptions of discrete log can be misleading about the
-computational tradeoffs, for example by optimizing for computing a \emph{single} discrete log. In fact, as illustrated in Figure~\ref{fig:nfs}, a
-single large precomputation on $p$ can be used to efficiently break \emph{all}
- Diffie-Hellman exchanges made with that prime.
+computational tradeoffs, for example by optimizing for computing a
+\emph{single} discrete log. In fact, as illustrated in Figure~\ref{fig:nfs},
+a single large precomputation on $p$ can be used to efficiently break
+\emph{all} Diffie-Hellman exchanges made with that prime.
 
+Diffie-Hellman is typically implemented with prime fields and large group
+orders. In this case, the most efficient discrete log algorithm is the number
+field sieve
+(NFS)~\cite{discrete-log-nfs-1993,virtual-logarithms-2005,nfs-prime-field-2003}.
+The algorithm has four stages with different computational properties. The
+first three steps are only dependent on the prime $p$ and comprise most of
+the computation.
 
-Diffie-Hellman is typically implemented with prime fields and large
-group orders. In this case, the most efficient discrete log algorithm
-is the number field sieve (NFS) \cite{discrete-log-nfs-1993,virtual-logarithms-2005,nfs-prime-field-2003}.
-The algorithm has four stages with different computational properties. The first three steps
-are only dependent on the prime $p$ and comprise most of the computation.
-
-
-
-First is \emph{polynomial selection}, in which one finds a polynomial
-$f(z)$ defining a number field $\QQ[z]/f(z)$ for the computation. This parallelizes well
-and is only a small portion of the runtime.
+First is \emph{polynomial selection}, in which one finds a polynomial $f(z)$
+defining a number field $\QQ[z]/f(z)$ for the computation. This parallelizes
+well and is only a small portion of the runtime.
 
 In the second stage, \emph{sieving}, one factors ranges of integers and
-number field elements in batches to find many relations of elements,
-all of whose prime factors are less than some bound $B$ (called
-$B$-smooth).
-Sieving parallelizes well, but is computationally
-expensive, because we must search through and attempt to factor many
-elements.
+number field elements in batches to find many relations of elements, all of
+whose prime factors are less than some bound $B$ (called $B$-smooth). Sieving
+parallelizes well, but is computationally expensive, because we must search
+through and attempt to factor many elements.
 
 In the third stage, \emph{linear algebra}, we construct a large, sparse
-matrix consisting of the coefficient vectors of prime factorizations
-we have found.  This stage can be parallelized in a
-limited fashion, and produces a database of logarithms which are used as input to the final stage.
+matrix consisting of the coefficient vectors of prime factorizations we have
+found. This stage can be parallelized in a limited fashion, and produces a
+database of logarithms which are used as input to the final stage.
 
-The final stage, \emph{descent}, actually deduces the discrete
-log of the target $y$.  We re-sieve until we find a set
-of relations that allow us to write the logarithm of $y$ in terms of the
-logarithms in the precomputed database.  Crucially, descent is the only NFS stage that involves $y$ (or $g$),
-so polynomial selection, sieving, and linear algebra can
-be done once for a prime $p$ and reused to compute the discrete
-logs of many targets.
+The final stage, \emph{descent}, actually deduces the discrete log of the
+target $y$. We re-sieve until we find a set of relations that allow us to
+write the logarithm of $y$ in terms of the logarithms in the precomputed
+database. Crucially, descent is the only NFS stage that involves $y$ (or
+$g$), so polynomial selection, sieving, and linear algebra can be done once
+for a prime $p$ and reused to compute the discrete logs of many targets.
 
+The numerous parameters of the algorithm allow some flexibility to reduce
+time on some computational steps at the expense of others. For example,
+sieving more will result in a smaller matrix, making linear algebra cheaper,
+and doing more work in the precomputation makes the final descent step
+easier.
 
-The numerous parameters of the algorithm allow some flexibility to
-reduce time on some computational steps at the expense of others. For
-example, sieving more will result in a smaller matrix, making linear
-algebra cheaper, and doing more work in the precomputation makes the
-final descent step easier.
-% candidate for removal
-
-
-
-
-\paragraph{Standard primes}
-Generating safe primes\footnote{\small An odd prime $p$ is safe when $(p-1)/2$ is prime.} can be computationally
-burdensome, so many implementations use standardized
-Diffie-Hellman parameters.  A prominent example is the Oakley
-groups~\cite{rfc2412}, which give ``safe'' primes of length 768 (Oakley Group 1), 1024 (Oakley Group 2),
-and 1536 (Oakley Group 5).  These groups were published in 1998 and have been used for
-many applications since, including IKE, SSH, Tor, and OTR\@.
+\paragraph{Standard primes.}
+Generating safe primes\footnote{\small An odd prime $p$ is safe when
+$(p-1)/2$ is prime.} can be computationally burdensome, so many
+implementations use standardized Diffie-Hellman parameters. A prominent
+example is the Oakley groups~\cite{rfc2412}, which give ``safe'' primes of
+length 768 (Oakley Group 1), 1024 (Oakley Group 2), and 1536 (Oakley Group
+5). These groups were published in 1998 and have been used for many
+applications since, including IKE, SSH, Tor, and OTR\@.
 
 When primes are of sufficient strength, there seems to be no
 disadvantage to reusing them.  However, widespread reuse of
@@ -217,16 +202,16 @@ cryptanalysis. Furthermore, for both normal and export-grade
 Diffie-Hellman, the vast majority of servers use a handful of common
 groups.
 
-In this section, we exploit these facts to construct a novel attack
-against TLS\@, which we call the Logjam attack.  First, we perform NFS precomputations for the two most
-popular 512-bit primes on the web, so that we can quickly compute the
-discrete log for any key exchange message that uses one of them.  Next, we show
-how a man-in-the-middle, so armed, can attack connections between
-popular browsers and any server that allows export-grade
-Diffie-Hellman, by using a TLS protocol flaw to downgrade the
-connection to export-strength and then recovering the session key.  We
-find that this attack with our precomputations can compromise connections to about 7.8\%
-of HTTPS servers among Alexa Top Million domains.
+In this section, we exploit these facts to construct a novel attack against
+TLS\@, which we call the Logjam attack. First, we perform NFS precomputations
+for the two most popular 512-bit primes on the web, so that we can quickly
+compute the discrete log for any key exchange message that uses one of them.
+Next, we show how a man-in-the-middle, so armed, can attack connections
+between popular browsers and any server that allows export-grade
+Diffie-Hellman, by using a TLS protocol flaw to downgrade the connection to
+export-strength and then recovering the session key. We find that this attack
+with our precomputations can compromise connections to about 7.8\% of HTTPS
+servers among Alexa Top Million domains.
 
 \def\AData{\texttt{Data}\xspace}
 \def\dhe{\textsf{\small DHE}\xspace}
@@ -250,9 +235,10 @@ of HTTPS servers among Alexa Top Million domains.
           (\emph{others\/}) & \ 8\% & (463~distinct primes) \\
           \bottomrule
 	\end{tabular}
-	\caption{\textbf{Top 512-bit DH primes for TLS\@.}  8.4\% of
-      Alexa Top~1M HTTPS domains allow \dheexp{}, of which 92.3\% use
-      one of the two most popular primes, shown here.\looseness=-1}
+    \caption{\textbf{Top 512-bit DH primes for TLS}\,---\,%
+        8.4\% of Alexa Top~1M HTTPS domains allow \dheexp{}, of which 92.3\% use
+        one of the two most popular primes, shown here.
+    }
     \label{tab:export-primes}
 \end{table}
 
@@ -261,48 +247,44 @@ of HTTPS servers among Alexa Top Million domains.
 The TLS handshake begins with a negotiation to determine the crypto
 algorithms used for the session. The client sends a list of supported
 ciphersuites (and a random nonce $cr$) within the \textsf{ClientHello}
-message, where each ciphersuite specifies a key exchange algorithm and
-other primitives.  The server selects a ciphersuite from the client's
-list and signals its selection in a \textsf{ServerHello} message
-(containing a random nonce $sr$).
+message, where each ciphersuite specifies a key exchange algorithm and other
+primitives. The server selects a ciphersuite from the client's list and
+signals its selection in a \textsf{ServerHello} message (containing a random
+nonce $sr$).
 
-TLS specifies ciphersuites supporting multiple varieties of
-Diffie-Hellman.
- Textbook Diffie-Hellman with unrestricted strength is
- called ``ephemeral''  Diffie-Hellman, or \dhe{},
- and is identified by ciphersuites that begin with
-\texttt{TLS\_DHE\_*}.\footnote{\small New ciphersuites that use elliptic curve Diffie-Hellman (\ecdhe{})
-  are gaining in popularity, but we focus exclusively on the traditional
-  prime field variety.}
- In \dhe{}, the server is responsible for selecting the Diffie-Hellman parameters.
- It chooses a group $(p,g)$, computes $g^b$, and
- sends a \textsf{ServerKeyExchange} message containing a signature over
- the tuple $(cr, sr, p, g, g^b)$ using the long-term signing key from its certificate.
- The client verifies the signature and responds with a \textsf{ClientKeyExchange}
- message containing $g^a$.
+TLS specifies ciphersuites supporting multiple varieties of Diffie-Hellman.
+Textbook Diffie-Hellman with unrestricted strength is called ``ephemeral''
+Diffie-Hellman, or \dhe{}, and is identified by ciphersuites that begin with
+\texttt{TLS\_DHE\_*}.\footnote{\small New ciphersuites that use elliptic
+curve Diffie-Hellman (\ecdhe{}) are gaining in popularity, but we focus
+exclusively on the traditional prime field variety.} In \dhe{}, the server is
+responsible for selecting the Diffie-Hellman parameters. It chooses a group
+$(p,g)$, computes $g^b$, and sends a \textsf{ServerKeyExchange} message
+containing a signature over the tuple $(cr, sr, p, g, g^b)$ using the
+long-term signing key from its certificate. The client verifies the signature
+and responds with a \textsf{ClientKeyExchange} message containing $g^a$.
 
- To ensure agreement on the negotiation messages, and to prevent downgrade attacks,
- each party computes the TLS master secret from $g^{ab}$ and calculates a MAC of its view of the
- handshake transcript.  These MACs are exchanged in a pair of \textsf{Finished} messages and
- verified by the recipients.
+To ensure agreement on the negotiation messages, and to prevent downgrade
+attacks, each party computes the TLS master secret from $g^{ab}$ and
+calculates a MAC of its view of the handshake transcript. These MACs are
+exchanged in a pair of \textsf{Finished} messages and verified by the
+recipients.
 
-%\subpar{Export-grade Diffie-Hellman.}
-To comply with 1990s-era U.S. export restrictions on
-cryptography, SSL 3.0 and TLS 1.0 supported reduced-strength
-\dheexp{} ciphersuites that were restricted to
-primes no longer than 512 bits. In all other
-respects, \dheexp{} protocol messages are identical to \dhe{}.
-The relevant export restrictions are no longer in effect, but many
-servers maintain support for backwards compatibility.
+\paragraph{Export-grade Diffie-Hellman.}
+To comply with 1990s-era U.S. export restrictions on cryptography, SSL 3.0
+and TLS 1.0 supported reduced-strength \dheexp{} ciphersuites that were
+restricted to primes no longer than 512 bits. In all other respects,
+\dheexp{} protocol messages are identical to \dhe{}. The relevant export
+restrictions are no longer in effect, but many servers maintain support for
+backwards compatibility.
 
-To understand how HTTPS servers in the wild use Diffie-Hellman, we
-modified the ZMap~\cite{ZMap} toolchain to offer \dhe{} and \dheexp{}
-ciphersuites and scanned TCP/443 on both the full public IPv4 address
-space and the Alexa Top~1M domains.  The scans took place in
-March 2015.  Of 539,000 HTTPS sites among Top~1M domains, we found
-that 68.3\% supported \dhe{} and 8.4\% supported \dheexp{}.  Of
-14.3~million IPv4 HTTPS servers with browser-trusted certificates, 23.9\%
-supported \dhe{} and 4.9\% \dheexp{}.
+To understand how HTTPS servers in the wild use Diffie-Hellman, we modified
+the ZMap~\cite{zmap-2013} toolchain to offer \dhe{} and \dheexp{}
+ciphersuites and scanned TCP/443 on both the full public IPv4 address space
+and the Alexa Top~1M domains. The scans took place in March 2015. Of 539,000
+HTTPS sites among Top~1M domains, we found that 68.3\% supported \dhe{} and
+8.4\% supported \dheexp{}. Of 14.3~million IPv4 HTTPS servers with
+browser-trusted certificates, 23.9\% supported \dhe{} and 4.9\% \dheexp{}.
 
 \iffalse
 \begin{table}[t]

@@ -36,6 +36,17 @@
     note = {\url{http://www.zdnet.com/blog/networking/here-comes-the-100gige-internet/334}}
 }
 
+@Article{new-directions-in-crypto-1976,
+  title = {New directions in cryptography},
+  author = {Diffie, Whitfield and Hellman, Martin E},
+  journal = {{IEEE} Trans. Inform. Theory},
+  volume = {22},
+  number = {6},
+  pages = {644--654},
+  publisher = {IEEE},
+  year = 1976
+}
+
 @Article{nfs-prime-field-2003,
   title = {Improvements to the general number field sieve for discrete logarithms 
            in prime fields. {A} comparison with the {G}aussian integer method},
@@ -102,7 +113,7 @@
 
 @InProceedings{ike-nrl-1999, 
   author = {Meadows, C.}, 
-  booktitle = {IEEE Symposium on Security and Privacy}, 
+  booktitle = {{IEEE} Symposium on Security and Privacy ({O}akland)}, 
   title = {Analysis of the {I}nternet Key Exchange protocol using the {NRL} Protocol Analyzer}, 
   year = 1999 
 }
@@ -113,8 +124,6 @@
   booktitle = {Crypto},
   year = {2002}
 }
-
-
 
 @InProceedings{multi-core-network-2010,
   title = {High speed network traffic analysis with commodity multi-core systems},
@@ -153,6 +162,20 @@
     booktitle = {Proc.\ 23rd {USENIX} Security Symposium},
     month = aug,
     year = 2014
+}
+
+@InProceedings{tls-state-of-the-union-2015,
+  title = {A messy state of the union: Taming the composite state machines of {TLS}},
+  author = {Beurdouche, Benjamin and 
+            Bhargavan, Karthikeyan and 
+            Delignat-Lavaud, Antoine and 
+            Fournet, C{\'e}dric and 
+            Kohlweiss, Markulf and 
+            Pironti, Alfredo and 
+            Strub, Pierre-Yves and 
+            Zinzindohoue, Jean Karim},
+	booktitle = {{IEEE} Symposium on Security and Privacy ({O}akland)}, 
+  year = 2015
 }
 
 @InProceedings{trapdoors-discrete-log-1992,
@@ -277,4 +300,41 @@
   title = {{FIPS PUB 180-4}: Secure Hash Standard ({SHS})},
   author = {{National Institute of Standards and Technology}},
   year = 2012
+}
+
+@Misc{dlp180,
+  author = {Cyril Bouvier and Pierrick Gaudry and Laurent Imbert and Hamza Jeljeli and Emmanuel Thom\'e},
+  title = {New record for discrete logarithm in a prime finite field of 180 decimal digits},
+  note = {\url{http://caramel.loria.fr/p180.txt}},
+  year = 2014
+}
+
+% RFCS
+
+@misc{rfc2412,
+  author = {H. Orman},
+  title = {The {O}akley Key Determination Protocol},
+  howpublished = {{IETF RFC 2412}},
+  year=1998
+}
+
+@Misc{rfc2818,
+  title = {{HTTP over TLS}},
+  author = {Rescorla, Eric},
+  howpublished = {{IETF RFC 2818}},
+  year = 2000
+}
+
+@Misc{rfc3546,
+  title = {{Transport Layer Security ({TLS}) Extensions}},
+  author = {S. Blake-Wilson and M. Nystrom and D. Hopwood and J. Mikkelsen and T. Wright},
+  howpublished = {{IETF RFC 3546}},
+  year = 2003
+}
+
+@misc{rfc6797,
+  title={{HTTP Strict Transport Security (HSTS)}},
+  author={Hodges, Jeff and Jackson, Collin and Barth, Adam},
+  howpublished={{IETF RFC 6797}},
+  year=2012
 }
