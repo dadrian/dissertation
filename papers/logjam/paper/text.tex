@@ -60,11 +60,11 @@ obtain the following results:
 \paragraph{Active attacks on export ciphers in TLS}
 We introduce Logjam, a new attack on TLS by which a man-in-the-middle
 attacker can downgrade a connection to export-grade cryptography. This attack
-is reminiscent of the FREAK attack~\cite{tls-state-of-the-union-2015} but
-applies to the ephemeral Diffie-Hellman ciphersuites and is a TLS protocol
-flaw rather than an implementation vulnerability. We present measurements
-that show that this attack applies to 8.4\% of Alexa Top Million HTTPS sites
-and 3.4\% of all HTTPS servers that have browser-trusted certificates.
+is reminiscent of the FREAK attack~\cite{freak-attack-2015} but applies to
+the ephemeral Diffie-Hellman ciphersuites and is a TLS protocol flaw rather
+than an implementation vulnerability. We present measurements that show that
+this attack applies to 8.4\% of Alexa Top Million HTTPS sites and 3.4\% of
+all HTTPS servers that have browser-trusted certificates.
 
 To exploit this attack, we implemented the number field sieve discrete log
 algorithm and carried out precomputation for two 512-bit Diffie-Hellman
@@ -488,7 +488,7 @@ summarize all the costs, measured or estimated, in Table~\ref{tab:costs}.
 \paragraph{DH-768: Completed in 2016}
 At the time of disclosure, the latest discrete log record was a 596-bit
 computation. Based on that work, and on prior experience with the 768-bit
-factorization record in 2009~\cite{rsa768}, we made the conservative
+factorization record in 2009~\cite{factor-rsa-768}, we made the conservative
 prediction that it was possible, as explained in~\S\ref{sec:dl}, to put more
 computational effort into sieving for the discrete log case than for
 factoring, so that the linear algebra step would run on a slightly smaller
@@ -504,10 +504,10 @@ logs. For 768-bit discrete logs, this polynomial selection method leads to a
 significantly smaller computational cost.
 
 In 2016, Kleinjung et al.\ completed a 768-bit discrete log
-computation~\cite{dlog-768-kleinjung-2017}. While this is a massive
-computation on the academic scale, a computation of this size has likely been
-within reach of nation-states for more than a decade. This data is mentioned
-in Table~\ref{tab:costs}.
+computation~\cite{compute-dlog-768}. While this is a massive computation on
+the academic scale, a computation of this size has likely been within reach
+of nation-states for more than a decade. This data is mentioned in
+Table~\ref{tab:costs}.
 
 \paragraph{DH-1024: Plausible with nation-state resources}
 Experimentally extrapolating sieving parameters to the 1024-bit case is
@@ -534,9 +534,9 @@ precomputation of about 6M core-years.
 
 The time complexity for each individual log after the precomputation should
 be multiplied by $L_{2^{1024}}(1.206)/L_{2^{768}}(1.206)\approx86$, where
-$k=1.206$ follows from~\cite{EC:FGHT17}. This last number does not correspond
-to what we observed in practice and we attribute that to the fact that the
-descent step has been far less studied.
+$k=1.206$ follows from~\cite{hidden-snfs-1024-2017}. This last number does
+not correspond to what we observed in practice and we attribute that to the
+fact that the descent step has been far less studied.
 
 In practice, it is not uncommon for estimates based merely on the complexity
 formula to be off by a factor of 10. Estimates of Table~\ref{tab:costs} must
@@ -662,175 +662,188 @@ illustrates the flow of information required to decrypt the tunneled traffic.
 
 When the IKE/ESP messages of a VPN of interest are collected, the IKE
 messages and a small amount of ESP traffic are sent to the Cryptanalysis and
-Exploitation Services (CES)~\cite{media-35526, media-35529, media-35515}.
+Exploitation Services (CES)~\cite{media-35526,media-35529,media-35515}.
 Within the CES enclave, a specialized ``attack orchestrator'' attempts to
 recover the ESP decryption key with assistance from high-performance
 computing resources as well as a database of known PSKs
-(``CORALREEF'')~\cite{media-35529, media-35526, media-35515}. If the recovery
+(``CORALREEF'')~\cite{media-35529,media-35526,media-35515}. If the recovery
 was successful, the decryption key is returned from CES and used to decrypt
 the buffered ESP traffic such that the encapsulated content can be
-processed~\cite{media-35529, media-35522}.
+processed~\cite{media-35529,media-35522}.
 
 \paragraph{Evidence for a discrete log attack}
-The ability to decrypt VPN traffic does not necessarily indicate a
-defeat of Diffie-Hellman. There are, however, several features of the described exploitation process that support this hypothesis.
+The ability to decrypt VPN traffic does not necessarily indicate a defeat of
+Diffie-Hellman. There are, however, several features of the described
+exploitation process that support this hypothesis.
 
-The IKE protocol has been extensively analyzed~\cite{ck02,meadows99}
-and is not believed to be exploitable in standard configurations under
-passive eavesdropping attacks.  Absent a vulnerability
-in the key derivation function or transport encryption, the attacker must recover the decryption keys. This requires
-the attacker to calculate \skeyid{} generated from the Phase~1 Diffie-Hellman shared secret after passively
-observing an IKE handshake.
+The IKE protocol has been extensively
+analyzed~\cite{ike-security-2002,ike-nrl-1999} and is not believed to be
+exploitable in standard configurations under passive eavesdropping attacks.
+Absent a vulnerability in the key derivation function or transport
+encryption, the attacker must recover the decryption keys. This requires the
+attacker to calculate \skeyid{} generated from the Phase~1 Diffie-Hellman
+shared secret after passively observing an IKE handshake.
 
 While IKE is designed to support a range of Diffie-Hellman groups, our
-Internet-wide scans (\S\ref{sec:1024effects}) show that the vast
-majority of IKE endpoints select one particular 1024-bit DH group even when offered stronger groups. Conducting an expensive, but feasible, precomputation for this single 1024-bit group (Oakley Group 2) would allow the efficient recovery of a large number of Diffie-Hellman shared secrets used to derive \skeyid{} and the subsequent \keymat.
+Internet-wide scans (\S\ref{sec:1024effects}) show that the vast majority of
+IKE endpoints select one particular 1024-bit DH group even when offered
+stronger groups. Conducting an expensive, but feasible, precomputation for
+this single 1024-bit group (Oakley Group 2) would allow the efficient
+recovery of a large number of Diffie-Hellman shared secrets used to derive
+\skeyid{} and the subsequent \keymat.
 
-Given an efficient oracle for solving the discrete logarithm problem,
-attacks on IKE are possible provided that the attacker can obtain the
-following: $(1)$ a complete two-sided IKE transcript, and
-$(2)$ any PSK used for deriving {\skeyid} in IKEv1. The available documents describe both of these as explicit prerequisites for the VPN exploitation process outlined above and provide the reader with internal resources available to meet these prerequisites~\cite{media-35515}.
+Given an efficient oracle for solving the discrete logarithm problem, attacks
+on IKE are possible provided that the attacker can obtain the following:
+$(1)$ a complete two-sided IKE transcript, and $(2)$ any PSK used for
+deriving {\skeyid} in IKEv1. The available documents describe both of these
+as explicit prerequisites for the VPN exploitation process outlined above and
+provide the reader with internal resources available to meet these
+prerequisites~\cite{media-35515}.
 
-Of course, this explanation is not dispositive and the possibility
-remains that NSA could defeat VPN encryption using alternative means.  A
-published NSA document refers to the use of a router ``implant'' to allow decryption of IPsec traffic
-indicating that the use of targeted malware is possible. This implant ``allows passive exploitation with just ESP''~\cite{media-35515} without the prerequisite of collecting the IKE handshake messages. This indicates that it is an alternative mechanism to the attack described above.
+Of course, this explanation is not dispositive and the possibility remains
+that NSA could defeat VPN encryption using alternative means. A published NSA
+document refers to the use of a router ``implant'' to allow decryption of
+IPsec traffic indicating that the use of targeted malware is possible. This
+implant ``allows passive exploitation with just ESP''~\cite{media-35515}
+without the prerequisite of collecting the IKE handshake messages. This
+indicates that it is an alternative mechanism to the attack described above.
 
-The most compelling argument
-for a pure cryptographic attack is the generality of the NSA's VPN exploitation process.This process appears to be applicable across a broad swath of VPNs without regard to endpoint's identity or the ability to compromise individual endpoints.
+The most compelling argument for a pure cryptographic attack is the
+generality of the NSA's VPN exploitation process. This process appears to be
+applicable across a broad swath of VPNs without regard to endpoint's identity
+or the ability to compromise individual endpoints.
 
 
 \subsection{Effects of a 1024-bit Break}
 \label{sec:1024effects}
 
-In this section, we use Internet-wide scanning to assess the impact of
-a hypothetical DH-1024 break on IKE, SSH, and
-HTTPS\@.  Our measurements, performed in early 2015, indicate that these protocols would be subject to widespread compromise by a
-nation-state attacker who had the resources to invest in precomputation
-for a small number of 1024-bit groups.
+In this section, we use Internet-wide scanning to assess the impact of a
+hypothetical DH-1024 break on IKE, SSH, and HTTPS\@. Our measurements,
+performed in early 2015, indicate that these protocols would be subject to
+widespread compromise by a nation-state attacker who had the resources to
+invest in precomputation for a small number of 1024-bit groups.
 
 \paragraph{IKE}
-We measured how IPsec VPNs use Diffie-Hellman in practice by
-scanning a 1\% random sample of the public IPv4 address space for IKEv1 and
-IKEv2 (the protocols used to initiate an IPsec VPN connection) in May~2015. We
-used the ZMap UDP probe module to measure support for Oakley Groups~1 and~2
-(two popular 768- and 1024-bit, built-in groups) and which group servers
-prefer. Of the 80K hosts that responded with a valid IKE packet, 44.2\% were willing
-to negotiate a connection using one of the two groups. We found that 31.8\% of IKEv1 and 19.7\% of IKEv2 servers support Oakley Group~1
-(768-bit) while 86.1\% and 91.0\% respectively supported Oakley Group~2
-(1024-bit).  In our sample of IKEv1 servers, 2.6\% of profiled servers preferred
-the 768-bit Oakley Group~1 and 66.1\% preferred the 1024-bit Oakley
-Group~2. For IKEv2, 5.8\% of profiled servers chose Oakley Group~1, and 63.9\%
-chose Oakley Group~2.
+We measured how IPsec VPNs use Diffie-Hellman in practice by scanning a 1\%
+random sample of the public IPv4 address space for IKEv1 and IKEv2 (the
+protocols used to initiate an IPsec VPN connection) in May~2015. We used the
+ZMap UDP probe module to measure support for Oakley Groups~1 and~2 (two
+popular 768- and 1024-bit, built-in groups) and which group servers prefer.
+Of the 80K hosts that responded with a valid IKE packet, 44.2\% were willing
+to negotiate a connection using one of the two groups. We found that 31.8\%
+of IKEv1 and 19.7\% of IKEv2 servers support Oakley Group~1 (768-bit) while
+86.1\% and 91.0\% respectively supported Oakley Group~2 (1024-bit). In our
+sample of IKEv1 servers, 2.6\% of profiled servers preferred the 768-bit
+Oakley Group~1 and 66.1\% preferred the 1024-bit Oakley Group~2. For IKEv2,
+5.8\% of profiled servers chose Oakley Group~1, and 63.9\% chose Oakley
+Group~2.
 
 \paragraph{SSH}
-All SSH handshakes complete either a finite field or elliptic
-curve Diffie-Hellman exchange. The protocol
-explicitly defines support for Oakley Group~2 (1024-bit) and Oakley Group~14
-(2048-bit) but also allows a server-defined group to be negotiated. We scanned 1\% random samples of the public IPv4 address
-space in April 2015.  We find that 98.9\% of SSH servers support the 1024-bit
-Oakley Group~2, 77.6\% support the 2048-bit Oakley Group~14, and 68.7\% support
-a server-defined group\@.
+All SSH handshakes complete either a finite field or elliptic curve
+Diffie-Hellman exchange. The protocol explicitly defines support for Oakley
+Group~2 (1024-bit) and Oakley Group~14 (2048-bit) but also allows a
+server-defined group to be negotiated. We scanned 1\% random samples of the
+public IPv4 address space in April 2015. We find that 98.9\% of SSH servers
+support the 1024-bit Oakley Group~2, 77.6\% support the 2048-bit Oakley
+Group~14, and 68.7\% support a server-defined group\@.
 
-During the SSH handshake, the server selects the client's highest
-priority mutually supported key exchange algorithm.  To
-estimate what servers will prefer in practice, we performed a scan in which we mimicked the algorithms offered
-by OpenSSH 6.6.1p1, the latest version of OpenSSH\@. In this scan, 21.8\% of
-servers preferred the 1024-bit Oakley Group~2, and 37.4\% preferred a
-server-defined group. 10\% of the server-defined groups were 1024-bit, but, of
-those, nearly all provided Oakley Group~2 rather than a custom group.
+During the SSH handshake, the server selects the client's highest priority
+mutually supported key exchange algorithm. To estimate what servers will
+prefer in practice, we performed a scan in which we mimicked the algorithms
+offered by OpenSSH 6.6.1p1, the latest version of OpenSSH\@. In this scan,
+21.8\% of servers preferred the 1024-bit Oakley Group~2, and 37.4\% preferred
+a server-defined group. 10\% of the server-defined groups were 1024-bit, but,
+of those, nearly all provided Oakley Group~2 rather than a custom group.
 
+Combining these equivalent choices, we find that a nation-state adversary who
+performed NFS precomputations for the 1024-bit Oakley Group~2 could passively
+eavesdrop on connections to 3.6M (25.7\%) publicly accessible SSH servers.
 
-Combining these equivalent choices, we find that a nation-state adversary  who
-performed NFS precomputations for the 1024-bit Oakley Group~2 could passively eavesdrop on connections to
-3.6M (25.7\%) publicly accessible SSH servers.
-
-\paragraph{HTTPS} \dhe is commonly deployed on web servers. 68.3\% of Alexa
-Top~1M sites support \dhe, as do 23.9\% of sites with browser-trusted
-certificates. Of the Top~1M sites that support \dhe, 84\% use a 1024-bit or smaller
-group, with 94\% of these using one of five groups.
+\paragraph{HTTPS}
+\dhe is commonly deployed on web servers. 68.3\% of Alexa Top~1M sites
+support \dhe, as do 23.9\% of sites with browser-trusted certificates. Of the
+Top~1M sites that support \dhe, 84\% use a 1024-bit or smaller group, with
+94\% of these using one of five groups.
 
 Despite widespread support for \dhe, a passive eavesdropper can only decrypt
 connections that organically agree to use Diffie-Hellman. We estimate the
 number of sites for which this will occur by offering the same sets of
-ciphersuites as Chrome, Firefox, and Safari.
-Approximately 24.0\% of browser connections with HTTPS-enabled Top~1M sites (and
-10\% with browser-trusted sites) will negotiate \dhe with one of the ten most
-popular 1024-bit primes; 17.9\% of connections with Top~1M sites could be
-passively eavesdropped given the precomputation for a single 1024-bit prime.
+ciphersuites as Chrome, Firefox, and Safari. Approximately 24.0\% of browser
+connections with HTTPS-enabled Top~1M sites (and 10\% with browser-trusted
+sites) will negotiate \dhe with one of the ten most popular 1024-bit primes;
+17.9\% of connections with Top~1M sites could be passively eavesdropped given
+the precomputation for a single 1024-bit prime.
 
 
 \section{Recommendations}
 \label{sec:lessons}
 
-In this section, we present concrete recommendations
-to recover the expected security of Diffie-Hellman.
+In this section, we present concrete recommendations to recover the expected
+security of Diffie-Hellman.
 
 \paragraph{Transition to elliptic curves.}
-Transitioning to elliptic curve Diffie-Hellman (ECDH) key exchange avoids
-all known feasible cryptanalytic attacks.  Current elliptic curve discrete log algorithms
-do not gain as much of an advantage from precomputation.
-In addition, ECDH keys are shorter and
-computations are faster.
-We recommend transitioning
-to elliptic curves; this is the most effective solution to the
-vulnerabilities in this paper.
-We note that in August 2015, the NSA announced that it was planning to
-transition away from elliptic curve cryptography for its Suite B cryptographic
-algorithms and would replace them with algorithms resistant to quantum
-computers~\cite{nsa-suiteb}.  However, since no fully vetted and standardized quantum-resistant
-algorithms exist currently, elliptic curves remain the most secure choice for public key operations.
+Transitioning to elliptic curve Diffie-Hellman (ECDH) key exchange avoids all
+known feasible cryptanalytic attacks. Current elliptic curve discrete log
+algorithms do not gain as much of an advantage from precomputation. In
+addition, ECDH keys are shorter and computations are faster. We recommend
+transitioning to elliptic curves; this is the most effective solution to the
+vulnerabilities in this paper. We note that in August 2015, the NSA announced
+that it was planning to transition away from elliptic curve cryptography for
+its Suite B cryptographic algorithms and would replace them with algorithms
+resistant to quantum computers~\cite{nsa-suiteb}. However, since no fully
+vetted and standardized quantum-resistant algorithms exist currently,
+elliptic curves remain the most secure choice for public key operations.
 
 \paragraph{Increase minimum key strengths.}
 To protect against the Logjam attack, server operators should disable \dheexp
 and configure \dhe ciphersuites to use primes of 2048 bits or larger.
 Browsers and clients should raise the minimum accepted size for
-Diffie-Hellman groups to at least 1024 bits in order to avoid downgrade attacks.
+Diffie-Hellman groups to at least 1024 bits in order to avoid downgrade
+attacks.
 
 \paragraph{Don't deliberately weaken crypto.}
-The Logjam attack
-illustrates the fragility of cryptographic ``front doors''.
-Although the key sizes originally used in \dheexp were intended
-to be tractable only to NSA, two decades of algorithmic and computational
+The Logjam attack illustrates the fragility of cryptographic ``front doors''.
+Although the key sizes originally used in \dheexp were intended to be
+tractable only to NSA, two decades of algorithmic and computational
 improvements have significantly lowered the bar to attacks on such key sizes.
-Despite the eventual relaxation of crypto export restrictions and subsequent attempts to remove support for \dheexp{}, the
-technical debt induced by the additional complexity has left implementations vulnerable for decades.
-Like FREAK~\cite{beurdouche2015messy}, our attacks warn
-of the long-term debilitating effects of deliberately weakening cryptography.
+Despite the eventual relaxation of crypto export restrictions and subsequent
+attempts to remove support for \dheexp{}, the technical debt induced by the
+additional complexity has left implementations vulnerable for decades. Like
+FREAK~\cite{freak-attack-2015}, our attacks warn of the long-term
+debilitating effects of deliberately weakening cryptography.
 
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We find that Diffie-Hellman key exchange, as used in practice, is often less secure than
-widely believed.  The problems stem from the fact that the number
+We find that Diffie-Hellman key exchange, as used in practice, is often less
+secure than widely believed. The problems stem from the fact that the number
 field sieve for discrete log allows an attacker to perform a single
 precomputation that depends only on the group, after which computing
-individual logarithms in that group has a far lower cost.  Although this
-is well known to cryptographers, it apparently has not been
-widely understood by system builders.  Likewise, many cryptographers
-did not appreciate that a large fraction of Internet
-communication depends on a few
-small, widely shared groups.\looseness=-1
+individual logarithms in that group has a far lower cost. Although this is
+well known to cryptographers, it apparently has not been widely understood by
+system builders. Likewise, many cryptographers did not appreciate that a
+large fraction of Internet communication depends on a few small, widely
+shared groups.
+%\looseness=-1
 
-A key lesson is that cryptographers and
-creators of practical systems need to work together more effectively.
-System builders should take responsibility for being aware of
-applicable cryptanalytic attacks. Cryptographers
-should involve themselves in how crypto is actually being applied,
-such as through engagement with standards efforts and software review.
-Bridging the perilous gap that separates these communities will be
-essential for keeping future systems secure.
+A key lesson is that cryptographers and creators of practical systems need to
+work together more effectively. System builders should take responsibility
+for being aware of applicable cryptanalytic attacks. Cryptographers should
+involve themselves in how crypto is actually being applied, such as through
+engagement with standards efforts and software review. Bridging the perilous
+gap that separates these communities will be essential for keeping future
+systems secure.
 
-\section*{Acknowledgments}
-
-The authors thank Michael Bailey, Daniel Bernstein, Ron Dreslinski,
-Tanja Lange, Adam Langley, Kenny Paterson, Andrei Popov, Ivan Ristic,
-Edward Snowden, Brian Smith, Martin Thomson, and Eric Rescorla.  This
-work was supported by the U.S. National Science Foundation, the Office
-of Naval Research, the European Research Council, and the French
-National Research Agency, with additional support from the Mozilla
-Foundation, Supermicro, Google, Cisco, the Morris Wellman
-Professorship, and the Alfred P. Sloan Foundation.  Some experiments
-used the Grid'5000 testbed, supported by INRIA, CNRS, RENATER, and
-others.
+%\section*{Acknowledgments}
+%
+%The authors thank Michael Bailey, Daniel Bernstein, Ron Dreslinski,
+%Tanja Lange, Adam Langley, Kenny Paterson, Andrei Popov, Ivan Ristic,
+%Edward Snowden, Brian Smith, Martin Thomson, and Eric Rescorla.  This
+%work was supported by the U.S. National Science Foundation, the Office
+%of Naval Research, the European Research Council, and the French
+%National Research Agency, with additional support from the Mozilla
+%Foundation, Supermicro, Google, Cisco, the Morris Wellman
+%Professorship, and the Alfred P. Sloan Foundation.  Some experiments
+%used the Grid'5000 testbed, supported by INRIA, CNRS, RENATER, and
+%others.
