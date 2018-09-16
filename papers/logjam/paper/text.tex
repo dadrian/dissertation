@@ -57,7 +57,7 @@ fact is well known among mathematical cryptographers, it seems to have been
 lost among practitioners deploying cryptosystems. We exploit it to
 obtain the following results:
 
-\paragraph{Active attacks on export ciphers in TLS\@.}
+\paragraph{Active attacks on export ciphers in TLS}
 We introduce Logjam, a new attack on TLS by which a man-in-the-middle
 attacker can downgrade a connection to export-grade cryptography. This attack
 is reminiscent of the FREAK attack~\cite{tls-state-of-the-union-2015} but
@@ -89,7 +89,7 @@ instances that use a particular $p$.
 \label{fig:nfs}
 \end{figure*}
 
-\paragraph{Risks from common 1024-bit groups.}
+\paragraph{Risks from common 1024-bit groups}
 We explore the implications of precomputation attacks for 768- and 1024-bit
 groups, which are widely used in practice and still considered secure. We
 estimate the computational resources necessary to compute discrete logs in
@@ -105,7 +105,7 @@ popular protocols, finding that an attacker who could perform precomputations
 for ten 1024-bit groups could passively decrypt traffic to about 66\% of IKE
 VPNs, 26\% of SSH servers, and 24\% of popular HTTPS sites.
 
-\paragraph{Mitigations and lessons.}
+\paragraph{Mitigations and lessons}
 In response to the Logjam attack, mainstream browsers have implemented a more
 restrictive policy on the size of Diffie-Hellman groups they accept, and
 Chrome has discontinued support for finite field key exchanges. We further
@@ -172,7 +172,7 @@ sieving more will result in a smaller matrix, making linear algebra cheaper,
 and doing more work in the precomputation makes the final descent step
 easier.
 
-\paragraph{Standard primes.}
+\paragraph{Standard primes}
 Generating safe primes\footnote{\small An odd prime $p$ is safe when
 $(p-1)/2$ is prime.} can be computationally burdensome, so many
 implementations use standardized Diffie-Hellman parameters. A prominent
@@ -270,7 +270,7 @@ calculates a MAC of its view of the handshake transcript. These MACs are
 exchanged in a pair of \textsf{Finished} messages and verified by the
 recipients.
 
-\paragraph{Export-grade Diffie-Hellman.}
+\paragraph{Export-grade Diffie-Hellman}
 To comply with 1990s-era U.S. export restrictions on cryptography, SSL 3.0
 and TLS 1.0 supported reduced-strength \dheexp{} ciphersuites that were
 restricted to primes no longer than 512 bits. In all other respects,
@@ -302,455 +302,374 @@ browser-trusted certificates, 23.9\% supported \dhe{} and 4.9\% \dheexp{}.
 0.0253 & \multicolumn{4}{c}{\emph{other primes}} \\
     \bottomrule
 	\end{tabular}
-    \TODO{Check that these sources and years are definitive.}}
     \label{tab:export-primes}
 \end{table}
 \fi
 
-While the TLS protocol allows servers to generate their own
-Diffie-Hellman parameters, just
-two 512-bit primes account for 92.3\% of Alexa Top~1M domains that
-support \dheexp{} (Table~\ref{tab:export-primes}), and 92.5\% of all servers with browser-trusted
-certificates that support \dheexp{}.  The most popular 512-bit prime
-was hard-coded into many versions of Apache;
-the second most popular is the \texttt{mod\_ssl} default for \dheexp{}.
+While the TLS protocol allows servers to generate their own Diffie-Hellman
+parameters, just two 512-bit primes account for 92.3\% of Alexa Top~1M
+domains that support \dheexp{} (Table~\ref{tab:export-primes}), and 92.5\% of
+all servers with browser-trusted certificates that support \dheexp{}. The
+most popular 512-bit prime was hard-coded into many versions of Apache; the
+second most popular is the \texttt{mod\_ssl} default for \dheexp{}.
 
 \subsection{Active Downgrade to Export-Grade DHE}
 \label{sec:dhead}
 
 \begin{figure}[t]
 \includegraphics[width=\linewidth]{\LogjamFigures/mitm-dhe-export}
-\caption{\textbf{The Logjam attack.} A man-in-the-middle can
-  force TLS clients to use export-strength DH with any
-  server that allows \dheexp{}. Then, by finding the 512-bit discrete
-  log, the attacker can learn the session key and arbitrarily read or
-  modify the contents. $\AData^{fs}$ refers to False Start
-  application data that some TLS clients send before receiving the server's \textsf{Finished} message.}
-\label{fig:mitm-export}
+    \caption{\textbf{The Logjam attack}\,---\,%
+    A man-in-the-middle can force TLS clients to use export-strength DH with
+    any server that allows \dheexp{}. Then, by finding the 512-bit discrete
+    log, the attacker can learn the session key and arbitrarily read or
+    modify the contents. $\AData^{fs}$ refers to False Start application data
+    that some TLS clients send before receiving the server's
+    \textsf{Finished} message.}
+    \label{fig:mitm-export}
 \end{figure}
 
+Given the widespread use of these primes, an attacker with the ability to
+compute discrete logs in 512-bit groups could efficiently break \dheexp{}
+handshakes for about 8\% of Alexa Top~1M HTTPS sites, but modern browsers
+never negotiate export-grade ciphersuites. To circumvent this, we show how an
+attacker can downgrade a regular \dhe{} connection to use a \dheexp{} group,
+and thereby break both the confidentiality and integrity of application data.
 
-Given the widespread use of these primes, an attacker with the ability
-to compute discrete logs in 512-bit groups could efficiently break
-\dheexp{} handshakes for about 8\% of Alexa Top~1M HTTPS sites, but
-modern browsers never negotiate export-grade ciphersuites.  To
-circumvent this, we show how an attacker can downgrade a regular \dhe{}
-connection to use a \dheexp{} group, and thereby break both
-the confidentiality and integrity of application data.
+The attack, which we call Logjam, is depicted in Figure~\ref{fig:mitm-export}
+and relies on a flaw in the way TLS composes \dhe{} and \dheexp{}. When a
+server selects \dheexp{} for a handshake, it proceeds by issuing a signed
+\textsf{ServerKeyExchange} message containing a 512-bit $p_{512}$, but the
+structure of this message is identical to the message sent during standard
+\dhe{} ciphersuites. Critically, the signed portion of the server's message
+fails to include any indication of the specific ciphersuite that the server
+has chosen. Provided that a client offers \dhe{}, an active attacker can
+rewrite the client's \textsf{ClientHello} to offer a corresponding \dheexp{}
+ciphersuite accepted by the server and remove other ciphersuites that could
+be chosen instead. The attacker rewrites the \textsf{ServerHello} response to
+replace the chosen \dheexp{} ciphersuite with a matching non-export
+ciphersuite and forwards the \textsf{ServerKeyExchange} message to the client
+as is. The client will interpret the export-grade tuple $(p_{512}, g, g^b)$
+as valid \dhe{} parameters chosen by the server and proceed with the
+handshake. The client and server have different handshake transcripts at this
+stage, but an attacker who can compute $b$ in close to real time can then
+derive the master secret and connection keys to complete the handshake with
+the client.
 
-The attack, which we call Logjam, is depicted in Figure~\ref{fig:mitm-export} and relies
-on a flaw in the way TLS composes \dhe{} and \dheexp{}.
-When a server selects \dheexp{} for a handshake, it proceeds by
-issuing a signed \textsf{ServerKeyExchange} message containing a
-512-bit $p_{512}$, but the structure of this message is identical to the
-message sent during standard \dhe{} ciphersuites. Critically, the signed portion of the
-server's message fails to include any indication of the specific
-ciphersuite that the server has chosen. Provided that a client offers \dhe{}, an
-active attacker can rewrite the client's \textsf{ClientHello} to
-offer a corresponding \dheexp{} ciphersuite accepted by the server and
-remove other ciphersuites that could be chosen instead. The attacker
-rewrites the \textsf{ServerHello} response to replace the chosen
-\dheexp{} ciphersuite with a matching non-export ciphersuite and
-forwards the \textsf{ServerKeyExchange} message to the client as
-is. The client will interpret the export-grade tuple $(p_{512}, g, g^b)$ as
-valid \dhe{} parameters chosen by the server and proceed with the handshake.
-The client and server have different handshake transcripts at this stage,
-but an attacker who can compute $b$ in close to real time can then derive the master
-secret and connection keys to complete the handshake with the client.
-
-There are two remaining challenges in implementing this active downgrade attack.
-The first is to compute individual discrete logs in close to real time, and the second is
-to delay handshake completion until the discrete log computation has had time to finish.
-
+There are two remaining challenges in implementing this active downgrade
+attack. The first is to compute individual discrete logs in close to real
+time, and the second is to delay handshake completion until the discrete log
+computation has had time to finish.
 
 \subsection{512-bit Discrete Log Computations}
 \label{subsec:512bit-dl-computation}
 
-We modified CADO-NFS~\cite{cado-nfs-2.3} to implement the number field sieve discrete log
-algorithm and applied it to the top two \dheexp{} primes shown in
-Table~\ref{tab:export-primes}. Precomputation took 7~days for each
-prime, after which computing individual logarithms requires a median of
-70~seconds.
-
+We modified CADO-NFS~\cite{cado-nfs-2.3} to implement the number field sieve
+discrete log algorithm and applied it to the top two \dheexp{} primes shown
+in Table~\ref{tab:export-primes}. Precomputation took 7~days for each prime,
+after which computing individual logarithms requires a median of 70~seconds.
 
 \paragraph{Precomputation}
-As illustrated in Figure~\ref{fig:nfs}, the precomputation phase includes
-the polynomial selection, sieving, and linear algebra steps. For this
-precomputation, we deliberately sieved more than strictly necessary.
-This enabled two optimizations: first, with more relations obtained
-from sieving, we eventually obtain a larger database of known logarithms,
-which makes the descent faster. Second, more sieving relations also
-yield a smaller linear algebra step, which is desirable because
-sieving is much easier to parallelize than linear
-algebra.\looseness=-1
+As illustrated in Figure~\ref{fig:nfs}, the precomputation phase includes the
+polynomial selection, sieving, and linear algebra steps. For this
+precomputation, we deliberately sieved more than strictly necessary. This
+enabled two optimizations: first, with more relations obtained from sieving,
+we eventually obtain a larger database of known logarithms, which makes the
+descent faster. Second, more sieving relations also yield a smaller linear
+algebra step, which is desirable because sieving is much easier to
+parallelize than linear algebra.
+%\looseness=-1
 
 For the polynomial selection and sieving steps, we used idle time on
-2000--3000 CPU cores in parallel.
-Polynomial selection ran for
-about 3~hours (7,600
-core-hours). Sieving ran for 15~hours (21,400
-core-hours). This sufficed to collect 40\,M relations of which
-28\,M were unique, involving 15\,M primes of at
-most 27~bits.
+2000--3000 CPU cores in parallel. Polynomial selection ran for about 3~hours
+(7,600 core-hours). Sieving ran for 15~hours (21,400 core-hours). This
+sufficed to collect 40\,M relations of which 28\,M were unique, involving
+15\,M primes of at most 27~bits.
 
-From this data set, we obtained a square matrix with 2.2\,M rows
-and columns, with 113 nonzero coefficients per row on average. We
-solved the corresponding linear system on a 36-node cluster using the block Wiedemann
-algorithm~\cite{Coppersmith94,Thome02b}. Using unoptimized code, 
-the computation finished in
-120 hours (60,000 core-hours).
+From this data set, we obtained a square matrix with 2.2\,M rows and columns,
+with 113 nonzero coefficients per row on average. We solved the corresponding
+linear system on a 36-node cluster using the block Wiedemann
+algorithm~\cite{coppersmith-block-wiedemann-1994,thome-block-wiedemann-2002}.
+Using unoptimized code, the computation finished in 120 hours (60,000
+core-hours).
 
-The experiment above was done with CADO-NFS
-in early 2015. As of 2017, release 2.3 of
-CADO-NFS~\cite{cado-nfs-2.3} performs 20\% faster for sieving,
-and drastically faster for linear algebra, since 9,000
-core-hours suffice to solve the same linear system on the same hardware.
-In total, the wall-clock time for each precomputation was slightly
-over one week in 2015, and is reduced to about two days with current
-hardware and more recent software.
+The experiment above was done with CADO-NFS in early 2015. As of 2017,
+release 2.3 of CADO-NFS~\cite{cado-nfs-2.3} performs 20\% faster for sieving,
+and drastically faster for linear algebra, since 9,000 core-hours suffice to
+solve the same linear system on the same hardware. In total, the wall-clock
+time for each precomputation was slightly over one week in 2015, and is
+reduced to about two days with current hardware and more recent software.
 
 \paragraph{Descent}
-Once this precomputation was finished, we were able to run the final
-descent step to compute individual discrete logs in about a minute. We implemented the descent calculation in a mix of Python and C\@. On average, computing individual logarithms took about 70~seconds,
-but the time varied from 34 to 206 seconds on a server with two 18-core Intel Xeon E5-2699 CPUs. For purposes of comparison, a single 512-bit RSA factorization using
-the CADO-NFS implementation takes about 4 days of wall-clock
-time on the computer used for the descent\cite{cado-nfs-2.3}.
+Once this precomputation was finished, we were able to run the final descent
+step to compute individual discrete logs in about a minute. We implemented
+the descent calculation in a mix of Python and C\@. On average, computing
+individual logarithms took about 70~seconds, but the time varied from 34 to
+206 seconds on a server with two 18-core Intel Xeon E5-2699 CPUs. For
+purposes of comparison, a single 512-bit RSA factorization using the CADO-NFS
+implementation takes about 4 days of wall-clock time on the computer used for
+the descent\cite{cado-nfs-2.3}.
+
 % reference: revision 580f1f1 of CADO-NFS with tasks.sieve.qmin=15470309
 % on a catrel node:
 % Total cpu/elapsed time for entire factorization: 1.06608e+07/351570
 % 351570/3600/24 = 4.07
 
-% candidate to not be dropped depending on how much space we have in the end
 \subsection{Active Attack Implementation}
-The main challenge in performing this attack is to compute the shared secret $g^{ab}$ before the
-handshake completes in order to forge a \textsf{Finished} message from
-the server.  With our descent implementation, the computation takes an
-average of 70 seconds, but there are several ways an attacker can work
-around this delay:
+The main challenge in performing this attack is to compute the shared secret
+$g^{ab}$ before the handshake completes in order to forge a \textsf{Finished}
+message from the server. With our descent implementation, the computation
+takes an average of 70 seconds, but there are several ways an attacker can
+work around this delay:
 
-\subpar{Non-browser clients.}
-Different TLS clients impose different time limits,
-after which they kill the connection. Command-line clients such as
-\texttt{curl} and \texttt{git} have
-long or no timeouts, and we can hijack their connections without
-difficulty.
+\paragraph{Non-browser clients}
+Different TLS clients impose different time limits, after which they kill the
+connection. Command-line clients such as \texttt{curl} and \texttt{git} have
+long or no timeouts, and we can hijack their connections without difficulty.
 
-\subpar{TLS warning alerts.}
-Web browsers tend to have shorter timeouts, but we can keep their
-connections alive by sending TLS warning alerts, which are ignored by
-the browser but reset the handshake timer.  For example, this
-allows us to keep Firefox TLS connections alive indefinitely.
+\paragraph{TLS warning alerts}
+Web browsers tend to have shorter timeouts, but we can keep their connections
+alive by sending TLS warning alerts, which are ignored by the browser but
+reset the handshake timer. For example, this allows us to keep Firefox TLS
+connections alive indefinitely.
 
-\subpar{Ephemeral key caching.}
+\paragraph{Ephemeral key caching}
 Many TLS servers do not use a fresh value $b$ for each connection, but
-instead compute $g^b$ once and reuse it for multiple negotiations. For example, F5 BIG-IP
-load balancers will reuse $g^b$ by default. Microsoft Schannel caches
-$g^b$ for two hours---this setting is hard-coded.
-For these servers, an
-attacker can compute the discrete log of $g^b$ from one connection and use it
-to attack later handshakes.
+instead compute $g^b$ once and reuse it for multiple negotiations. For
+example, F5 BIG-IP load balancers will reuse $g^b$ by default. Microsoft
+Schannel caches $g^b$ for two hours---this setting is hard-coded. For these
+servers, an attacker can compute the discrete log of $g^b$ from one
+connection and use it to attack later handshakes.
 
-\subpar{TLS False Start.}
-Even when clients enforce shorter timeouts and servers do not reuse
-values for $b$, the attacker can still break the confidentiality of
-user requests that use TLS False Start.
-Recent versions of Chrome, Internet Explorer, and Firefox
-implement False Start, but their policies on when to enable it
-vary. Firefox 35, Chrome 41, and Internet
-Explorer (Windows 10) send False Start data with \dhe{}\@.
-
-In these cases, a man-in-the-middle can record
-the handshake and decrypt the False Start payload at leisure.
-
-
-\if0
-\begin{table}[t]
-\centering\small
-\begin{tabular}{rrrrr}
-& \multicolumn{2}{c}{Alexa Top~1M} & \multicolumn{2}{c}{Browser-trusted IPv4} \\
-\toprule
-Bits & \dheexp{} & \dhe{} & \dheexp{} & \dhe{} \\
-\midrule
-512  & 0.9576 & 0.0003 & 0.9929 & 0.0008 \\
-768  &      0 & 0.0021 &      0 & 0.0264 \\
-1024 & 0.0008 & 0.8376 & 0.0003 & 0.8436 \\
-2048 & 0.0414 & 0.1536 & 0.0067 & 0.1185 \\
-4096 & 0.0002 & 0.0064 & 0.0001 & 0.0105 \\
-\bottomrule
-\end{tabular}
-\caption{Prime length of DHE ciphersuites for TLS
-\TODO{Clean up}}
-\label{tab:prime-length}
-\end{table}
-\fi
-
+\paragraph{TLS False Start}
+Even when clients enforce shorter timeouts and servers do not reuse values
+for $b$, the attacker can still break the confidentiality of user requests
+that use TLS False Start. Recent versions of Chrome, Internet Explorer, and
+Firefox implement False Start, but their policies on when to enable it vary.
+Firefox 35, Chrome 41, and Internet Explorer (Windows 10) send False Start
+data with \dhe{}\@. In these cases, a man-in-the-middle can record the
+handshake and decrypt the False Start payload at leisure.
 
 \section{Nation-State Threats to DH}
+\label{sec:nationstate}
 
 The previous sections demonstrate the existence of practical attacks against
-Diffie-Hellman key exchange as currently used by TLS\@. However, these attacks
-rely on the ability to downgrade connections to export-grade crypto.  In this section we address the following question:
-how secure is Diffie-Hellman in broader practice, as used in other protocols
-that do not suffer from downgrade, and when applied with stronger groups?
+Diffie-Hellman key exchange as currently used by TLS\@. However, these
+attacks rely on the ability to downgrade connections to export-grade crypto.
+In this section we address the following question: how secure is
+Diffie-Hellman in broader practice, as used in other protocols that do not
+suffer from downgrade, and when applied with stronger groups?
 
 \input{\LogjamFigures/fig_scaling.tex}
 
 To answer this question we must first examine how the number field sieve for
 discrete log scales to 768- and 1024-bit groups. As we argue below, 768-bit
-groups  in relatively widespread use are now within reach for
-academic computational resources. Additionally, performing precomputations for a small
-number of 1024-bit groups is plausibly within the resources of nation-state adversaries. The precomputation would likely require special-purpose hardware, but
-would not require any major algorithmic improvements. In light of these results, we examine several standard Internet
-security protocols---IKE, SSH, and TLS---to determine their vulnerability.  Although the cost of
-the precomputation for a 1024-bit group is several times higher than
-for an RSA key of equal size, a one-time investment
-could be used to attack millions of hosts, due to widespread reuse of
-the most common Diffie-Hellman parameters. Finally, we apply this new understanding to a set of
-recently published documents to evaluate the hypothesis that the
-National Security Agency has {\em already} implemented such a
-capability.
+groups in relatively widespread use are now within reach for academic
+computational resources. Additionally, performing precomputations for a small
+number of 1024-bit groups is plausibly within the resources of nation-state
+adversaries. The precomputation would likely require special-purpose
+hardware, but would not require any major algorithmic improvements. In light
+of these results, we examine several standard Internet security
+protocols---IKE, SSH, and TLS---to determine their vulnerability. Although
+the cost of the precomputation for a 1024-bit group is several times higher
+than for an RSA key of equal size, a one-time investment could be used to
+attack millions of hosts, due to widespread reuse of the most common
+Diffie-Hellman parameters. Finally, we apply this new understanding to a set
+of recently published documents to evaluate the hypothesis that the National
+Security Agency has {\em already} implemented such a capability.
 
 \subsection{Scaling NFS to 768- and 1024-bit DH}
 
-Estimating the cost for discrete log cryptanalysis at larger key sizes
-is far from straightforward due to the complexity of
-parameter tuning.
-We attempt
-estimates up to 1024-bit discrete log based on the existing
-literature and our own experiments but further work is needed for
-greater confidence.  We
-summarize all the costs, measured or estimated, in
-Table~\ref{Tab:costs}.
+Estimating the cost for discrete log cryptanalysis at larger key sizes is far
+from straightforward due to the complexity of parameter tuning. We attempt
+estimates up to 1024-bit discrete log based on the existing literature and
+our own experiments but further work is needed for greater confidence. We
+summarize all the costs, measured or estimated, in Table~\ref{tab:costs}.
 
-\paragraph{DH-768: done in 2016}
-When the ACM CCS version of this article was prepared, the latest
-discrete log record was a 596-bit computation. Based on that work, and on
-prior experience with the 768-bit factorization record in
-2009~\cite{rsa768}, we made the conservative prediction that it was
-possible, as explained in~\S\ref{sec:dl}, to put more computational
-effort into sieving for the discrete log case than for factoring, so that the
-linear algebra step would run on a slightly smaller matrix. This led to a
-runtime estimate of around 35,000 core-years, most of which was
-spent on linear algebra.
+\paragraph{DH-768: Completed in 2016}
+At the time of disclosure, the latest discrete log record was a 596-bit
+computation. Based on that work, and on prior experience with the 768-bit
+factorization record in 2009~\cite{rsa768}, we made the conservative
+prediction that it was possible, as explained in~\S\ref{sec:dl}, to put more
+computational effort into sieving for the discrete log case than for
+factoring, so that the linear algebra step would run on a slightly smaller
+matrix. This led to a runtime estimate of around 35,000 core-years, most of
+which was spent on linear algebra.
 
-This estimate turned out be overly conservative, for several reasons.
-First, there have been significant improvements in our software implementation
+This estimate turned out be overly conservative, for several reasons. First,
+there have been significant improvements in our software implementation
 (see~\S\ref{subsec:512bit-dl-computation}). In addition, our estimate did not
-use the Joux-Lercier alternative
-polynomial selection method~\cite[\S2.1]{JL}, which is specific to discrete
-logs.  For 768-bit discrete logs,
-this polynomial selection method leads to a significantly smaller
-computational cost.
+use the Joux-Lercier alternative polynomial selection
+method~\cite[\S2.1]{nfs-prime-field-2003}, which is specific to discrete
+logs. For 768-bit discrete logs, this polynomial selection method leads to a
+significantly smaller computational cost.
 
-In 2016, Kleinjung et al.\ completed a 768-bit discrete
-log computation~\cite{Kleinjung2017}. While this is a massive
-computation on the academic scale, a computation
-of this size has likely been within reach of nation-states for more than a decade. This
-data is mentioned in Table~\ref{Tab:costs}.
+In 2016, Kleinjung et al.\ completed a 768-bit discrete log
+computation~\cite{dlog-768-kleinjung-2017}. While this is a massive
+computation on the academic scale, a computation of this size has likely been
+within reach of nation-states for more than a decade. This data is mentioned
+in Table~\ref{tab:costs}.
 
-%For the 768-bit case,
-%we based our initial estimates on the recent discrete log
-%record at 596 bits~\cite{dlp180} and the integer factorization record
-%of 768 bits from 2009~\cite{rsa768}.  While the algorithms for
-%factorization and discrete log are similar, the discrete log linear
-%algebra stage is many times more difficult.
-%
-%A 596-bit factorization takes about 5 core-years, most of it spent on
-%sieving.  In comparison, the record 596-bit discrete log effort tuned
-%parameters such that they spent 50 core-years on sieving. This reduced
-%their linear algebra calculation to 80 core-years.  We used this same
-%strategy in our 512-bit experiments
-%in~\S\ref{subsec:512bit-dl-computation}.
-%
-%Similarly, the 768-bit RSA factoring record spent more time on sieving
-%in order to save time on the linear algebra step. The cost of sieving
-%was around 1500 core-years and the matrix that was produced had 200M
-%rows and columns. As a result, the linear algebra took 150 core-years.
-%Taking algorithmic improvements since 2009 into account and
-%optimizing for the total time, we estimate that factoring an
-%RSA-768 integer would take 900 core-years in total.
-%
-%For a 768-bit discrete log, we can expect ten times as much
-%sieving as the RSA case.  We extrapolate from experiments with existing software and estimate that
-%this linear algebra would take 28,500 core-years, for
-%a total of 36,500 core-years. This is within reach by computing power
-%available to academics.
-%
-%The descent step takes relatively little time.  We experimented with
-%both CADO-NFS and a new implementation with GMP-ECM based on
-%the early-abort strategy~\cite{batchnfs} finding that  the initial descent phase took an average of around
-%1~core-day. The remaining phase uses sieving similar to the  precomputation and, extrapolating from experiments, the rest of
-%the descent should take at most 1~core-day. After
-%precomputation, the cost of a single 768-bit discrete log computation
-%is around 2~core-days.\footnote{Subsequent research found that
-%these initial estimates may have been substantial over-estimates. Kleinjung
-%et~al.\  performed the computation against a 768-bit safe prime finding that the
-%total effort required an order of magnitude less computation. Their
-%precomputation required the equivalent of about 5,300~core years (approximately
-%% PZ: this is 200 and not 90: see Table 1 of [15]: 110 core years for
-%% |g_max| <= 165, and 90 core years for |g_max| <= 333
-%200~for polynomial selection, 4,000~for sieving,
-%% PZ: 4000 is just for sieving, linear algebra took 920 core years (Table 1)
-%and 920 for linear algebra) and
-%% PZ: it is 3-220~core hours not years! Cf Table 1 of [15]
-%3-220~core hours (average of 43) for descent~\cite{Kleinjung2017}.}
-%
 \paragraph{DH-1024: Plausible with nation-state resources}
-Experimentally extrapolating sieving parameters to the 1024-bit case
-is difficult due to the tradeoffs between the steps of the algorithm and their relative
-parallelism.  The prior work proposing parameters for factoring a
-1024-bit RSA key is thin and we resort to extrapolating from asymptotic complexity.  For the
-number field sieve, the complexity is $\exp\big((k+o(1))(\log N)^{1/3}(\log\log N)^{2/3}\big),$
-where $N$ is the integer to factor or the prime modulus for discrete log and $k$ is an
-algorithm-specific constant. This formula is
-inherently imprecise, since the $o(1)$ in the exponent can hide
-polynomial factors.
-This
-complexity formula, with $k=1.923$, describes the overall time for both
-discrete log and factorization, which are both dominated by sieving and linear algebra in the precomputation. Evaluating the formula for 768- and 1024-bit $N$ gives us estimated
-multiplicative factors by which time and space will increase from
+Experimentally extrapolating sieving parameters to the 1024-bit case is
+difficult due to the tradeoffs between the steps of the algorithm and their
+relative parallelism. The prior work proposing parameters for factoring a
+1024-bit RSA key is thin and we resort to extrapolating from asymptotic
+complexity. For the number field sieve, the complexity is
+$\exp\big((k+o(1))(\log N)^{1/3}(\log\log N)^{2/3}\big),$ where $N$ is the
+integer to factor or the prime modulus for discrete log and $k$ is an
+algorithm-specific constant. This formula is inherently imprecise, since the
+$o(1)$ in the exponent can hide polynomial factors. This complexity formula,
+with $k=1.923$, describes the overall time for both discrete log and
+factorization, which are both dominated by sieving and linear algebra in the
+precomputation. Evaluating the formula for 768- and 1024-bit $N$ gives us
+estimated multiplicative factors by which time and space will increase from
 the 768- to the 1024-bit case.
 
 For 1024-bit precomputation, the total time complexity can be expected to
-increase by a factor of
-1220 using the complexity formula, while space
-complexity increases by its square root, approximately
-35.
-These ratios are relevant for both factorization and discrete log
-since they have the same asymptotic behavior. For DH-1024,
-we get a total cost estimate for the precomputation of about 6M core-years.
-% The time complexity for each individual log after the precomputation
-% should be multiplied by
-% $L_{2^{1024}}(1.206)/L_{2^{768}}(1.206)\approx86$, where $k=1.206$
-% follows from~\cite{EC:FGHT17}.
-% This last number does not correspond to what
-% we observed in practice and we attribute that to the fact that the descent
-% step has been far less studied.
-In practice, it is not uncommon for estimates based merely on the
-complexity formula to
-be off by a factor of 10. Estimates of Table~\ref{Tab:costs} must therefore be considered with
-due caution.
+increase by a factor of 1220 using the complexity formula, while space
+complexity increases by its square root, approximately 35. These ratios are
+relevant for both factorization and discrete log since they have the same
+asymptotic behavior. For DH-1024, we get a total cost estimate for the
+precomputation of about 6M core-years.
 
-For 1024-bit descent, we experimented with our early-abort
-implementation to inform our estimates for descent
-initialization, which should dominate the individual discrete log computation.  For a random target in Oakley Group 2, initialization took 22 core-days, and yielded a few primes of at most
-130 bits to be descended further. In twice this time, we
-reached primes of about 110 bits.  At this point, we were certain to have bootstrapped the descent and
-could continue down to the smoothness bound in a few more core-days
-if proper sieving software were available.  Thus we estimate that a 1024-bit
-descent would take about 30~core-days, once again easily parallelizable.
+The time complexity for each individual log after the precomputation should
+be multiplied by $L_{2^{1024}}(1.206)/L_{2^{768}}(1.206)\approx86$, where
+$k=1.206$ follows from~\cite{EC:FGHT17}. This last number does not correspond
+to what we observed in practice and we attribute that to the fact that the
+descent step has been far less studied.
+
+In practice, it is not uncommon for estimates based merely on the complexity
+formula to be off by a factor of 10. Estimates of Table~\ref{tab:costs} must
+therefore be considered with due caution.
+
+For 1024-bit descent, we experimented with our early-abort implementation to
+inform our estimates for descent initialization, which should dominate the
+individual discrete log computation. For a random target in Oakley Group~2,
+initialization took 22 core-days, and yielded a few primes of at most 130
+bits to be descended further. In twice this time, we reached primes of about
+110 bits. At this point, we were certain to have bootstrapped the descent and
+could continue down to the smoothness bound in a few more core-days if proper
+sieving software were available. Thus we estimate that a 1024-bit descent
+would take about 30~core-days, once again easily parallelizable.
 
 \paragraph{Costs in hardware}
-Although several millions of core-years is a massive computational effort, it is not
-necessarily out of reach for a nation-state.  At this scale,
-significant cost savings could be realized by developing
-application-specific hardware given that
-sieving is a natural target for hardware implementation.  To our
-knowledge, the best prior description of an ASIC implementation of
+Although several millions of core-years is a massive computational effort, it
+is not necessarily out of reach for a nation-state. At this scale,
+significant cost savings could be realized by developing application-specific
+hardware given that sieving is a natural target for hardware implementation.
+To our knowledge, the best prior description of an ASIC implementation of
 1024-bit sieving is the 2007 work of Geiselmann and
-Steinwandt~\cite{GeSt07}.  Updating their estimates for modern
-techniques and adjusting parameters for discrete log allows us to extrapolate the financial and time costs.
+Steinwandt~\cite{hardware-scaling-nfs-2007}. Updating their estimates for
+modern techniques and adjusting parameters for discrete log allows us to
+extrapolate the financial and time costs.
 
 We increase their chip count by a factor of ten to sieve more and save on
-linear algebra as above giving an estimate of 3M chips to
-complete sieving in one year.  Shrinking the dies from the 130~nm
-technology node used in the paper to a more modern size reduces costs as transistors are cheaper at newer technologies.
-With standard transistor costs and utilization, it
-would cost about \$2 per chip to manufacture after fixed design and
-tape-out costs of roughly \$2M~\cite{jefferiesReport}.  This suggests
-that an \$8M investment would buy enough ASICs to complete the DH-1024
-sieving precomputation in one year. Since a step of descent
-uses sieving, the same hardware could likely be reused to speed
-calculations of individual logarithms.
+linear algebra as above giving an estimate of 3M chips to complete sieving in
+one year. Shrinking the dies from the 130~nm technology node used in the
+paper to a more modern size reduces costs as transistors are cheaper at newer
+technologies. With standard transistor costs and utilization, it would cost
+about \$2 per chip to manufacture after fixed design and tape-out costs of
+roughly \$2M~\cite{jefferies-report-2012}. This suggests that an \$8M
+investment would buy enough ASICs to complete the DH-1024 sieving
+precomputation in one year. Since a step of descent uses sieving, the same
+hardware could likely be reused to speed calculations of individual
+logarithms.
 
-Estimating the financial cost for the linear algebra is more
-difficult since there has been little work on designing chips that
-are suitable for the larger fields involved in discrete log.  To
-derive a rough estimate, we can begin with general purpose hardware
-and the core-year estimate from Table~\ref{Tab:costs}. Using the 300,000
-CPU core Titan supercomputer it would take 4~years to complete
-the 1024-bit linear algebra stage (notwithstanding the fact that
-estimates from Table~\ref{Tab:costs} are known to be extremely coarse,
-and could be optimistic by a factor of maybe 10).  Titan was constructed in 2012
-for \$94M, suggesting a cost of \$0.5B in supercomputers to finish this
-step in a year.  In the context of factorization, moving
-linear algebra from general purpose CPUs to ASICs has been estimated
-to reduce costs by a factor of 80~\cite{geiselmann2005improved}.  If we optimistically assume that a similar reduction can be
-achieved for discrete log, the hardware cost to perform the linear
-algebra for DH-1024 in one year is plausibly on the order of tens
-of millions of dollars.
+Estimating the financial cost for the linear algebra is more difficult since
+there has been little work on designing chips that are suitable for the
+larger fields involved in discrete log. To derive a rough estimate, we can
+begin with general purpose hardware and the core-year estimate from
+Table~\ref{tab:costs}. Using the 300,000 CPU core Titan supercomputer it
+would take 4~years to complete the 1024-bit linear algebra stage
+(notwithstanding the fact that estimates from Table~\ref{tab:costs} are known
+to be extremely coarse, and could be optimistic by a factor of maybe 10).
+Titan was constructed in 2012 for \$94M, suggesting a cost of \$0.5B in
+supercomputers to finish this step in a year. In the context of
+factorization, moving linear algebra from general purpose CPUs to ASICs has
+been estimated to reduce costs by a factor of
+80~\cite{improving-linear-algebra-nfs-2005}. If we optimistically assume that
+a similar reduction can be achieved for discrete log, the hardware cost to
+perform the linear algebra for DH-1024 in one year is plausibly on the order
+of tens of millions of dollars.
 
-To put this dollar figure in context, the FY\,2012 budget for the
-U.S. Consolidated Cryptologic Program (which includes the NSA)
-was \$10.5 billion\footnote{\small The National Science Foundation's budget
-was \$7 billion.}~\cite{blackBudget:full}.  The 2013 budget request, which prioritized investment in ``groundbreaking
-cryptanalytic capabilities to defeat adversarial cryptography and
-exploit internet traffic'' included notable \$100M+ increases in two
-programs under Cryptanalysis \& Exploitation Services: ``Cryptanalytic IT Systems''
-(to \$247M), and the cryptically named ``PEO Program C'' (to \$360M)~\cite{blackBudget:full}.
+To put this dollar figure in context, the FY\,2012 budget for the U.S.
+Consolidated Cryptologic Program (which includes the NSA) was \$10.5
+billion\footnote{\small The National Science Foundation's budget was \$7
+billion.}~\cite{black-budget-leak-2013}. The 2013 budget request, which
+prioritized investment in ``groundbreaking cryptanalytic capabilities to
+defeat adversarial cryptography and exploit internet traffic'' included
+notable \$100M+ increases in two programs under Cryptanalysis \& Exploitation
+Services: ``Cryptanalytic IT Systems'' (to \$247M), and the cryptically named
+``PEO Program C'' (to \$360M)~\cite{black-budget-leak-2013}.
 
 \subsection{Is NSA Breaking 1024-bit DH?}
 
-Our calculations suggest that it is plausibly within NSA's resources
-to have performed number field sieve precomputations for a
-small number of 1024-bit Diffie-Hellman groups.  This would allow them
-to break any key exchanges made with those groups in close to real
-time.  If true, this would answer one of the major cryptographic
-questions raised by the Edward Snowden leaks: How is NSA defeating the
-encryption for widely used VPN protocols?
+Our calculations suggest that it is plausibly within NSA's resources to have
+performed number field sieve precomputations for a small number of 1024-bit
+Diffie-Hellman groups. This would allow them to break any key exchanges made
+with those groups in close to real time. If true, this would answer one of
+the major cryptographic questions raised by the Edward Snowden leaks: How is
+NSA defeating the encryption for widely used VPN protocols?
 
-Virtual private networks (VPNs) are widely used for tunneling business
-or personal traffic across potentially hostile networks. We focus on the
+Virtual private networks (VPNs) are widely used for tunneling business or
+personal traffic across potentially hostile networks. We focus on the
 Internet Protocol Security (IPsec) VPN protocol using the Internet Key
-Exchange (IKE) protocol for key establishment and parameter negotiation and the
-Encapsulating Security Payload (ESP) protocol for protecting packet contents.
+Exchange (IKE) protocol for key establishment and parameter negotiation and
+the Encapsulating Security Payload (ESP) protocol for protecting packet
+contents.
 
 \paragraph{IKE}
-There are two versions, IKEv1 and
-IKEv2, which differ in message structure but are
-conceptually similar. For the sake of brevity, we will use IKEv1
+There are two versions, IKEv1 and IKEv2, which differ in message structure
+but are conceptually similar. For the sake of brevity, we will use IKEv1
 terminology~\cite{rfc7296}.
 
 \newcommand{\skeyid}{\textsf{\small SKEYID}}
 \newcommand{\keymat}{\textsf{\small KEYMAT}}
 \newcommand{\psk}{\textsf{\small PSK}}
 
-Each IKE session begins with a Phase~1 handshake in which the client
-and server select a Diffie-Hellman group from a small set of
-standardized parameters and perform a key exchange to establish a
-shared secret.  The shared secret is combined with other cleartext values
- transmitted by each side, such as nonces and cookies, to derive
-a value called \skeyid\@.  When authenticated with a pre-shared key (PSK) in IKEv1, the PSK value is incorporated into the derivation of \skeyid.
+Each IKE session begins with a Phase~1 handshake in which the client and
+server select a Diffie-Hellman group from a small set of standardized
+parameters and perform a key exchange to establish a shared secret. The
+shared secret is combined with other cleartext values transmitted by each
+side, such as nonces and cookies, to derive a value called \skeyid\@. When
+authenticated with a pre-shared key (PSK) in IKEv1, the PSK value is
+incorporated into the derivation of \skeyid.
 
 The resulting \skeyid\ is used to encrypt and authenticate a Phase~2
-handshake.  Phase~2 establishes the parameters and key material,
-\keymat, for protecting the
-subsequently tunneled traffic.  Ultimately, \keymat{} is derived from \skeyid,
-additional nonces, and the result of an optional Phase~2
-Diffie-Hellman exchange.
+handshake. Phase~2 establishes the parameters and key material, \keymat, for
+protecting the subsequently tunneled traffic. Ultimately, \keymat{} is
+derived from \skeyid, additional nonces, and the result of an optional
+Phase~2 Diffie-Hellman exchange.
 
 \paragraph{NSA's VPN exploitation process}
-Documents published by Der Spiegel describe NSA's ability to decrypt VPN traffic using passive
-eavesdropping and without message injection or
-man-in-the-middle attacks on IPsec or IKE\@.
-Figure~\ref{fig:scarynsafigure} illustrates the flow of information
-required to decrypt the tunneled traffic.
+Documents published by Der Spiegel describe NSA's ability to decrypt VPN
+traffic using passive eavesdropping and without message injection or
+man-in-the-middle attacks on IPsec or IKE\@. Figure~\ref{fig:scarynsafigure}
+illustrates the flow of information required to decrypt the tunneled traffic.
 
 \begin{figure}
-        \noindent\includegraphics[width=\linewidth]{\LogjamFigures/NSA_combined.png}
-        \caption{\textbf{NSA's VPN decryption infrastructure.}  This
-      classified illustration published by Der
-      Spiegel~\cite{media-35526} shows captured IKE handshake messages
-      being passed to a high-performance computing system, which
-      returns the symmetric keys for ESP session traffic.  The details
-      of this attack are consistent with an efficient break for
-      1024-bit Diffie-Hellman.}
-      \label{fig:scarynsafigure}
+    \noindent\includegraphics[width=\linewidth]{\LogjamFigures/NSA_combined.png}
+    \caption{\textbf{NSA's VPN decryption infrastructure}\,---\,%
+    This classified illustration published by Der
+    Spiegel~\cite{media-35526} shows captured IKE handshake messages
+    being passed to a high-performance computing system, which returns the
+    symmetric keys for ESP session traffic. The details of this attack are
+    consistent with an efficient break for 1024-bit Diffie-Hellman.}
+    \label{fig:scarynsafigure}
 \end{figure}
 
 \input{\LogjamFigures/scan_summary.tex}
 
-When the IKE/ESP messages of a VPN of interest are collected, the IKE messages and a small amount of ESP traffic are sent to the Cryptanalysis and Exploitation Services (CES)~\cite{media-35526, media-35529, media-35515}. Within the CES enclave, a specialized ``attack orchestrator'' attempts to recover the ESP decryption key with assistance from high-performance computing resources as well as a database of known PSKs (``CORALREEF'')~\cite{media-35529, media-35526, media-35515}. If the recovery was successful, the decryption key is returned from CES and used to decrypt the buffered ESP traffic such that the encapsulated content can be processed~\cite{media-35529, media-35522}.
+When the IKE/ESP messages of a VPN of interest are collected, the IKE
+messages and a small amount of ESP traffic are sent to the Cryptanalysis and
+Exploitation Services (CES)~\cite{media-35526, media-35529, media-35515}.
+Within the CES enclave, a specialized ``attack orchestrator'' attempts to
+recover the ESP decryption key with assistance from high-performance
+computing resources as well as a database of known PSKs
+(``CORALREEF'')~\cite{media-35529, media-35526, media-35515}. If the recovery
+was successful, the decryption key is returned from CES and used to decrypt
+the buffered ESP traffic such that the encapsulated content can be
+processed~\cite{media-35529, media-35522}.
 
 \paragraph{Evidence for a discrete log attack}
 The ability to decrypt VPN traffic does not necessarily indicate a
