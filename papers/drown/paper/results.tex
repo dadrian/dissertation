@@ -5,8 +5,7 @@
 
 %% \subsubsection{Comparing hardware platforms}
 \if0
-The most computationally expensive part of our general DROWN attack is breaking the 40-bit symmetric key.  W
-e wanted to find the platform that would have the best tradeoff of cost and speed for the attack, so we performed some preliminary experiments comparing performance of symmetric key breaking on CPUs, GPUs, and FPGAs.  These experiments used a na\"{\i}ve version of the attack using the OpenSSL implementation of MD5 and RC2.
+The most computationally expensive part of our general DROWN attack is breaking the 40-bit symmetric key.  We wanted to find the platform that would have the best tradeoff of cost and speed for the attack, so we performed some preliminary experiments comparing performance of symmetric key breaking on CPUs, GPUs, and FPGAs.  These experiments used a na\"{\i}ve version of the attack using the OpenSSL implementation of MD5 and RC2.
 
 The CPU machine contained four Intel Xeon E7-4820 CPUs with a total of 32 cores (64 concurrent threads). The GPU system was equipped with a ZOTAC GeForce GTX TITAN and an Intel Xeon E5-1620 host CPU\@. The FPGA setup consisted of 64 Spartan-6 LX150 FPGAs.
 
@@ -16,30 +15,31 @@ Table~\ref{perf_comparison} compares the three platforms.
 
 While the FPGA implementation was the fastest in our test setup, the speed-to-cost ratio of GPUs was the most promising. Therefore, we decided to focus on optimizing the attack on the GPU platform.
 \fi
-\if0
+
+\ifext
 \subsubsection{Optimized GPU implementation}
 \label{sec:gpu_brief}
 We developed a highly optimized GPU implementation of our general DROWN brute force attack.  Our first na\"{\i}ve GPU implementation performed around 26MH/s, where MH measures the calculation of an MD5 hash and the RC2 decryption. The optimizations described below gave a final speed of 515MH/s, a speedup factor of 19.8.  
 \fi
-%We describe these optimizations in further detail in Section~\ref{sec:gpu}.
 
 %\input{sections/gpu}
 
-\if0
+\ifext
 We obtained our improvements through a number of optimizations.  Our original implementation ran into a communication bottleneck in the PCI-E bus in transmitting candidate keys from CPU to GPU, so we removed this bottleneck by generating key candidates on the GPU itself.  We optimized memory management, including storing candidate keys and the RC2 permutation table in constant memory, which is almost as fast as a register, instead of slow global memory.  We optimized the cryptographic checks themselves by rewriting the RC2 implementation to use 32-bit instructions, removing unnecessary RC2 keysize checks, dropping unused ADD instructions during MD5, and manually shifting input bytes into the MD5 input registers to avoid loop branches.
 \looseness=1
 \fi
 
-\if0
+\ifext
 
 \label{sec:ec2_results}
 %In this section, we discuss attack performance and cost when a rented cloud compute cluster is used for the GPU breaking.
 \fi
 
-The most computationally expensive part of our general DROWN attack is breaking the 40-bit symmetric key, so we developed a highly optimized GPU implementation of this brute force attack.  Our first na\"{\i}ve GPU implementation performed around 26MH/s, where MH measures the calculation of an MD5 hash and the RC2 decryption. Our optimized implementation gave a final speed of 515MH/s, a speedup factor of 19.8.  
+The most computationally expensive part of our general DROWN attack is breaking the 40-bit symmetric key, so we developed a highly optimized GPU implementation of this brute force attack.  Our first na\"{\i}ve GPU implementation performed around 26MH/s, where MH denotes the time required for testing one million possible values of $mk_{secret}$. Our optimized implementation runs at a final speed of 515MH/s, a speedup factor of 19.8.  
 \label{sec:gpu_brief}
 
-We obtained our improvements through a number of optimizations.  Our original implementation ran into a communication bottleneck in the PCI-E bus in transmitting candidate keys from CPU to GPU, so we removed this bottleneck by generating key candidates on the GPU itself.  We optimized memory management, including storing candidate keys and the RC2 permutation table in constant memory, which is almost as fast as a register, instead of slow global memory.  We optimized the cryptographic checks themselves by rewriting the RC2 implementation to use 32-bit instructions, removing unnecessary RC2 keysize checks, dropping unused ADD instructions during MD5, and manually shifting input bytes into the MD5 input registers to avoid loop branches.  We describe these optimizations in further detail in Appendix~\ref{sec:gpu}.
+We obtained our improvements through a number of optimizations.  For example, our original implementation ran into a communication bottleneck in the PCI-E bus in transmitting candidate keys from CPU to GPU, so we removed this bottleneck by generating key candidates on the GPU itself.  We optimized memory management, including storing candidate keys and the RC2 permutation table in constant memory, which is almost as fast as a register, instead of slow global memory. 
+\ifext  We optimized the cryptographic checks themselves by rewriting the RC2 implementation to use 32-bit instructions, removing unnecessary RC2 keysize checks, dropping unused ADD instructions during MD5, and manually shifting input bytes into the MD5 input registers to avoid loop branches.  We describe these optimizations in further detail in Appendix~\ref{sec:gpu}. \fi
 
 We experimentally evaluated our optimized implementation on a local cluster and in the cloud.
 We used it to execute a full attack of $2^{49.6}$ tested keys on each platform.
@@ -47,7 +47,7 @@ The required number of keys to test during the attack is a random variable, dist
 We treat a full attack as requiring $2^{49.6}$ tested keys overall.
 
 \paragraph{Hashcat.}
-Hashcat\cite{hashcat} is an open source optimized password-recovery tool.
+Hashcat~\cite{hashcat} is an open source optimized password-recovery tool.
 The Hashcat developers allowed us to use their GPU servers for our attack evaluation. 
 The servers contain a total of 40 GPUs: 32 Nvidia GTX 980 cards, and 8 AMD R9 290X cards.
 The value of this equipment is roughly \$18,040.
@@ -61,12 +61,29 @@ Our full attack took less than 18 hours to complete on the Hashcat servers, with
 \paragraph{Amazon EC2.}
 \label{sec:ec2_results}
 % AH: Suggest trimming this as in the submitted version
-\iftrue
-We also ran our optimized GPU code on the Amazon Elastic Compute Cloud (EC2)~\cite{ec2} service.  We used a cluster composed of 200 variable-price ``spot'' instances: 150 \texttt{g2.2xlarge} instances, each of which contains one high-performance NVIDIA GPU with 1,536 CUDA cores and 50 \texttt{g2.8xlarge} instances, each containing four of these GPUs.  
+\ifext
+\input{sections/ec2}
+\else
+We also ran our optimized GPU code on the Amazon Elastic Compute Cloud (EC2) service.  We used a cluster composed of 200 variable-price ``spot'' instances: 150 \texttt{g2.2xlarge} instances, each containing one high-performance NVIDIA GPU with 1,536 CUDA cores and 50 \texttt{g2.8xlarge} instances, each containing four of these GPUs.  
 When we ran our experiments in January 2016, the average spot rates we paid were \$0.09/hr and \$0.83/hr respectively.  
 %The 150 \texttt{g2.2xlarge} nodes finished after 6h26m, while the \texttt{g2.8xlarge} finished after 7h41m.  $7.2\%$ of the jobs that we expected to complete failed due to overheating GPUs.  The attack was successful despite the failed jobs, so we did not rerun them.  
 Our full attack finished in under 8 hours including startup and shutdown for a cost of \$440.  
-See Appendix~\ref{sec:ec2-details} for more details.
-\else
-\input{sections/ec2}
+\ifext See Appendix~\ref{sec:ec2-details} for more details. \fi
 \fi
+
+
+\subsection{OpenSSL SSLv2 cipher suite selection bug}
+
+General DROWN is a protocol flaw, but the population of vulnerable hosts is
+increased due to a bug in OpenSSL that causes many servers to erroneously
+support \ssltwo and export ciphers even when configured not to. The OpenSSL
+team intended to disable \ssltwo by default in 2010, with a change that removed
+all \ssltwo cipher suites from the default list of ciphers offered by the
+server~\cite{opensslchangelog}.  However, the code for the protocol itself was
+not removed in standard builds and \ssltwo itself remained enabled. We
+discovered a bug in OpenSSL's \ssltwo cipher suite negotiation logic that
+allows clients to select \ssltwo cipher suites even when they are not
+explicitly offered by the server. We notified the OpenSSL team of this
+vulnerability, which was assigned CVE-2015-3197.  The problem was fixed in
+OpenSSL releases 1.0.2f and 1.0.1r~\cite{opensslchangelog}.
+\looseness=1

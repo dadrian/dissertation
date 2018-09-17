@@ -9,9 +9,138 @@ This is just a temporary place to scribble down todo items.
 
 \subsection{Paper todos}
 \begin{itemize}
-	\item Move ciphersuite selection bug to Measurements
-	\item Describe the Leaky Export oracle in the special drown section
-	\item Describe the improvement of Leaky Export on QUIC in the signature forgery section
+	\item Move ciphersuite selection bug to Measurements - LGTM after first pass from me.
+	\item Describe the Leaky Export oracle in the special drown section - made a first review pass, I'm still not thrilled about the state of the new text.
+	\item Describe the improvement of Leaky Export on QUIC in the signature forgery section - LGTM after first pass from me.
+	\item Shorten the paper to 13 pages for the body, and 18 pages overall.
+	\item If space permits, include a table summarizing the different attacks,
+	with the oracles they require, and the required amounts of server connections
+	and offline work - DONE. I'd really like to keep it.
 \end{itemize}
 
+Paper structure:
+0 Abstract
+1 Intro
+2 Background
+  2.1 PKCS
+  2.2 SSL and TLS
+  2.3 Bleichenbacher
+3 Attack
+  3.1 Attack scenario
+  3.2 A generic SSLv2 oracle
+  3.3 DROWN attack template
+  3.3.1 Phase 1
+  3.3.2 Phase 2 - Rotations
+  3.3.3 Later phases - Adapted Bleichenbacher iteration
+4 General DROWN
+  4.1 The SSLv2 export padding oracle
+  4.2 TLS decryption attack
+    4.2.1 Attack scenario
+    4.2.2 Constructing the attack
+    4.2.3 Attack performance
+  4.3 Implementing general DROWN with GPUs
+5 Special DROWN
+  5.1 The Extra Clear oracle
+  5.2 The OpenSSL Leaky export oracle
+  5.3 Combining the two oracles
+6 Measurements
+  Cipher suite selection bug
+  Widespread public key reuse
+  Special DROWN
+7 MITM attacks and QUIC
+  7.1 MITM attack against TLS
+    7.1.1 Attack scenario
+    7.1.2 Constructing the attack
+  7.2 Extending the attack to QUIC
+    Unauthenticated QUIC discovery
+    Signature forgery details
+    Attack cost
+  7.3 QUIC signature forgery using special DROWN
+  7.4 SSLv2 servers with CA certificates
+8 Related work
+9 Discussion
+  9.2 Implications for modern protocols
+  9.3 Lessons for key reuse
+  9.4 Harms from obsolete cryptography
+  9.5 Harms from deliberately weakening cryptography
+Acknowledgements
+Appendices:
+A public key reuse
+B Adaptations to Bleichenbacher’s attack
+  B.1 Calculating the success probability of a fraction
+  B.2 Optimizing the chosen set of fractions
+  B.3 Efficiently computing rotations and multipliers
+  B.4 Rotations in the general DROWN attack
+  B.5 General DROWN Bleichenbacher iterations
+  B.6 General DROWN attack performance
+  B.7 Performance of the MITM attack against TLS using special DROWN
+    Using multiple queries per fraction
+C Highly optimized GPU implementation
+D Amazon EC2 evaluation
+E A brief history of obsolete cryptography
+
+Stuff we might cut:
+- Figure 1: SSLv2 handshake
+- 3.1 "attacker's position in the network".
+  We could probably make this shorter, currently it's roughly a 1/3 of a page.
+  Similarly for 4.2.1 "Attack scenario" under "General DROWN"
+- 5.1 The Extra Clear oracle - we can probably make this shorter.
+  The visual master_keys in particular can be replaced with a 0^ notation, saving a lot of space.
+  Similarly for 5.2 The OpenSSL Leaky export oracle.
+- Table 5 - Summary of the attacks.
+- 9.1 Lessons for protocol design
+- Appendix B: It's not at all clear if/what parts overlap with the body.
+- Appendix A.3: The lattices part.
+  As cool as it is, if we're short on space, we can allow the reader to assume
+  we just used more CPU, the entire attack before this optimization took 10
+  minutes of CPU on my machine.
+
+Shortened:
+- Widespread public key reuse - it's an important point,
+  but I'm not sure we can afford a 1/3 of a page to it
+
+Removed:
+- Appendix A: Public key reuse.
+- Appendix C: Highly optimized GPU implementation.
+- Appendix E: A brief history of obsolete cryptography:
+  Personally I'd like to hammer this point home even in the body,
+  but realistically we give it due space in 9.4.
+- Table 4 - hosts vulnerable to special DROWN.
+  Ideally we should include it, but with our space limitations we might consider
+  merging the HTTPS and Alexa rows into the general DROWN table?
+- Figure 2: Visual overview of the attack
+- 7.4 SSLv2 servers with CA certificates
+- D Amazon EC2 evaluation
+- 9.1 Lessons for protocol design
+
+Comparison between Section 3/4 and Appendix B:
+--------------------------------------------
+3 Attack
+  3.1 Attack scenario
+  3.2 A generic SSLv2 oracle
+  3.3 DROWN attack template
+  3.3.1 Phase 1 - just a primer about trimmers, with a concrete example.
+        No probability computation.
+  3.3.2 Phase 2 - Rotations
+  3.3.3 Later phases - Adapted Bleichenbacher iteration
+4.2.2 Constructing the attack: Does explain the rationale behind the different phases.
+
+Appendix should:
+V Compute random probability.
+V A.4 should contain further explanations on the shifting technique?
+  I'm not sure any more explanations are needed.
+  (Yes, they're needed to tie together the rationale,
+  i.e. explain with formulas the need for m_3$.
+V A.5 should further describe Bleichenbacher iteration.
+V Should not include the rationale behind the different phases.
+  (It only formalizes the need, LGTM).
+V A.6 should explain the computation given a fraction set F.
+  (A.1 does this, fixed the ref and deleted A.6).
+
+Things we might add back if space permits:
+------------------------------------------
+- False Start paragraph.
+- Table 4 (summary of attacks).
+
 \end{document}
+

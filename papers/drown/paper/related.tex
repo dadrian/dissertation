@@ -1,30 +1,49 @@
+TLS has had a long history of implementation flaws and protocol attacks~\cite{POODLE,CRIME,RC4biases,Lucky13,BEAST,SLOTH,Durumeric:2014:MH:2663716.2663755}. We discuss relevant Bleichenbacher and cross-protocol attacks below.
+
 \paragraph{Bleichenbacher's attack.}
-Bleichenbacher's adaptive chosen ciphertext attack against SSL was first published in 1998~\cite{Bleichenbacher}.  Since then, several works have adapted his attack to different scenarios~\cite{klima2003attacking,bardou2012efficient,Jager2012}.
+Bleichenbacher's adaptive chosen ciphertext attack against SSL was first published in 1998~\cite{Bleichenbacher}. Several works have adapted his attack to different scenarios~\cite{klima2003attacking,bardou2012efficient,Jager2012}.
+The TLS standard explicitly introduces countermeasures against the attack~\cite{rfc5246}, but several modern implementations have been discovered to be vulnerable to timing-attack variants in recent years~\cite{Meyer14,Zhang:2014:CSA:2660267.2660356}. These side-channel attacks are implementation failures and only apply when the attacker is co-located with the victim.
 
 \ifext
-Klima \etal~\cite{klima2003attacking} extended the attack to take advantage of leaked protocol version numbers present in the decrypted plaintext, rather than the validity of the padding format.  Bardou \etal~\cite{bardou2012efficient} applied the attack to several cryptographic hardware implementations, and developed the concept of ``trimmers" to aid the mathematical algorithm behind the attack, which we also use in this work. 
+Klima \etal~\cite{klima2003attacking} extended the attack to take advantage of leaked protocol version numbers present in the decrypted plaintext, rather than the validity of the padding format.  Bardou \etal~\cite{bardou2012efficient} applied the attack to several cryptographic hardware implementations, and developed the concept of ``trimmers" to aid the mathematical algorithm behind the attack, which we also use in this work.
 \fi
 
-Despite the fact that the TLS standard~\cite{rfc5246} explicitly introduces countermeasures against Bleichenbacher's attack, several modern implementations have been discovered to be vulnerable to it in recent years. Meyer \etal~\cite{Meyer14} inspected various software and hardware implementations and discovered timing side-channels that enabled the attack. Zhang  \etal~applied Bleichenbacher's attack to develop a cache flush-and-reload timing attack against OpenSSL in cross-tenant environments~\cite{Zhang:2014:CSA:2660267.2660356}. These side-channel attacks, however, are applicable only in scenarios where the attacker is physically close to or co-located with the victim and are based on implementation failures.
+\if0
+Meyer \etal~\cite{Meyer14} inspected various software and hardware implementations and discovered timing side-channels that enabled the attack. Zhang  \etal~applied Bleichenbacher's attack to develop a cache flush-and-reload timing attack against OpenSSL in cross-tenant environments~\cite{Zhang:2014:CSA:2660267.2660356}. These side-channel attacks, however, are applicable only in scenarios where the attacker is physically close to or co-located with the victim and are based on implementation failures.
 
-Jager et al. described a similar Bleichenbacher oracle, as we use in our paper, to attack XML Encryption in Web Services~\cite{Jager2012}. To this end, they exploited the fact that RSA~PKCS\#1~v1.5 was used in combination with symmetric algorithms in CBC mode of operation.
+Jager et al.\@ described a similar Bleichenbacher oracle, as we use in our paper, to attack XML Encryption in Web Services~\cite{Jager2012}. To this end, they exploited the fact that RSA~PKCS\#1~v1.5 was used in combination with symmetric algorithms in CBC mode of operation.
+\fi
 
 %Very recently, it was practically shown that it is still possible to construct \PKCS oracles based on different side-channels in well-used TLS libraries. At USENIX Security 2014, Meyer et al. showed that tiny timing differences can be used to decrypt TLS connections~\cite{Meyer14}. At CCS 2014, Zhang et al. evaluated application of flush-and-reload attacks to decrypt RSA \PKCS ciphertexts~\cite{Zhang:2014:CSA:2660267.2660356}. However, these two techniques are only possible if the analyzed TLS library \textit{implements the countermeasure incorrectly}, and if the attacker can execute the attacks \textit{from a near server distance}: either from a LAN~\cite{Meyer14} or even from the same physical machine~\cite{Zhang:2014:CSA:2660267.2660356}. In addition, these two side-channels can lead to wrong oracle responses, which could break the attack execution~\cite{Meyer14}.
 
 \paragraph{Cross-protocol attacks.}
-
-Jager et al.~\cite{Jager:2015:STQ:2810103.2813657} observed that a cross-protocol Bleichenbacher RSA padding oracle attack is possible against the proposed TLS 1.3 standard, in spite of the fact that TLS 1.3 does not include RSA key exchange, if server implementations use the same certificate for previous versions of TLS and TLS 1.3.  Wagner and Schneier~\cite{WagnerSchneier:SSLAnalysis:96} developed a cross-cipher suite attack for SSLv3, in which an attacker could reuse a signed server key exchange message in a later exchange with a different cipher suite.  Mavrogiannopoulos et al~\cite{CCS:MVVP12} developed a cross-cipher suite attack allowing an attacker to use elliptic curve Diffie-Hellman as plain Diffie-Hellman.
+Jager et al.\@ \cite{Jager:2015:STQ:2810103.2813657} showed that a cross-protocol
+Bleichenbacher RSA padding oracle attack is possible against the proposed TLS
+1.3 standard, in spite of the fact that TLS 1.3 does not include RSA key
+exchange, if server implementations use the same certificate
+for previous versions of TLS and TLS 1.3.
+Wagner and Schneier~\cite{WagnerSchneier:SSLAnalysis:96} developed a cross-cipher suite attack for
+SSLv3, in which an attacker could reuse a signed server
+key exchange message in a later exchange with a different
+cipher suite.
+Mavrogiannopoulos et al.\@ \cite{CCS:MVVP12}
+developed a cross-cipher suite attack allowing an attacker to use
+elliptic curve Diffie-Hellman as prime field Diffie-Hellman.
 
 \paragraph{Attacks on export-grade cryptography.}
-Recently, the FREAK~\cite{SMACKTLS} and Logjam~\cite{LogJam} attacks allowed an active attacker to downgrade a connection to export-grade RSA and Diffie-Hellman, respectively.
-Export-grade cryptography plays an important role in DROWN as well, as it exploits export-grade symmetric ciphers.
+Recently, the FREAK~\cite{SMACKTLS} and Logjam~\cite{LogJam} attacks allowed an
+active attacker to downgrade a connection to export-grade RSA and
+Diffie-Hellman, respectively.  DROWN exploits export-grade symmetric ciphers,
+completing the export-grade cryptography attack trifecta.
 
+\if0
 \paragraph{Further attacks on SSL/TLS\@.}
 Other attacks on SSL and TLS include:
 POODLE~\cite{POODLE}, which exploits SSLv3's lack of a requirement for the contents of padding bytes, and its MAC-then-encrypt construction;
 CRIME~\cite{CRIME}, which exploits support for compression and observes ciphertexts' lengths in order to decrypt traffic;
-The RC4 Biases attack~\cite{RC4biases}, which utilizes biases in the the RC4 keystream;
+The RC4 Biases attack~\cite{RC4biases}, which utilizes biases in the RC4 keystream;
 Lucky13~\cite{Lucky13}, which exploits small timing differences and MAC-then-encrypt;
 and BEAST~\cite{BEAST}, which exploits predictable IVs in TLS\@.
  Bhargavan and Leurent presented SLOTH attacks and broke TLS and other protocols using MD5 for computing transcript hashes~\cite{SLOTH}.
+\fi
 

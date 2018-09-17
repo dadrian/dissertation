@@ -1,60 +1,199 @@
-\newcommand{\DrownPaper}{papers/drown/paper}
-\newcommand{\DrownFigures}{papers/drown/figures}
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{usenix,epsfig,endnotes}
 
-\input{\DrownFigures/figs}
+\pagestyle{plain}
+
+\usepackage[colorlinks=true, citecolor=black, urlcolor=black, linkcolor=black]{hyperref}
+\usepackage{marginnote}
+\newcommand{\todo}[1]{\textcolor{red}{\marginnote{TODO} To Do: #1}}
+\newcommand{\etal}{{\em et~al.}}
+\urlstyle{rm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{xspace}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{cite}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{authblk}
+\usepackage{slashbox}
+
+\usepackage{booktabs}
+\usepackage{titlesec}
+
+\usepackage[protrusion=true,expansion=true,kerning]{microtype} % removed tracking, which seems to screw up the small caps in the references
+
+\usepackage{balance}
+
+% dirty spacing tricks
+\titlespacing*{\paragraph}
+{0pt}{4pt}{6pt}
+\titlespacing*{\section}
+{0pt}{6pt}{3pt}
+\titlespacing*{\subsection}
+{0pt}{6pt}{2pt}
+\titlespacing*{\subsubsection}
+{0pt}{6pt}{2pt}
+\titleformat*{\subsection}{\normalfont\fontsize{11}{12.5}\bfseries} % AH: This is a common improvement to the Usenix style
+\setlist[itemize]{itemsep=0.5pt, topsep=3pt}
+\setlist[enumerate]{itemsep=0.5pt, topsep=3pt}
+
+% Better URL hyphenation (AH 12/08)
+\def\UrlBreaks{\do-\do\.\do\@\do\\\do\!\do\_\do\|\do\;\do\>\do\]%
+\do\)\do\,\do\?\do\'\do+\do\=\do\#}
+\def\UrlBigBreaks{\do\:\do\/}%
+
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}[section]
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+% include command definitions
+\input{Commanddefs}
+
+% Keep extra detail for the extended version
+\newif\ifext\extfalse
+\newif\ifdraft\draftfalse
+\newif\ifblind\blindtrue
+
+\draftfalse
+\blindfalse
+%\exttrue
+
+\usepackage{watermark}
+\thiswatermark{\parbox{\textwidth}{\vskip-6pt\centering%\fontsize{10.75}{13}\normalfont
+    \emph{Proceedings of the 25th USENIX Security Symposium}, August 2016\hfill
+    \bfseries {\url{https://drownattack.com}\normalfont}
+    \vskip3pt
+    \rule[\baselineskip]{\textwidth}{.75pt}
+}}
+
+\usepackage[top=1in,left=1in,right=1in,bottom=1in]{geometry}
+
+\makeatletter
+\g@addto@macro\normalsize{%
+  \addtolength\abovedisplayskip{-0.2\baselineskip}
+  \addtolength\belowdisplayskip{-0.2\baselineskip}
+  \addtolength\abovedisplayshortskip{-0.2\baselineskip}
+  \addtolength\belowdisplayshortskip{-0.2\baselineskip}
+}
+\makeatother
+
+\begin{document}
+\thispagestyle{empty}
+
+\title{DROWN: Breaking TLS using SSLv2}
+\ifblind
+\author{}
+\else
+\author[1]{Nimrod Aviram}
+\author[2]{Sebastian Schinzel}
+\author[3]{Juraj Somorovsky}
+\author[4]{Nadia Heninger}
+\author[2]{Maik Dankel}
+\author[5]{Jens~Steube}
+\author[4]{Luke Valenta}
+\author[6]{David Adrian}
+\author[6]{J. Alex Halderman}
+\author[7]{Viktor Dukhovni}
+\author[8]{Emilia~K\"asper}
+\author[4]{Shaanan Cohney}
+\author[3]{Susanne Engels}
+\author[3]{Christof Paar}
+\author[1]{Yuval Shavitt}
+\affil[1]{Department of Electrical Engineering, Tel Aviv University}
+\affil[2]{M\"unster University of Applied Sciences}
+\affil[3]{Horst G\"ortz Institute for IT Security, Ruhr University Bochum}
+\affil[4]{University of Pennsylvania}
+\affil[5]{Hashcat Project}
+\affil[6]{University of Michigan}
+\affil[7]{Two Sigma/OpenSSL}
+\affil[8]{Google/OpenSSL}
+
+\renewcommand\Affilfont{\fontsize{10}{12}\selectfont}
+
+\renewcommand\Authands{ and }
+\fi
+
+%\pagestyle{plain}
+
+\maketitle
+
+\newif\ifsubmit\submittrue % Cuts for usenix submission
+
+\newcommand{\twolinecell}[2][r]{%
+\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\input{figs}
 
 \section*{Abstract}
-\input{\DrownPaper/abstract}
+\input{sections/abstract}
+%\footnote{Submissions are due on Thursday, February 18, 2016, 9:00 pm EST. Paper submissions should be at most 13 typeset pages, excluding bibliography and well-marked appendices.}
 
 \section{Introduction}
-\input{\DrownPaper/intro}
+\input{sections/intro}
 
 \section{Background}
-\input{\DrownPaper/background}
+\input{sections/background}
 
 \section{Breaking TLS with SSLv2}
-\input{\DrownPaper/attack}
+\input{sections/attack}
 
 \subsection{Implementing general DROWN with GPUs} 
-\input{\DrownPaper/results}
+%\subsection{Optimizing brute forcing export keys}
+\input{sections/results}
 
 \section{Special DROWN}
-\input{\DrownPaper/clear}
+\input{sections/clear}
+\input{sections/leaky}
+
+%\section{MITM attacks and QUIC}
+\input{sections/quic}
 
 \section{Measurements}
-\input{\DrownPaper/statistics}
-
-\section{Signature forgery attacks and QUIC}
-\input{\DrownPaper/quic}
+\input{sections/statistics}
 
 \section{Related work}
-\input{\DrownPaper/related}
+\input{sections/related}
 
 \section{Discussion}
-\input{\DrownPaper/discussion}
+\input{sections/discussion}
 
-%\section*{Acknowledgements}
-%
-%The authors thank team Hashcat for making their GPUs available for the execution of the attack,
-%Ralph Holz for providing early scan data, Adam Langley for insights about QUIC, Graham Steel for insights about TLS False Start, the OpenSSL team for their help with disclosure, Ivan Ristic for comments on session resumption in a BEAST-styled attack, and Tibor Jager and Christian Mainka for further helpful comments. %The authors also would like to thank Sarah Madden for DROWN logo and web site design and Christian Dresen for additional website development.
-%
-%This material is based upon work supported by the U.S. National Science Foundation under Grants No.\@ CNS-1345254, CNS-1408734, CNS-1409505, CNS-1505799, CNS-1513671, and CNS-1518888, an AWS Research Education grant, a scholarship from the Israeli Ministry of Science, Technology and Space, a grant from the Blavatnik Interdisciplinary Cyber Research Center (ICRC) at Tel Aviv University, a gift from Cisco, and an Alfred P. Sloan Foundation research fellowship.
-%Any opinions, findings, and conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the U.S. National Science Foundation. % Required by NSF until we've completed peer review
+\ifblind
+\else
+\section*{Acknowledgements}
+
+The authors thank team Hashcat for making their GPUs available for the execution of the attack,
+Ralph Holz for providing early scan data, Adam Langley for insights about QUIC, Graham Steel for insights about TLS False Start, the OpenSSL team for their help with disclosure, Ivan Ristic for comments on session resumption in a BEAST-styled attack, and Tibor Jager and Christian Mainka for further helpful comments. %The authors also would like to thank Sarah Madden for DROWN logo and web site design and Christian Dresen for additional website development.
+We thank the exceptional sysadmins at the University of Michigan for their help
+and support throughout this project, including Chris Brenner, Kevin Cheek,
+Laura Fink, Dan Maletta, Jeff Richardson, Donald Welch, Don Winsor, and others
+from ITS, CAEN, and DCO.
+
+This material is based upon work supported by the U.S. National Science Foundation under Grants No.\@ CNS-1345254, CNS-1408734, CNS-1409505, CNS-1505799, CNS-1513671, and CNS-1518888, an AWS Research Education grant, a scholarship from the Israeli Ministry of Science, Technology and Space, a grant from the Blavatnik Interdisciplinary Cyber Research Center (ICRC) at Tel Aviv University, a gift from Cisco, and an Alfred P. Sloan Foundation research fellowship.
+%Any opinions, findings, and conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the U.S. National Science Foundation. % Removed, since not required after peer review
+\fi
+
+{\footnotesize\bibliographystyle{acm}\raggedright
+\bibliography{drown,rfc}}
+
 
 \appendix
+
+\ifext
 \section{Public key reuse}
 \label{sec:pub_key_reuse}
 
-Reuse of RSA keys among different services was identified as a huge
-amplification to the number of services vulnerable to DROWN\@.
-Table~\ref{amount_shared_keys} describes the number of reused RSA keys among
-different protocols. The two clusters 110-143 and 993-995 stick out as they
-share the majority of public keys. This is expected, as most of these ports
-are served by the same IMAP/POP3 daemon. The rest of the ports also share a
-substantial fraction of public keys, usually between 21\% and 87\%. The
-numbers for HTTPS (port 443) differ as there are four times as many public
-keys in HTTPS as in the second largest protocol.
-
+Reuse of RSA keys among different services was identified as a huge amplification to the number of services vulnerable to DROWN\@. Table~\ref{amount_shared_keys} describes the number of reused RSA keys among different protocols. The two clusters 110-143 and 993-995 stick out as they share the majority of public keys. This is expected, as most of these ports are served by the same IMAP/POP3 daemon. 
+The rest of the ports also share a substantial fraction of public keys, usually between 21\% and 87\%. The numbers for HTTPS (port 443) differ as there are four times as many public keys in HTTPS as in the second largest protocol.
 \begin{table*}[th]
 \centering\footnotesize
  \begin{tabular}{rrrrrrrrr} 
@@ -99,17 +238,28 @@ keys in HTTPS as in the second largest protocol.
 %  \label{amount_cve_2015_3197}
 %  \caption{\textbf{Hosts vulnerable to OpenSSL's cipher suite selection bug (CVE 2015-3197)}}
 % \end{figure*}
+\fi
 
 \section{Adaptations to Bleichenbacher's attack}
-\input{\DrownPaper/adapting-bleichenbacher}
+\input{sections/adapting-bleichenbacher}
 
-\balance
+%\balance
 
+\ifext
 \section{Highly optimized GPU implementation}
-\input{\DrownPaper/gpu}
+\input{sections/gpu}
+\fi
 
+\ifext
 \section{Amazon EC2 evaluation}
-\input{\DrownPaper/ec2}
+\input{sections/ec2}
+\fi
 
+\ifext
 \section{A brief history of obsolete cryptography}
-\input{\DrownPaper/rant}
+\input{sections/rant}
+\fi
+
+\end{document}
+
+

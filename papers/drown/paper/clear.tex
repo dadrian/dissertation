@@ -1,17 +1,16 @@
 \label{sec:special}
 
-We discovered a vulnerability in recent
+We discovered multiple vulnerabilities in recent
 (but not current) versions of the OpenSSL SSLv2 handshake code that
-creates a powerful Bleichenbacher oracle, and drastically reduces the amount
-of computation required to implement our attack.  
-The vulnerability, which has been designated CVE-2016-0703, was
+create even more powerful Bleichenbacher oracles, and drastically reduce the amount
+of computation required to implement our attacks.  
+The vulnerabilities, designated CVE-2016-0703 and CVE-2016-0704, were
 present in the OpenSSL codebase from at least the start of the repository,
-in 1998, until it was unknowingly fixed on March 4, 2015 by a
+in 1998, until they were unknowingly fixed on March 4, 2015 by a
 patch~\cite{openssl-clear-patch} designed to correct an unrelated
 problem~\cite{CVE-2015-0293}.
-By adapting DROWN to
-exploit this special case, we can cut the number of connections
-required by more than 50\% and reduce the computational work to a negligible amount.
+By adapting DROWN to exploit this special case, we can significantly cut both
+the number of connections and the computational work required.
 
 %To distinguish the two, we call the attack developed so far
 %\emph{general} DROWN and refer to the variant that
@@ -28,10 +27,70 @@ required by more than 50\% and reduce the computational work to a negligible amo
 
 \input{sections/clear-vuln}
 
-\tabDrownAll
+%\tabDrownAll
 
-\input{sections/clear-analysis}
+\subsection{MITM attack against TLS}
+\label{sec:special_mitm_tls}
 
+Special DROWN is fast enough that it can decrypt a TLS premaster
+secret \emph{online}, during a connection handshake.  A
+man-in-the-middle attacker can use it to compromise connections
+between modern browsers and TLS servers---even those configured to
+prefer non-RSA cipher suites.
 
+%\subsubsection{Attack scenario}
+The MITM attacker impersonates the server and sends a
+\texttt{ServerHello} message that selects a cipher suite with RSA as
+the key-exchange method.  Then, the attacker uses special DROWN to
+decrypt the \pms.  The main difficulty is completing the decryption and producing a valid
+\texttt{ServerFinished} message before the client's connection times
+out.  Most browsers will allow the handshake to last up to one minute~\cite{LogJam}.
 
+The attack requires targeting
+an average of 100 connections, only one of
+which will be attacked, probabilistically.  The simplest
+way for the attacker to facilitate this is to use JavaScript to cause
+the client to connect repeatedly to the victim server, as described in
+Section~\ref{sec:attack-scenario}.  Each connection is tested
+against the oracle with only small number of fractions, and the attacker can discern
+immediately when he receives a positive response from the oracle.
 
+Note that since the decryption must be completed online, the Leaky Export oracle
+cannot be used, and the attack uses only the Extra Clear oracle.
+
+\subsubsection{Constructing the attack}
+We will use \texttt{SSL\_DES\_192\_EDE3\_CBC\_WITH\_MD5} as the cipher suite, allowing the attacker to recover 24 bytes of key at a time.
+The attack works as follows:
+
+\begin{enumerate}
+ \setcounter{enumi}{-1}
+ \item The attacker causes the victim client to connect repeatedly to the
+  victim server, with at least 100 connections.
+ \item The attacker uses the fractional trimmers as described in
+  Section~\ref{sec:trimmers} to convert one of the TLS ciphertexts
+  into an \sslconform ciphertext $c_0$.
+ \item Once the attacker has obtained a valid \ssltwo ciphertext $c_1$,
+  they repeatedly use the shifting technique described in
+  Section~\ref{sec:rotations} to rotate the message by 25 bytes each iteration,
+  learning 27 bytes with each shift.  After several iterations, they have learned
+  the entire plaintext.
+ \item The attacker then transforms the decrypted \ssltwo plaintext into the decrypted TLS plaintext. 
+\end{enumerate}
+
+Using 100 fractional trimmers, this more efficient oracle attack allows
+the attacker to recover one in 100 TLS session keys using only about
+27,000 connections to the server, as described in
+Appendix~\ref{sec:special-performance}.  The computation cost is so low that
+we can complete the full attack on a single workstation in under one
+minute.
+
+\ifext
+The ability of the victim server to perform 27,000 handshakes in less than a
+minute is not an impediment for modern hardware.  An RSA
+private key operation with a 2048-bit modulus requires on the order of
+1~ms using OpenSSL on a recent-generation CPU, so the cryptographic
+portion of the attacker's queries induces additional server load of
+roughly 22~core-seconds.  In tests with a nearby server running Apache
+2.4, we could easily complete 10,000 HTTPS requests in under 10
+seconds.
+\fi

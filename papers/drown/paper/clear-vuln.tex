@@ -10,43 +10,47 @@ the server substitutes them for bytes from the
 encrypted key. For example, consider the case that the client chooses a 128-bit cipher and sends a 16-byte
 encrypted key $k\pos{1}, k\pos{2}, \ldots, k\pos{16}$ but, contrary to the protocol specification, includes 4
 null bytes of \texttt{clear\_key\_data}. Vulnerable OpenSSL versions will
-construct the following \texttt{master\_key}:
-\small
-%$$[00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}\ k\pos{3}\ k\pos{4}\ k\pos{5}\ k\pos{6}\ k\pos{7}\ k\pos{8}\ k\pos{9}\ k\pos{10}\ k\pos{11}\ k\pos{12}]$$
-\[[00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}\ k\pos{3}\ k\pos{4}\ \dots\ k\pos{9}\ k\pos{10}\ k\pos{11}\ k\pos{12}]\]
-\normalsize
-This enables a straightforward key-recovery attack against such versions.
+construct the following \texttt{master\_key}:\smallskip
+
+\small\noindent\quad\quad $[00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}\ k\pos{3}\ k\pos{4}\ \dots\ k\pos{9}\ k\pos{10}\ k\pos{11}\ k\pos{12}]$\normalsize\vspace{-12pt}
+\smallskip
+
+This enables a straightforward key recovery attack against such versions.
 An attacker that has intercepted an \ssltwo connection takes the RSA
 ciphertext of the encrypted key and replays it in non-export handshakes to
 the server with varying lengths of \texttt{clear\_key\_data}. For a 16-byte
 encrypted key, the attacker starts with 15 bytes of clear key, causing the server to use the \texttt{master\_key}:
-\small
-$$[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}]$$
-\normalsize
+\smallskip
+
+\small\noindent\quad\quad $[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}]$\normalsize
+\smallskip
+
 The attacker can brute force the first byte of the encrypted key by
 finding the matching \texttt{ServerVerify} message among 256
-possibilities. Knowing the first byte, the attacker makes another
+possibilities. Knowing $k\pos{1}$, the attacker makes another
 connection with the same RSA ciphertext but 14 bytes of clear key,
 resulting in the \texttt{master\_key}:
-\small
-	$$[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}]$$
-\normalsize
+\smallskip
+
+\small\noindent\quad\quad $[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}]$\normalsize
+\smallskip
+
 % Note: The number below is 15, since you the original intercepted connection
 % servers as the case with 0 bytes of clear_key_data.
-Since the attacker already knows $k\pos{1}$, he can easily brute force
-the second byte. With only 15 probe connections and an expected $15 \cdot 128 = 1,920$
+The attacker can now easily brute force $k\pos{2}$. With only 15 probe
+connections and an expected $15 \cdot 128 = 1,920$
 trial encryptions, the attacker learns the entire \texttt{master\_key} for the
 recorded session.
 
 %\subsubsection{An improved oracle for DROWN}
 
-% As this oracle is obtained by improperly sending unexpected clear-key bytes,
-% we have named it the "\tOracleSSLclear".
+As this oracle is obtained by improperly sending unexpected clear-key bytes,
+we call it the Extra Clear oracle.
 
-This session key-recovery attack can be directly converted to a Bleichenbacher oracle. Given a candidate ciphertext and symmetric key length $k$, the attacker sends the ciphertext with $k$ known bytes of \texttt{clear\_key\_data}. The oracle decision is simple:
+This session key-recovery attack can be directly converted to a Bleichenbacher oracle. Given a candidate ciphertext and symmetric key length $\ell_k$, the attacker sends the ciphertext with $\ell_k$ known bytes of \texttt{clear\_key\_data}. The oracle decision is simple:
 \begin{itemize}
-\item If the ciphertext is valid, the \texttt{ServerVerify} message will reflect a \texttt{master\_key} consisting of those $k$ known bytes.
-\item If the ciphertext is invalid, the \texttt{master\_key} will be replaced with $k$ random bytes (by following the countermeasure against the Bleichenbacher attack), resulting in a different \texttt{ServerVerify} message.
+\item If the ciphertext is valid, the \texttt{ServerVerify} message will reflect a \texttt{master\_key} consisting of those $\ell_k$ known bytes.
+\item If the ciphertext is invalid, the \texttt{master\_key} will be replaced with $\ell_k$ random bytes (by following the countermeasure against the Bleichenbacher attack), resulting in a different \texttt{ServerVerify} message.
 \end{itemize}
 
-This oracle decision requires one connection to the server and one \texttt{ServerVerify} computation. After the attacker has found a valid ciphertext corresponding to a $k$-byte encrypted key, they can recover the $k$ plaintext bytes by repeating the key recovery attack from above.  Thus our oracle $\OracleSSLclear(c)$ requires one connection to determine whether $c$ is valid, and thus the two most significant bytes \hexb{00}{02} of the plaintext $m$.  After $k$ connections, the attacker can additionally learn the $k$ least significant bytes of $m$.  We model this as a single oracle call, but the number of server connections will vary depending on the response.
+This oracle decision requires one connection to the server and one \texttt{ServerVerify} computation. After the attacker has found a valid ciphertext corresponding to a $\ell_k$-byte encrypted key, they recover the $\ell_k$ plaintext bytes by repeating the key recovery attack from above.  Thus our oracle $\OracleSSLclear(c)$ requires one connection to determine whether $c$ is valid.  After $\ell_k$ connections, the attacker additionally learns the $\ell_k$ least significant bytes of $m$.  We model this as a single oracle call, but the number of server connections will vary depending on the response.

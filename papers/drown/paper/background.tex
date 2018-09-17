@@ -6,22 +6,22 @@
 In the following, $a||b$ denotes concatenation of strings $a$ and
 $b$. $a{[i]}$ references the $i$-th byte in $a$.
 $(N,e)$ denotes an RSA public key, where $N$ has byte-length
-$\ell$ ($|N|=\ell$) and $e$ is the public exponent. The corresponding
+$\ell_m$ ($|N|=\ell_m$) and $e$ is the public exponent. The corresponding
 secret exponent is $d = 1/e \bmod \phi(N)$.
 
 \subsection{\PKCS encryption padding}
 \label{sec:PKCSdescr}
 
-Our attacks rely on the structure of RSA \PKCS padding.  Although there are newer versions of the PKCS standard,
-for example RSA PKCS\#1 v2.0 which implements OAEP, SSL/TLS uses \PKCS.
-The basic task of the \PKCS encryption padding scheme~\cite{rfc2313}
-is to randomize encryptions by prepending a random padding string $PS$
-to a message $k$ (typically a symmetric session key) before applying
+Our attacks rely on the structure of RSA \PKCS padding.  Although RSA PKCS\#1 v2.0
+implements OAEP, SSL/TLS still uses \PKCS.
+The \PKCS encryption padding scheme~\cite{rfc2313}
+randomizes encryptions by prepending a random padding string $PS$
+to a message $k$ (here, a symmetric session key) before
 RSA encryption:
 
 \begin{enumerate} 
-	\item The plaintext message is $k$. The encrypter generates a random byte
-	string $PS$, where $|PS| \geq 8$, $|PS|=\ell-3-|k|$, and $\hex{00} \not \in \{PS{[1]}, \ldots,PS{[|PS|]}\}$. 
+	\item The plaintext message is $k$, $\ell_k = |k|$. The encrypter generates a random byte
+	string $PS$, where $|PS| \geq 8$, $|PS|=\ell_m-3-\ell_k$, and $\hex{00} \not \in \{PS{[1]}, \ldots,PS{[|PS|]}\}$. 
 	\item The encryption block is $m = 00||02||PS||00||k$. 
 	\item The ciphertext is computed as $c = m^e \bmod N$. 
 \end{enumerate} 
@@ -30,7 +30,7 @@ To decrypt such a ciphertext, the decrypter first computes $m = c^d
 \bmod N$.  Then it checks whether the decrypted message $m$ is
 correctly formatted as a \PKCS-encoded message. We say that the
 ciphertext $c$ and the decrypted message bytes $m{[1]} || m{[2]} || ... ||
-m{[\ell]}$ are \PKCSconform if:
+m{[\ell_m]}$ are \PKCSconform if:
 \begin{equation*} 
 	\begin{split} 
 		m{[1]}||m{[2]} \text{ } = &\text{ } \hex{00} || \hex{02}\\
@@ -39,7 +39,7 @@ m{[\ell]}$ are \PKCSconform if:
 \end{equation*} 
 If this condition holds, the decrypter searches for the first value
 $i>10$ such that $m{[i]}=0x00$. Then, it extracts $k =
-m{[i+1]}||\ldots||m{[\ell]}$. Otherwise, the ciphertext is rejected.
+m{[i+1]}||\ldots||m{[\ell_m]}$. Otherwise, the ciphertext is rejected.
 
 In SSLv3 and TLS, RSA \PKCS is used to encapsulate the
 \pms exchanged during the
@@ -80,7 +80,7 @@ differences.
 
 \paragraph{The \ssltwo handshake protocol.}
 \label{sec:ssl2}
-The \ssltwo protocol description~\cite{SSLv2}  is much less formally specified than modern RFCs. Figure~\ref{fig:ssl-handshake} depicts an \ssltwo handshake.
+The \ssltwo protocol description~\cite{SSLv2}  is less formally specified than modern RFCs. Figure~\ref{fig:ssl-handshake} depicts an \ssltwo handshake.
 %
 %\ifext
 % Juraj: we can rather remove the TLS protocol figure...everybody knows TLS or can easily find a nice protocol description
@@ -120,19 +120,21 @@ encrypted, and the length of $mk_{clear}$ is zero.
 
 The client and server can then compute session keys from the reconstructed \texttt{master\_key} $mk$:
 
+\vspace{-6pt}
 \begin{center}
 \begin{math}
 	\texttt{server\_write\_key} = MD5(mk || ``0" || r_c || r_s) \linebreak	
 	\texttt{client\_write\_key} = MD5(mk || ``1" || r_c || r_s)
 \end{math}
 \end{center}
+\vspace{-6pt}
 
 The server responds with a \texttt{ServerVerify} message
 consisting of the \texttt{challenge} $r_c$ encrypted with the
 \texttt{server\_write\_key}.  Both peers then exchange
 \texttt{Finished} messages in order to authenticate to each other.
 
-Our attack exploits the fact the server always decrypts an RSA-\PKCS
+Our attack exploits the fact that the server always decrypts an RSA-\PKCS
 ciphertext, computes the \texttt{server\_write\_key}, and \textit{immediately}
 responds with a \texttt{ServerVerify} message.  The \ssltwo standard
 implies this message ordering, but does not make it explicit.
@@ -201,13 +203,11 @@ Holz et al.~\cite{2016holz_analysis_tls-based_protocols_electronic_communication
 
 %This bug was also fixed in the aforementioned openssl releases.
 
-\input{sections/openssl-selection-vuln}
-
 \subsection{Bleichenbacher's attack}
 \label{sec:bleichenbacher}
 Bleichenbacher's attack is a padding oracle attack---it exploits the
-fact that RSA ciphertexts should decrypt to plaintexts compliant with
-the \PKCS padding format. If an implementation receives an RSA
+fact that RSA ciphertexts should decrypt to \PKCS-compliant plaintexts.
+If an implementation receives an RSA
 ciphertext that decrypts to an invalid \PKCS plaintext, it might
 naturally leak this information via an error message, by closing the
 connection, or by taking longer to process the error condition.  This
@@ -221,8 +221,8 @@ oracle could be exploited to decrypt RSA ciphertexts.
 
 \paragraph{Algorithm.}
 In the simplest attack scenario, the attacker has a valid \PKCS
-ciphertext $c_{0}$ that he wishes to decrypt to discover the message
-$m_{0}$.  He has no access to the private RSA key, but instead has
+ciphertext $c_{0}$ that they wish to decrypt to discover the message
+$m_{0}$.  They have no access to the private RSA key, but instead have
 access to an oracle $\Oracle$ that will decrypt a ciphertext $c$ and
 inform the attacker whether the most significant two bytes match
 the required value for a correct \PKCS padding:
@@ -235,15 +235,15 @@ the required value for a correct \PKCS padding:
 \end{equation*} 
 
 If the oracle answers with \texttt{1}, the attacker knows that $2B
-\leq m \leq 3B-1$, where $B = 2^{8(\ell-2)}$.  The attacker can take
-advantage of RSA malleability to generate new candidate ciphertexts
+\leq m \leq 3B-1$, where $B = 2^{8(\ell_m-2)}$.  The attacker can
+take advantage of RSA malleability to generate new candidate ciphertexts
 for any $s$:
-\[ 
+\[
 c = (c_{0} \cdot s^e) \bmod N = (m_{0} \cdot s)^e \bmod N 
-\] 
+\]
 The attacker queries the oracle with $c$. If the oracle responds with
 $0$, the attacker increments $s$ and repeats the previous
-step. Otherwise, the attacker learns that for some~$r$, $2B \leq m_{0}s - rN  < 3B$. This allows the attacker to reduce the range of possible solutions to  
+step. Otherwise, the attacker learns that for some~$r$, $2B \leq m_{0}s - rN  < 3B$. This allows the attacker to reduce the range of possible solutions to:  
 \[ 
 \frac{2B+rN}{s} \leq m_{0} < \frac{3B+rN}{s}  
 \] 
@@ -255,15 +255,15 @@ detail~\cite{Bleichenbacher}.
 
 \paragraph{Countermeasures.}
 In order to protect against this attack, the decrypter must not leak
-any information about the \PKCS validity of the ciphertext.  Since the
-ciphertext itself does not decrypt to a valid message, the
-decrypter needs to generate a fake plaintext and continue with the
-protocol using this decoy.  The attacker should not be able to
+information about the \PKCS validity of the ciphertext.  The
+ciphertext does not decrypt to a valid message, so the
+decrypter generates a fake plaintext and continues the
+protocol with this decoy.  The attacker should not be able to
 distinguish the resulting computation from a correctly decrypted
 ciphertext.
 
-In the case of SSL/TLS, the server generates a random \pms and finishes
-the handshake with this random \pms if the decrypted ciphertext is
+In the case of SSL/TLS, the server generates a random \pms to continue
+the handshake if the decrypted ciphertext is
 invalid.  The client will not possess the session key to send a valid
 \texttt{ClientFinished} message and the connection will terminate.
 
