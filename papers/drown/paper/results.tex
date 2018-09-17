@@ -22,8 +22,6 @@ While the FPGA implementation was the fastest in our test setup, the speed-to-co
 We developed a highly optimized GPU implementation of our general DROWN brute force attack.  Our first na\"{\i}ve GPU implementation performed around 26MH/s, where MH measures the calculation of an MD5 hash and the RC2 decryption. The optimizations described below gave a final speed of 515MH/s, a speedup factor of 19.8.  
 \fi
 
-%\input{sections/gpu}
-
 \ifext
 We obtained our improvements through a number of optimizations.  Our original implementation ran into a communication bottleneck in the PCI-E bus in transmitting candidate keys from CPU to GPU, so we removed this bottleneck by generating key candidates on the GPU itself.  We optimized memory management, including storing candidate keys and the RC2 permutation table in constant memory, which is almost as fast as a register, instead of slow global memory.  We optimized the cryptographic checks themselves by rewriting the RC2 implementation to use 32-bit instructions, removing unnecessary RC2 keysize checks, dropping unused ADD instructions during MD5, and manually shifting input bytes into the MD5 input registers to avoid loop branches.
 \looseness=1
@@ -62,7 +60,7 @@ Our full attack took less than 18 hours to complete on the Hashcat servers, with
 \label{sec:ec2_results}
 % AH: Suggest trimming this as in the submitted version
 \ifext
-\input{sections/ec2}
+\input{\DrownFigures/ec2}
 \else
 We also ran our optimized GPU code on the Amazon Elastic Compute Cloud (EC2) service.  We used a cluster composed of 200 variable-price ``spot'' instances: 150 \texttt{g2.2xlarge} instances, each containing one high-performance NVIDIA GPU with 1,536 CUDA cores and 50 \texttt{g2.8xlarge} instances, each containing four of these GPUs.  
 When we ran our experiments in January 2016, the average spot rates we paid were \$0.09/hr and \$0.83/hr respectively.  

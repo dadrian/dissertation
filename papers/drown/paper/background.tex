@@ -86,7 +86,7 @@ The \ssltwo protocol description~\cite{SSLv2}  is less formally specified than m
 % Juraj: we can rather remove the TLS protocol figure...everybody knows TLS or can easily find a nice protocol description
 \begin{figure}
 	%\centering 
-	\includegraphics[width=\linewidth]{img/ssl-handshake} 
+	\includegraphics[width=\linewidth]{\DrownFigures/ssl-handshake} 
 	\caption{\textbf{\ssltwo handshake.} The server responds with a \texttt{ServerVerify} message directly after receiving an RSA-\PKCS ciphertext contained in \texttt{ClientMasterKey}. This protocol feature enables our attack.\looseness=-1}
 	\label{fig:ssl-handshake}
 \end{figure}
@@ -174,7 +174,7 @@ in length, and is only five bytes for export ciphers.
 \ifsubmit\relax\else
 \begin{figure}
 	%\centering 
-	\includegraphics[width=\linewidth]{img/tls-handshake} 
+	\includegraphics[width=\linewidth]{\DrownFigures/tls-handshake} 
 	\caption{\textbf{TLS-RSA handshake.} After receiving an encrypted \pms, the server waits for an authenticated \texttt{ClientFinished} message.}
 	\label{fig:tls-handshake}
 \end{figure}
