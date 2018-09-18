@@ -19,7 +19,7 @@ While the FPGA implementation was the fastest in our test setup, the speed-to-co
 \ifext
 \subsubsection{Optimized GPU implementation}
 \label{sec:gpu_brief}
-We developed a highly optimized GPU implementation of our general DROWN brute force attack.  Our first na\"{\i}ve GPU implementation performed around 26MH/s, where MH measures the calculation of an MD5 hash and the RC2 decryption. The optimizations described below gave a final speed of 515MH/s, a speedup factor of 19.8.  
+We developed a highly optimized GPU implementation of our general DROWN brute force attack.  Our first na\"{\i}ve GPU implementation performed around 26MH/s, where MH measures the calculation of an MD5 hash and the RC2 decryption. The optimizations described below gave a final speed of 515MH/s, a speedup factor of 19.8.
 \fi
 
 \ifext
@@ -77,11 +77,11 @@ increased due to a bug in OpenSSL that causes many servers to erroneously
 support \ssltwo and export ciphers even when configured not to. The OpenSSL
 team intended to disable \ssltwo by default in 2010, with a change that removed
 all \ssltwo cipher suites from the default list of ciphers offered by the
-server~\cite{opensslchangelog}.  However, the code for the protocol itself was
+server~\cite{openssl-changelog}.  However, the code for the protocol itself was
 not removed in standard builds and \ssltwo itself remained enabled. We
 discovered a bug in OpenSSL's \ssltwo cipher suite negotiation logic that
 allows clients to select \ssltwo cipher suites even when they are not
 explicitly offered by the server. We notified the OpenSSL team of this
 vulnerability, which was assigned CVE-2015-3197.  The problem was fixed in
-OpenSSL releases 1.0.2f and 1.0.1r~\cite{opensslchangelog}.
-\looseness=1
+OpenSSL releases 1.0.2f and 1.0.1r~\cite{openssl-changelog}.
+%\looseness=1
