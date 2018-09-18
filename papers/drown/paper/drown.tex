@@ -61,9 +61,6 @@
 %%Any opinions, findings, and conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the U.S. National Science Foundation. % Removed, since not required after peer review
 %\fi
 
-\appendix
-
-\ifext
 \section{Public key reuse}
 \label{sec:pub_key_reuse}
 
@@ -75,7 +72,7 @@ The rest of the ports also share a substantial fraction of public keys, usually 
 \toprule
 
 \textbf{Port} & \textbf{25 (SMTP)} & \textbf{110 (POP3)} & \textbf{143 (IMAP)} & \textbf{443 (HTTPS)} & \textbf{465 (SMTPS)} & \textbf{587 (SMTP)} & \textbf{993 (IMAPS)} & \textbf{995 (POP3S)}\smallskip\\
-\textbf{ 25} &  1,115 (100\%) &           331 (32\%) &       318 (32\%) &       196 (4\%) &        403 (47\%) &       307 (48\%) &       369 (33\%) &       321 (32\%) \\
+\textbf{ 25} &  1,115 (100\%) &          331 (32\%) &       318 (32\%) &       196 (4\%) &        403 (47\%) &       307 (48\%) &       369 (33\%) &       321 (32\%) \\
 \textbf{110} &    331 (30\%) &         1,044 (100\%) &      795 (79\%) &       152 (3\%) &        337 (39\%) &       222 (35\%) &       819 (72\%) &       877 (87\%) \\
 \textbf{143} &    318 (29\%) &           795 (76\%) &     1,003 (100\%) &      149 (3\%) &        321 (38\%) &       220 (35\%) &       878 (78\%) &       755 (75\%) \\
 \textbf{443} &    196 (18\%) &           152 (15\%) &       149 (15\%) &     4,579 (100\%) &      129 (15\%) &        94 (15\%) &       175 (16\%) &       151 (15\%) \\
@@ -113,7 +110,6 @@ The rest of the ports also share a substantial fraction of public keys, usually 
 %  \label{amount_cve_2015_3197}
 %  \caption{\textbf{Hosts vulnerable to OpenSSL's cipher suite selection bug (CVE 2015-3197)}}
 % \end{figure*}
-\fi
 
 \section{Adaptations to Bleichenbacher's attack}
 \input{\DrownPaper/adapting-bleichenbacher}

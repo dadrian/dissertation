@@ -1,18 +1,13 @@
 %\paragraph{Transport Layer Security (TLS).}
-TLS~\cite{rfc5246} is one of the main protocols
-responsible for transport security on the modern Internet.
-%Properly
-%used, TLS prevents eavesdropping, tampering, or message forgery in
-%communications between client and server applications such as web and
-%email traffic.
-TLS and its precursor SSLv3 have been the target of a large number of cryptographic attacks in
-the research community, both on popular implementations and the
-protocol itself~\cite{2013:01:briefChronologyOfSSLTLSAttacks}.
-Prominent recent examples include attacks on outdated or deliberately
-weakened encryption in RC4~\cite{RC4biases}, RSA~\cite{SMACKTLS}, and
-Diffie-Hellman~\cite{LogJam}, different side channels including
-Lucky13~\cite{Lucky13}, BEAST~\cite{BEAST}, and POODLE~\cite{POODLE},
-and several attacks on invalid TLS protocol
+TLS~\cite{rfc5246} is one of the main protocols responsible for transport
+security on the modern Internet. TLS and its precursor SSLv3 have been the
+target of a large number of cryptographic attacks in the research community,
+both on popular implementations and the protocol
+itself~\cite{2013:01:briefChronologyOfSSLTLSAttacks}. Prominent recent
+examples include attacks on outdated or deliberately weakened encryption in
+RC4~\cite{RC4biases}, RSA~\cite{SMACKTLS}, and Diffie-Hellman~\cite{logjam-2015},
+different side channels including Lucky13~\cite{Lucky13}, BEAST~\cite{BEAST},
+and POODLE~\cite{POODLE}, and several attacks on invalid TLS protocol
 flows~\cite{SMACKTLS,ProtocolStateFuzzing15,TripleHandshake}.
 
 Comparatively little attention has been paid to the \ssltwo protocol,

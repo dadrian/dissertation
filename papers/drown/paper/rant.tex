@@ -1,4 +1,23 @@
-A flaw was first observed in the MD5 hash function in 1996; the first collision was discovered in 2004~\cite{Wang:2005:BMO:2154598.2154601}, but MD5 was still in use by certificate authorities in 2009 when Stevens et al.~\cite{Stevens2009} used a chosen-prefix MD5 attack to construct a malicious TLS certificate with a valid CA signature. 
-The RC4 stream cipher was observed to be biased as early as 1995 and shown to be catastrophically broken in the context of WEP in 2001~\cite{Fluhrer2001}; it was used by about 50\% of TLS connections in 2013 when AlFardan et~al.\ demonstrated near-practical attacks against RC4 in TLS~\cite{RC4biases}.
-TLSv1.0 was standardized in 1998 to replace SSLv3; before the POODLE attack~\cite{POODLE} was shown to render all SSLv3 block cipher suites insecure in 2014, support for SSLv3 was near 100\% for popular HTTPS sites, and most clients were vulnerable to a downgrade attack from TLS to SSLv3~\cite{ssllabs}.  Export-grade cipher suites for TLS have been obsolete since 2000, when the United States relaxed restrictions on commercial and open source software; before the FREAK attack~\cite{SMACKTLS} demonstrated widespread implementation flaws allowing a catastrophic downgrade attack exploiting export RSA, 37\% of HTTPS sites with browser-trusted certificates supported export-grade RSA\@.  Three months later the Logjam attack~\cite{LogJam} demonstrated a TLS protocol flaw downgrade attack exploiting export Diffie-Hellman; 8.4\% of the Alexa top million sites were vulnerable at the time.
+A flaw was first observed in the MD5 hash function in 1996; the first
+collision was discovered in 2004~\cite{Wang:2005:BMO:2154598.2154601}, but
+MD5 was still in use by certificate authorities in 2009 when Stevens et
+al.~\cite{Stevens2009} used a chosen-prefix MD5 attack to construct a
+malicious TLS certificate with a valid CA signature. The RC4 stream cipher
+was observed to be biased as early as 1995 and shown to be catastrophically
+broken in the context of WEP in 2001~\cite{Fluhrer2001}; it was used by about
+50\% of TLS connections in 2013 when AlFardan et~al.\ demonstrated
+near-practical attacks against RC4 in TLS~\cite{RC4biases}. TLSv1.0 was
+standardized in 1998 to replace SSLv3; before the POODLE attack~\cite{POODLE}
+was shown to render all SSLv3 block cipher suites insecure in 2014, support
+for SSLv3 was near 100\% for popular HTTPS sites, and most clients were
+vulnerable to a downgrade attack from TLS to SSLv3~\cite{ssllabs}.
+Export-grade cipher suites for TLS have been obsolete since 2000, when the
+United States relaxed restrictions on commercial and open source software;
+before the FREAK attack~\cite{SMACKTLS} demonstrated widespread
+implementation flaws allowing a catastrophic downgrade attack exploiting
+export RSA, 37\% of HTTPS sites with browser-trusted certificates supported
+export-grade RSA\@. Three months later the Logjam attack~\cite{logjam-2015}
+demonstrated a TLS protocol flaw downgrade attack exploiting export
+Diffie-Hellman; 8.4\% of the Alexa top million sites were vulnerable at the
+time.
 
