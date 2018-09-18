@@ -17,7 +17,7 @@ Jager et al.\@ described a similar Bleichenbacher oracle, as we use in our paper
 %Very recently, it was practically shown that it is still possible to construct \PKCS oracles based on different side-channels in well-used TLS libraries. At USENIX Security 2014, Meyer et al. showed that tiny timing differences can be used to decrypt TLS connections~\cite{Meyer14}. At CCS 2014, Zhang et al. evaluated application of flush-and-reload attacks to decrypt RSA \PKCS ciphertexts~\cite{Zhang:2014:CSA:2660267.2660356}. However, these two techniques are only possible if the analyzed TLS library \textit{implements the countermeasure incorrectly}, and if the attacker can execute the attacks \textit{from a near server distance}: either from a LAN~\cite{Meyer14} or even from the same physical machine~\cite{Zhang:2014:CSA:2660267.2660356}. In addition, these two side-channels can lead to wrong oracle responses, which could break the attack execution~\cite{Meyer14}.
 
 \paragraph{Cross-protocol attacks.}
-Jager et al.\@ \cite{Jager:2015:STQ:2810103.2813657} showed that a cross-protocol
+Jager et al.\@ \cite{tls-quic-pkcs-2015} showed that a cross-protocol
 Bleichenbacher RSA padding oracle attack is possible against the proposed TLS
 1.3 standard, in spite of the fact that TLS 1.3 does not include RSA key
 exchange, if server implementations use the same certificate

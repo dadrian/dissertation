@@ -1,15 +1,25 @@
 
-%An attacker can also use a Bleichenbacher-type attack to compute valid RSA signatures on arbitrary messages.  Mathematically, RSA signing and decryption are identical.  Such an attack could theoretically be used to forge a signed Server Key Exchange message for Diffie-Hellman cipher suites, thus allowing an attacker to perform a man-in-the-middle attack against all TLS versions up to TLSv1.3.~\cite{Jager:2015:STQ:2810103.2813657}  Since the server key exchange message includes the client and server randoms, the attacker must forge the signature online before the handshake times out. We are not able to use all of our optimizations for signature forgery, so such an attack does not seem feasible without additional improvements, even for special DROWN.
+%An attacker can also use a Bleichenbacher-type attack to compute valid RSA signatures on arbitrary messages.  Mathematically, RSA signing and decryption are identical.  Such an attack could theoretically be used to forge a signed Server Key Exchange message for Diffie-Hellman cipher suites, thus allowing an attacker to perform a man-in-the-middle attack against all TLS versions up to TLSv1.3.~\cite{tls-quic-pkcs-2015}  Since the server key exchange message includes the client and server randoms, the attacker must forge the signature online before the handshake times out. We are not able to use all of our optimizations for signature forgery, so such an attack does not seem feasible without additional improvements, even for special DROWN.
 
 \section{Extending the attack to QUIC}
 \label{sec:quic}
 
-DROWN can also be extended to a feasible-time man-in-the-middle attack against QUIC~\cite{Jager:2015:STQ:2810103.2813657}.  QUIC~\cite{quic, langley2014quic} is a recent cryptographic protocol designed and implemented by Google that is intended to reduce the setup time to establish a secure connection while providing security guarantees analogous to TLS\@.  QUIC's security relies on a static ``server config'' message signed by the server's public key.  Jager et al.\@~\cite{Jager:2015:STQ:2810103.2813657} observe that an attacker who can forge a signature on a malicious QUIC server config once would be able to impersonate the server indefinitely.  In this section, we show an attacker with significant resources would be able to mount such an attack against a server whose RSA public keys is exposed via \ssltwo.
+DROWN can also be extended to a feasible-time man-in-the-middle attack
+against QUIC~\cite{tls-quic-pkcs-2015}. QUIC~\cite{quic,
+quic-langley-2014} is a recent cryptographic protocol designed and implemented
+by Google that is intended to reduce the setup time to establish a secure
+connection while providing security guarantees analogous to TLS\@. QUIC's
+security relies on a static ``server config'' message signed by the server's
+public key. Jager et al.\@~\cite{tls-quic-pkcs-2015} observe that
+an attacker who can forge a signature on a malicious QUIC server config once
+would be able to impersonate the server indefinitely. In this section, we
+show an attacker with significant resources would be able to mount such an
+attack against a server whose RSA public keys is exposed via \ssltwo.
 
 A QUIC client receives a ``server config'' message, signed by the server's public key, which enumerates connection parameters: a static elliptic curve Diffie-Hellman public value, and a validity period.  In order to mount a man-in-the-middle attack against any client, the attacker wishes to generate a valid server config message containing their own Diffie-Hellman value, and an expiration date far in the future.
 
 %\paragraph{Unauthenticated QUIC discovery.}
-The attacker needs to present a forged QUIC config to the client in order to carry out a successful attack.  This is straightforward, since QUIC discovery may happen over non-encrypted HTTP~\cite{QUICDiscovery}.  The server does not even need to support QUIC at all: an attacker could impersonate the attacked server over an unencrypted HTTP connection and falsely indicate that the server supports QUIC\@. The next time the client connects to the server, it will attempt to connect using QUIC, allowing the attacker to present the forged ``server config'' message and execute the attack~\cite{Jager:2015:STQ:2810103.2813657}.
+The attacker needs to present a forged QUIC config to the client in order to carry out a successful attack.  This is straightforward, since QUIC discovery may happen over non-encrypted HTTP~\cite{QUICDiscovery}.  The server does not even need to support QUIC at all: an attacker could impersonate the attacked server over an unencrypted HTTP connection and falsely indicate that the server supports QUIC\@. The next time the client connects to the server, it will attempt to connect using QUIC, allowing the attacker to present the forged ``server config'' message and execute the attack~\cite{tls-quic-pkcs-2015}.
 
 \begin{table}[t]
   \centering
