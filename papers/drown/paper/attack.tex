@@ -185,7 +185,7 @@ As described in Section~\ref{sec:attack-scenario}, we consider a server that acc
 %\paragraph{Server supports export cipher suites for \ssltwo.}
 We also assume the server supports export cipher suites for \ssltwo.
 This can happen for two reasons.
-First, the same server operators that fail to follow best practices in disabling \ssltwo~\cite{ProhibitingSSLv2} may also fail to follow best practices by supporting export cipher suites.
+First, the same server operators that fail to follow best practices in disabling \ssltwo~\cite{rfc6176} may also fail to follow best practices by supporting export cipher suites.
 Alternatively, the server might be running a version of OpenSSL prior to January 2016, in which case it is vulnerable to the OpenSSL cipher suite selection bug described in Section~\ref{sec:openssl-selection}, and an attacker may negotiate a cipher suite of his choice independent of the server configuration.
 
 % Nimrod: The previous subsection, introducing the generic SSLv2 oracle,
