@@ -15,7 +15,7 @@ Comparatively little attention has been paid to the \ssltwo protocol,
 likely because the known attacks are so devastating and the protocol
 has long been considered obsolete.  Wagner and Schneier wrote in 1996 that
 their attacks on \ssltwo ``will be irrelevant in the long term
-when servers stop accepting SSL 2.0 connections''~\cite{WagnerSchneier:SSLAnalysis:96}.
+when servers stop accepting SSL 2.0 connections''~\cite{ssl-v3-1996}.
 Most modern TLS clients do not support \ssltwo at all.
 Yet in 2016, our Internet-wide scans find that out of 36~million
 HTTPS servers, 6~million (17\%) support \ssltwo.
@@ -29,7 +29,7 @@ HTTPS servers, 6~million (17\%) support \ssltwo.
 %\vspace{-3pt}
 
 \paragraph{A Bleichenbacher attack on \ssltwo.}
-Bleichenbacher's padding oracle attack~\cite{Bleichenbacher} is an
+Bleichenbacher's padding oracle attack~\cite{bleichenbacher-1998} is an
 adaptive chosen ciphertext attack against \PKCS, the RSA padding
 standard used in SSL and TLS\@.  It enables decryption of RSA
 ciphertexts if a server distinguishes between correctly and
@@ -39,79 +39,73 @@ number of decryption queries needed to deduce a plaintext.  All
 widely used SSL/TLS servers include
 countermeasures against Bleichenbacher attacks.
 
-\if0
-\paragraph{Our results.}
-In this paper, we construct an efficient Bleichenbacher attack~\cite{Bleichenbacher}
-against \ssltwo that needs only a few thousand server queries to
-decrypt an RSA ciphertext.
-Our attack works against implementations that
-implement the recommended countermeasures against Bleichenbacher attacks.  Next, we go on to show how
-our \ssltwo attack can be used to decrypt passively collected TLS
-ciphertexts from clients who do not even speak \ssltwo.  Due to
-widespread reuse of RSA keys across servers, protocols, and protocol
-versions, an attacker can use our attack to compromise completely
-up-to-date clients and servers.
-\fi
+Our first result shows that the \ssltwo protocol is fatally vulnerable to a
+form of Bleichenbacher attack that enables decryption of RSA ciphertexts. We
+develop a novel application of the attack that allows us to use a server that
+supports \ssltwo as an efficient padding oracle. This attack is a
+protocol-level flaw in \ssltwo that results in a feasible attack for 40-bit
+export cipher strengths, and in fact abuses the universally implemented
+countermeasures against Bleichenbacher attacks to obtain a decryption oracle.
+%\looseness=-1
 
-Our first result shows that the \ssltwo protocol is fatally
-vulnerable to a form of Bleichenbacher attack
-%Bleichenbacher adaptive chosen ciphertext
-%attack~\cite{Bleichenbacher} 
-that enables decryption of RSA
-ciphertexts.  We develop a novel application of the
-attack that allows us to use a server that supports \ssltwo as an
-efficient padding oracle.  This attack is a protocol-level flaw in \ssltwo that
-results in a feasible attack for 40-bit export cipher strengths,
-and in fact abuses the universally implemented countermeasures against
-Bleichenbacher attacks to obtain a decryption oracle.
-\looseness=-1
-
-We also discovered multiple implementation flaws in
-commonly deployed OpenSSL versions that allow an extremely efficient
-\ifext and much more dangerous \fi instantiation of this attack.
+We also discovered multiple implementation flaws in commonly deployed OpenSSL
+versions that allow an extremely efficient and much more dangerous
+instantiation of this attack.
 
 \paragraph{Using \ssltwo to break TLS\@.}
-Second, we present a novel \textit{cross-protocol attack} that allows an attacker to break a passively collected RSA key exchange for any TLS server if the RSA keys are also used for \ssltwo, possibly on a different server.
-We call this attack DROWN (\emph{Decrypting RSA using Obsolete and Weakened eNcryption}).
+Second, we present a novel \textit{cross-protocol attack} that allows an
+attacker to break a passively collected RSA key exchange for any TLS server
+if the RSA keys are also used for \ssltwo, possibly on a different server. We
+call this attack DROWN (\emph{Decrypting RSA using Obsolete and Weakened
+eNcryption}).
 
-In its \emph{general} version, the attack exploits the protocol flaws in \ssltwo, does not rely on any particular library implementation, and is feasible to carry out in practice by taking advantage of commonly supported export-grade ciphers.  In order to decrypt one TLS session, the attacker must passively capture about 1,000 TLS sessions using RSA key exchange, make 40,000 \ssltwo connections to the victim server, and perform \begin{math} 2^{50} \end{math} symmetric encryption operations.  We successfully carried out this attack using an optimized GPU implementation and were able to decrypt a 2048-bit RSA ciphertext in less than 18 hours on a GPU cluster and less than 8 hours using Amazon EC2.  
+In its \emph{general} version, the attack exploits the protocol flaws in
+\ssltwo, does not rely on any particular library implementation, and is
+feasible to carry out in practice by taking advantage of commonly supported
+export-grade ciphers. In order to decrypt one TLS session, the attacker must
+passively capture about 1,000 TLS sessions using RSA key exchange, make
+40,000 \ssltwo connections to the victim server, and perform $2^{50}$
+symmetric encryption operations. We successfully carried out this attack
+using an optimized GPU implementation and were able to decrypt a 2048-bit RSA
+ciphertext in less than 18 hours on a GPU cluster and less than 8 hours using
+Amazon EC2.
 
-We found that 11.5~million HTTPS servers (33\%) are vulnerable to this attack, 
-because many HTTPS servers that do not directly support \ssltwo share
-RSA keys with other services that do.   Of servers
-offering HTTPS with browser-trusted certificates, 22\% are vulnerable.
+We found that 11.5~million HTTPS servers (33\%) are vulnerable to this
+attack, because many HTTPS servers that do not directly support \ssltwo share
+RSA keys with other services that do. Of servers offering HTTPS with
+browser-trusted certificates, 22\% are vulnerable.
 
-We also present a \emph{special} version of DROWN that exploits flaws in OpenSSL for a more efficient oracle.
-% requires the attacker to capture as few as 16 TLS ciphertexts, make 10,000 connections to the victim server, and
-% (Nimrod) Yes, you can probably get a first conforming ciphertext with Leaky Export after capturing only 16 ciphertexts.
-% Problem is, if the 0 delimiter byte is not near the end, we don't have an algorithm that allows us to continue,
-% at least not right now.
-% The analysis of Extra Clear requires the same amount of queries for phase 1, which is roughly 20,000,
-% then "only" another 9,600 for the accelerated phase 2, instead of another ~20,000.
-% (it does achieve a speedup because we don't need to brute force, but it's not really a lot less queries overall).
-It requires roughly the same number of captured TLS sessions as the general attack, but only half as many connections to the victim server and no large computations.  
-This attack can be completed on a single core on
-commodity hardware in less than a minute, \ifext without GPUs or distributed computing, \fi
-and is limited primarily by how fast the server can complete
-handshakes.  It is fast enough that an attacker can perform man-in-the-middle attacks on live TLS
-sessions before the handshake times out, and {downgrade} a modern TLS client to RSA key exchange with a server that prefers non-RSA cipher suites.
-Our Internet-wide scans suggest that 79\% of HTTPS servers that are vulnerable to the general attack, or 26\% of all HTTPS servers,
-are also vulnerable to real-time attacks exploiting these implementation flaws.
+We also present a \emph{special} version of DROWN that exploits flaws in
+OpenSSL for a more efficient oracle. It requires roughly the same number of
+captured TLS sessions as the general attack, but only half as many
+connections to the victim server and no large computations. This attack can
+be completed on a single core on commodity hardware in less than a minute,
+\ifext without GPUs or distributed computing, \fi and is limited primarily by
+how fast the server can complete handshakes. It is fast enough that an
+attacker can perform man-in-the-middle attacks on live TLS sessions before
+the handshake times out, and {downgrade} a modern TLS client to RSA key
+exchange with a server that prefers non-RSA cipher suites. Our Internet-wide
+scans suggest that 79\% of HTTPS servers that are vulnerable to the general
+attack, or 26\% of all HTTPS servers, are also vulnerable to real-time
+attacks exploiting these implementation flaws.
 
-Our results highlight the risk that continued support for SSLv2 imposes on the security of much more recent TLS versions.
-This is an instance of a more general phenomenon of insufficient domain separation, where older, vulnerable security standards can open the door to attacks on newer versions.
-We conclude that phasing out outdated and insecure standards should become a priority for standards designers and practitioners. 
+Our results highlight the risk that continued support for SSLv2 imposes on
+the security of much more recent TLS versions. This is an instance of a more
+general phenomenon of insufficient domain separation, where older, vulnerable
+security standards can open the door to attacks on newer versions. We
+conclude that phasing out outdated and insecure standards should become a
+priority for standards designers and practitioners.
 
 \paragraph{Disclosure.}
-DROWN was assigned CVE-2016-0800.
-We disclosed our attacks to OpenSSL and worked with them to coordinate further disclosures.  The specific OpenSSL vulnerabilities we discovered have been designated CVE-2015-3197, CVE-2016-0703, and CVE-2016-0704.  In response to our findings, OpenSSL has
+DROWN was assigned CVE-2016-0800. We disclosed our attacks to OpenSSL and
+worked with them to coordinate further disclosures. The specific OpenSSL
+vulnerabilities we discovered have been designated CVE-2015-3197,
+CVE-2016-0703, and CVE-2016-0704. In response to our findings, OpenSSL has
 made it impossible to configure a TLS server in such a way that it is
-vulnerable to DROWN\@.
-Microsoft  had already disabled \ssltwo for all supported versions of IIS\@.
-We also disclosed the attack to the NSS developers, who have disabled \ssltwo on the last NSS tool that supported it and have hastened efforts to entirely remove the protocol from their codebase.
-In response to our disclosure, Google will disable QUIC support for non-whitelisted servers and modify the QUIC standard.
-% as detailed in Section~\ref{sec:quic}.
-We also notified IBM, Cisco, Amazon, the German CERT-Bund, and the Israeli CERT\@.
-
-\paragraph{Online resources.}
-Contact information, server test tools, and updates are available at https://drownattack.com.
+vulnerable to DROWN\@. Microsoft had already disabled \ssltwo for all
+supported versions of IIS\@. We also disclosed the attack to the NSS
+developers, who have disabled \ssltwo on the last NSS tool that supported it
+and have hastened efforts to entirely remove the protocol from their
+codebase. In response to our disclosure, Google will disable QUIC support for
+non-whitelisted servers and modify the QUIC standard. We also notified IBM,
+Cisco, Amazon, the German CERT-Bund, and the Israeli CERT\@.
