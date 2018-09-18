@@ -1,11 +1,11 @@
 In this section, we describe our cross-protocol DROWN attack that uses an
-\ssltwo server as an oracle to efficiently decrypt TLS connections.
-The attacker learns the session key for targeted TLS connections
-but does not learn the server's private RSA key. We first describe our techniques
-using a generic \ssltwo oracle. In Section~\ref{vulnerability}, we show how a
-protocol flaw in \ssltwo can be used to construct such an oracle, and describe
-our general DROWN attack. In Section~\ref{sec:special}, we show how an
-implementation flaw in common versions of OpenSSL leads to a more powerful
+\ssltwo server as an oracle to efficiently decrypt TLS connections. The
+attacker learns the session key for targeted TLS connections but does not
+learn the server's private RSA key. We first describe our techniques using a
+generic \ssltwo oracle. In Section~\ref{vulnerability}, we show how a
+protocol flaw in \ssltwo can be used to construct such an oracle, and
+describe our general DROWN attack. In Section~\ref{sec:special}, we show how
+an implementation flaw in common versions of OpenSSL leads to a more powerful
 oracle and describe our efficient special DROWN attack.
 
 %\subsection{An efficient Bleichenbacher attack}
@@ -16,34 +16,32 @@ oracle and describe our efficient special DROWN attack.
 We consider a server accepting TLS connections from clients. The connections are established using a secure, state-of-the-art TLS version (1.0--1.2) and a \texttt{TLS\_RSA} cipher suite with a private key unknown to the attacker.
 
 %\paragraph{Server RSA key exposed via \ssltwo.}
-The same RSA public key as the TLS connections is also used for \ssltwo. 
-\if0
-This can arise in a number of situations that are common in practice.  The simplest case is a server (mis)configured to also support \ssltwo on the port accepting the TLS connections.  But the \ssltwo support may be on an entirely different port, or an entirely different server.
-This situation might arise when an organization uses a wildcard certificate for both its website on port 443 and its SMTP server on port 25.  Both of these situations are common in practice; see Section~\ref{sec:scans} for more detail.  
-\fi
-For simplicity, our presentation will refer to the servers accepting TLS and \ssltwo connections as the same entity.
+The same RSA public key as the TLS connections is also used for \ssltwo. For
+simplicity, we will refer to the servers accepting TLS and \ssltwo
+connections as the same entity.
 
 %\paragraph{The attacker's position in the network.}
 Our attacker is able to passively eavesdrop on traffic between the client and
 server and record RSA-based TLS traffic.
 The attacker may or may not be also required to perform active man-in-the-middle
 interference, as explained below.
-\ifext
-The goal of our attacker is to decrypt a \texttt{TLS\_RSA} connection established between the server and one of the clients that connects to it.
-Our attacker could be as sophisticated as a nation state with eavesdropping capabilities at Internet exchange points, or as simple as a neighbor on an open WiFi network.
-\fi
 
-The attacker can expect to decrypt one out of 1,000 intercepted TLS connections in our attack for typical parameters.  This is a devastating threat in many scenarios.  For example, a decrypted TLS connection might reveal a client's HTTP cookie or plaintext password, and an attacker would only need to successfully decrypt a single ciphertext to compromise the client's account. In order to collect 1,000 TLS connections, the attacker might simply wait patiently until sufficiently many connections are recorded.
-%As an example, the Mozilla Thunderbird email client will check for new email messages every ten minutes by default.  
+The attacker can expect to decrypt one out of 1,000 intercepted TLS
+connections in our attack for typical parameters. This is a devastating
+threat in many scenarios. For example, a decrypted TLS connection might
+reveal a client's HTTP cookie or plaintext password, and an attacker would
+only need to successfully decrypt a single ciphertext to compromise the
+client's account. In order to collect 1,000 TLS connections, the attacker
+might simply wait patiently until sufficiently many connections are recorded.
 A less patient attacker might use man-in-the-middle interference, as in the
-BEAST attack~\cite{BEAST}.
+BEAST attack~\cite{beast-2011}.
 
 \ifext
 In order to collect 1,000 TLS connections, the attacker might simply wait patiently until sufficiently many connections are recorded.  If the attacker's intended victim is the \emph{server}, rather than a specific client, observing this many connections from many clients might take only a short time for an attacker who is located at a company firewall or who could perform a DNS spoofing or BGP hijacking attack to redirect traffic transparently through themselves.  If the attacker's intended victim is a \emph{particular client}, this is still feasible in many cases.  As an example, the Mozilla Thunderbird email client will check for new email messages every ten minutes by default.  A targeted user will make 1,000 connections after leaving the application running for a week.
 
 A less patient attacker might have to resort to active man-in-the-middle techniques
 in order to collect the required 1,000 TLS connections.
-The attacker could embed or inject malicious JavaScript on an otherwise innocuous web site to cause the client to connect repeatedly to the victim server in a short time frame, as in the BEAST attack~\cite{BEAST}.
+The attacker could embed or inject malicious JavaScript on an otherwise innocuous web site to cause the client to connect repeatedly to the victim server in a short time frame, as in the BEAST attack~\cite{beast-2011}.
 The attacker may also need to trigger an error in each of the connections, in order
 to prevent the handshakes from using TLS session resumption.
 \fi
@@ -75,14 +73,14 @@ $k$ will be 5 bytes, so the attacker learns 8 bytes of $m$.
 Our attacker will use an \ssltwo oracle $\Oracle$ to decrypt a TLS \texttt{ClientKeyExchange}.  
 The behavior of $\Oracle$ poses two problems for the attacker. First, a TLS key exchange ciphertext decrypts to a 48-byte \pms. But since no \ssltwo cipher suites have 48-byte key strengths, this means that a valid TLS ciphertext is invalid to our oracle $\Oracle$. 
 In order to apply Bleichenbacher's attack, the attacker must transform the TLS ciphertext into a valid \ssltwo key exchange message. Second, $\Oracle$ is very restrictive, since it strictly checks the length of the unpadded message. 
-According to Bardou et al.~\cite{bardou2012efficient}, Bleichenbacher's attack would require 12 million queries to such an oracle.\footnote{See Table~1 in~\cite{bardou2012efficient}. The oracle is denoted with the term \texttt{FFF}.} 
+According to Bardou et al.~\cite{efficient-padding-oracle-2012}, Bleichenbacher's attack would require 12 million queries to such an oracle.\footnote{See Table~1 in~\cite{efficient-padding-oracle-2012}. The oracle is denoted with the term \texttt{FFF}.} 
 %As each query would require an exhaustive search over $2^{40}$ values, this would make the attack significantly more costly.
 
 Our attacker overcomes these problems by following this generic attack flow:
 \begin{enumerate}
  \setcounter{enumi}{-1}
 	\item The attacker collects many encrypted TLS RSA key exchange messages.
-	\item The attacker converts one of the intercepted TLS ciphertexts containing a 48-byte \pms to an RSA \PKCS encoded ciphertext valid to the \ssltwo oracle $\Oracle$. \ifext We accomplish this by taking advantage of RSA ciphertext malleability and a technique of Bardou et al.~\cite{bardou2012efficient}. \fi
+	\item The attacker converts one of the intercepted TLS ciphertexts containing a 48-byte \pms to an RSA \PKCS encoded ciphertext valid to the \ssltwo oracle $\Oracle$. \ifext We accomplish this by taking advantage of RSA ciphertext malleability and a technique of Bardou et al.~\cite{efficient-padding-oracle-2012}. \fi
 	\item Once the attacker has obtained a valid \ssltwo RSA ciphertext, they can continue with a modified version of Bleichenbacher's attack, and decrypt the message after many more oracle queries.
 	\item The attacker then transforms the decrypted plaintext back into the original plaintext, which is one of the collected TLS handshakes.
 \end{enumerate}
@@ -97,7 +95,7 @@ A trivial approach would be to generate multipliers $s_i \in \{s_1,s_2,\ldots\}$
 However, the number of generated ciphertexts would be high, because $\Oracle$ is very restrictive; for 2048-bit RSA keys and an oracle expecting a 5-byte $mk_{secret}$ the probability that a random ciphertext becomes \sslconform is $P_{rnd} \approx (1/256)^3 * (255/256)^{249} \approx 2^{-25}$.
 \fi
 
-For this task, we rely on the concept of \emph{trimmers}, which were introduced by Bardou et al.~\cite{bardou2012efficient}. 
+For this task, we rely on the concept of \emph{trimmers}, which were introduced by Bardou et al.~\cite{efficient-padding-oracle-2012}. 
 Assume that the message $m_{0} = {c_0}^d \bmod N$ is divisible by a small number~$t$. In that case,  $m_{0} \cdot t^{-1} \bmod{N}$ simply equals the natural number $m_{0} / t$. 
 If we choose $u \approx t$, and multiply the original message by $u \cdot t^{-1}$, the resulting number will lie near the original message: $m_0 \approx m_0 / t \cdot u$.  \ifext We shall refer to such fractions as ``small'' fractions. \fi
 
@@ -135,7 +133,11 @@ For a 2048-bit modulus, the total expected number of queries when using this tec
 \begin{figure}[t]
 	%\centering 
 	\includegraphics[width=\linewidth]{\DrownFigures/ssl-tls} 
-	\caption{\textbf{\ssltwo-based Bleichenbacher attack on TLS\@.} An attacker passively collects RSA ciphertexts from a TLS 1.2 handshake, and then performs oracle queries against a server that supports \ssltwo with the same public key to decrypt the TLS ciphertext.}
+	\caption{\textbf{\ssltwo-based Bleichenbacher attack on TLS}\,---\,%
+	An attacker passively collects RSA ciphertexts from a TLS 1.2 handshake, and
+    then performs oracle queries against a server that supports \ssltwo with the
+	same public key to decrypt the TLS ciphertext.
+	}
 	\label{fig:ssl-tls}
 \end{figure}
 %\fi
@@ -269,7 +271,14 @@ From there, we can finally apply the adapted Bleichenbacher iteration technique 
 	online work         &              906 &          8 &              39,437  & $2^{52.25}$ \\
 	\bottomrule
 	\end{tabular}
-        \caption{\textbf{2048-bit Bleichenbacher attack complexity.} The cost to decrypt one ciphertext can be adjusted by choosing the set of fractions $F$ the attacker applies to each of the passively collected ciphertexts in the first step of the attack. This choice affects several parameters: the number of these collected ciphertexts, the number of connections the attacker makes to the \ssltwo server, and the number of offline decryption operations.}% The number of connections for the remaining phases after phase 1 is roughly 24,936, independently of phase 1.}
+		\caption{\textbf{2048-bit Bleichenbacher attack complexity}\,---\,%
+		The cost to decrypt one ciphertext can be adjusted by choosing the set of
+        fractions $F$ the attacker applies to each of the passively collected
+		ciphertexts in the first step of the attack. This choice affects several
+		parameters: the number of these collected ciphertexts, the number of
+ 		connections the attacker makes to the \ssltwo server, and the number of
+		offline decryption operations.
+		}
         \label{tab:reasonable_parameters}
 \end{table}
 
@@ -291,8 +300,13 @@ From there, we can finally apply the adapted Bleichenbacher iteration technique 
                4096 &  18,286  &  62,185 & 80,471 & $2^{52.16}$ \\
 \bottomrule
 \end{tabular*}
-\caption{\textbf{Oracle queries required by our attack.} In Phase 1, the attacker queries the oracle until an \ssltwo conformant ciphertext is found.  In Phases 2--5, the attacker decrypts this ciphertext using leaked plaintext.  These numbers minimize total queries.  In our attack, an oracle query represents two server connections.}
-\label{tab:optimal_queries}
+	\caption{\textbf{Oracle queries required by our attack}\,---\,%
+	In Phase 1, the attacker queries the oracle until an \ssltwo conformant
+	ciphertext is found. In Phases 2--5, the attacker decrypts this ciphertext
+	using leaked plaintext. These numbers minimize total queries. In our attack,
+	an oracle query represents two server connections.
+	}
+	\label{tab:optimal_queries}
 \end{table}
 
 \newcommand{\GPUTable}{
@@ -309,8 +323,14 @@ From there, we can finally apply the adapted Bleichenbacher iteration technique 
         Optimized Hashcat & NVIDIA GTX / AMD R9 & \$18,040 & $0.75$ days & \$13,500 \\
         Optimized EC2 & NVIDIA & \$440 & $0.33$ days & \$147 \\
         \bottomrule
-  \end{tabular}	
-\caption{\textbf{Time and cost efficiency of our attack on different hardware platforms.} The brute force attacks against symmetric export keys are the most expensive part of our attack.  We compared the performance of a na\"{\i}ve implementation of our attack on different platforms, and decided that a GPU implementation held the most promise.  We then heavily optimized our GPU implementation, obtaining several orders of magnitude in speedup.}
+    \end{tabular}	
+	\caption{\textbf{Time and cost efficiency of our attack on different hardware platforms.}\,---\,%
+	The brute force attacks against symmetric export keys are the most expensive
+	part of our attack. We compared the performance of a na\"{\i}ve
+	implementation of our attack on different platforms, and decided that a GPU
+	implementation held the most promise. We then heavily optimized our GPU
+	implementation, obtaining several orders of magnitude in speedup.
+	}
 \label{perf_comparison}
 \end{table*}
 }

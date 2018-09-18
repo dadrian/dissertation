@@ -1,11 +1,11 @@
 TLS has had a long history of implementation flaws and protocol attacks~\cite{POODLE,CRIME,RC4biases,Lucky13,BEAST,SLOTH,Durumeric:2014:MH:2663716.2663755}. We discuss relevant Bleichenbacher and cross-protocol attacks below.
 
 \paragraph{Bleichenbacher's attack.}
-Bleichenbacher's adaptive chosen ciphertext attack against SSL was first published in 1998~\cite{Bleichenbacher}. Several works have adapted his attack to different scenarios~\cite{klima2003attacking,bardou2012efficient,Jager2012}.
+Bleichenbacher's adaptive chosen ciphertext attack against SSL was first published in 1998~\cite{Bleichenbacher}. Several works have adapted his attack to different scenarios~\cite{klima2003attacking,efficient-padding-oracle-2012,Jager2012}.
 The TLS standard explicitly introduces countermeasures against the attack~\cite{rfc5246}, but several modern implementations have been discovered to be vulnerable to timing-attack variants in recent years~\cite{Meyer14,Zhang:2014:CSA:2660267.2660356}. These side-channel attacks are implementation failures and only apply when the attacker is co-located with the victim.
 
 \ifext
-Klima \etal~\cite{klima2003attacking} extended the attack to take advantage of leaked protocol version numbers present in the decrypted plaintext, rather than the validity of the padding format.  Bardou \etal~\cite{bardou2012efficient} applied the attack to several cryptographic hardware implementations, and developed the concept of ``trimmers" to aid the mathematical algorithm behind the attack, which we also use in this work.
+Klima \etal~\cite{klima2003attacking} extended the attack to take advantage of leaked protocol version numbers present in the decrypted plaintext, rather than the validity of the padding format.  Bardou \etal~\cite{efficient-padding-oracle-2012} applied the attack to several cryptographic hardware implementations, and developed the concept of ``trimmers" to aid the mathematical algorithm behind the attack, which we also use in this work.
 \fi
 
 \if0
