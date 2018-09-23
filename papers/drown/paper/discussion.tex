@@ -16,7 +16,7 @@ Although the protocol flaws in SSLv2 enabling DROWN are not present in recent TL
 \begin{enumerate}
 	\item RSA key exchange. TLS 1.2~\cite{rfc5246} allows this.
 	\item Reuse of server-side nonce by the client. QUIC~\cite{quic-langley-2014} allows this.
-	\item Server sends a message encrypted with the derived key before the client. QUIC, TLS 1.3~\cite{TLS1_3}, and TLS False Start~\cite{FalseStart} do this.
+	\item Server sends a message encrypted with the derived key before the client. QUIC, TLS 1.3~\cite{rfc8446}, and TLS False Start~\cite{rfc7918} do this.
 	\item Deterministic cipher parameters are generated from the \pms and nonces. This is the case for all TLS stream ciphers and TLS 1.0 block ciphers.
 \end{enumerate}
 
@@ -30,10 +30,6 @@ If that is not the case, the attacker can choose a stream cipher.
 \fi
 
 DROWN has a natural adaptation when all three properties are present. The attacker exposes a Bleichenbacher oracle by connecting to the server twice with the identical RSA ciphertexts and server-side nonces. If the RSA ciphertext is PKCS conformant, the server will respond with identical messages across both connections; otherwise they will differ.
-\ifext
-XML Encryption Web Services~\cite{Jager2012} was vulnerable to such an
-attack.
-\fi
 
 \looseness=-1
 
@@ -66,10 +62,6 @@ DROWN illustrates the cryptographic principle that keys should be single use.
 Often, this principle is primarily applied to keys that are used to both sign
 and decrypt, but DROWN illustrates that using keys \emph{for different protocol
 versions} can also be a serious security risk.
-\if0
-% This doesn't apply, even if you had different certificates for different protocol versions, as long as the name matches, it doesn't matter which one is used.
-Unfortunately, the TLS certificate authority funding model produces a financial incentive for users to purchase as few certificates as necessary to protect their infrastructure.  However, even without this financial incentive in place, the sheer number of SSL/TLS protocol versions in use would make key management difficult.
-\fi
 Unfortunately, there is no widely supported way to pin X.509 certificates to specific
 protocols. While using per-protocol certificates may help defend against
 passive attacks, an active attacker could still leverage any certificate with a
@@ -86,18 +78,47 @@ real-world systems.
 
 DROWN exploits a modification of an 18-year-old attack against a combination of protocols and ciphers that have long been superseded by better options: the \ssltwo protocol, export cipher suites, and PKCS \#1 v1.5 RSA padding. In fact, support for RSA as a key exchange method, including the use of PKCS \#1 v1.5, is mandatory even for TLS 1.2. The attack is made more severe by implementation flaws in rarely used code.
 
-Our work serves as yet another reminder of the importance of removing deprecated technologies before they become exploitable vulnerabilities.  In response to many of the vulnerabilities listed above, browser vendors have been aggressively warning end users when TLS connections are negotiated with unsafe cryptographic parameters, including SHA-1 certificates, small RSA and Diffie-Hellman parameters, and SSLv3 connections.  This process is currently happening in a piecemeal fashion, primitive by primitive.  Vendors and developers rightly prioritize usability and backward compatibility in standards, and are willing to sacrifice these only for practical attacks. This approach works less well for cryptographic vulnerabilities, where the first sign of a weakness, while far from being practically exploitable, can signal trouble in the future.
-Communication issues between academic researchers and vendors and developers have been voiced by many in the community, including Green~\cite{green2015secure} and Jager et~al.\@~\cite{jager2013one}.
+Our work serves as yet another reminder of the importance of removing
+deprecated technologies before they become exploitable vulnerabilities. In
+response to many of the vulnerabilities listed above, browser vendors have
+been aggressively warning end users when TLS connections are negotiated with
+unsafe cryptographic parameters, including SHA-1 certificates, small RSA and
+Diffie-Hellman parameters, and SSLv3 connections. This process is currently
+happening in a piecemeal fashion, primitive by primitive. Vendors and
+developers rightly prioritize usability and backward compatibility in
+standards, and are willing to sacrifice these only for practical attacks.
+This approach works less well for cryptographic vulnerabilities, where the
+first sign of a weakness, while far from being practically exploitable, can
+signal trouble in the future. Communication issues between academic
+researchers and vendors and developers have been voiced by many in the
+community, including Green~\cite{green-2015} and Jager
+et~al.\@~\cite{jager-2013}.
 
-The long-term solution is to proactively remove these obsolete technologies.  There is movement towards this already: TLS 1.3 has entirely removed RSA key exchange and has restricted Diffie-Hellman key exchange to a few groups large enough to withstand cryptanalytic attacks long in the future.  The CA/Browser forum will remove support for SHA-1 certificates this year.
-Resources such as the SSL Labs SSL Reports have gathered information about best practices and vulnerabilities
-in one place, in order to encourage administrators to make
+The long-term solution is to proactively remove these obsolete technologies.
+There is movement towards this already: TLS 1.3 has entirely removed RSA key
+exchange and has restricted Diffie-Hellman key exchange to a few groups large
+enough to withstand cryptanalytic attacks long in the future. The CA/Browser
+forum will remove support for SHA-1 certificates this year. Resources such as
+the SSL Labs SSL Reports have gathered information about best practices and
+vulnerabilities in one place, in order to encourage administrators to make
 the best choices.
 
-\subsection{Harms from \ifext deliberately\fi weakening cryptography}
+\subsection{Harms from weakening cryptography}
 
-Export-grade cipher suites for TLS deliberately weakened three primitives to the point that they are now broken even to enthusiastic amateurs: 512-bit RSA key exchange, 512-bit Diffie-Hellman key exchange, and 40-bit symmetric encryption.
-All three deliberately weakened primitives have been cornerstones of high-profile attacks: FREAK exploits export RSA, Logjam exploits export Diffie-Hellman, and now DROWN exploits export symmetric encryption.
+Export-grade cipher suites for TLS deliberately weakened three primitives to
+the point that they are now broken even to enthusiastic amateurs: 512-bit RSA
+key exchange, 512-bit Diffie-Hellman key exchange, and 40-bit symmetric
+encryption. All three deliberately weakened primitives have been cornerstones
+of high-profile attacks: FREAK exploits export RSA, Logjam exploits export
+Diffie-Hellman, and now DROWN exploits export symmetric encryption.
 
-Like FREAK and Logjam, our results illustrate the continued harm that a legacy of deliberately weakened export-grade cryptography inflicts on the security of modern systems, even decades after the regulations influencing the original design were lifted.  The attacks described in this paper are fully feasible against export cipher suites today. The technical debt induced by cryptographic ``front doors'' has left implementations vulnerable for decades. With the slow rate at which obsolete protocols and primitives fade away, we can expect some fraction of hosts to remain vulnerable for years to come.
+Like FREAK and Logjam, our results illustrate the continued harm that a
+legacy of deliberately weakened export-grade cryptography inflicts on the
+security of modern systems, even decades after the regulations influencing
+the original design were lifted. The attacks described in this paper are
+fully feasible against export cipher suites today. The technical debt induced
+by cryptographic ``front doors'' has left implementations vulnerable for
+decades. With the slow rate at which obsolete protocols and primitives fade
+away, we can expect some fraction of hosts to remain vulnerable for years to
+come.
 
