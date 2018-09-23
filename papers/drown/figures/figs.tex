@@ -30,7 +30,9 @@
 %% \fi
   \bottomrule
    \end{tabularx}
-   \caption{\textbf{Hosts vulnerable to general DROWN\@.} We performed Internet-wide scans to measure the number of hosts supporting \ssltwo on several different protocols.  A host is vulnerable to DROWN if its public key is exposed anywhere via \ssltwo.  Overall vulnerability to DROWN is much larger than support for \ssltwo due to widespread reuse of keys.}
+   \caption{\textbf{Hosts vulnerable to general DROWN}\,---\,%
+   We performed Internet-wide scans to measure the number of hosts supporting \ssltwo on several different protocols.  A host is vulnerable to DROWN if its public key is exposed anywhere via \ssltwo.  Overall vulnerability to DROWN is much larger than support for \ssltwo due to widespread reuse of keys.
+   }
    \label{table:general}
   \end{table*}
 }
@@ -56,7 +58,8 @@
     (Alexa~Top~1M) & 443 & 611\,K & 22\,K \ns (4\%)  & 52\,K \ns (9\%)     & 456\,K    & 33\,K \ns (7\%)     & 85\,K (19\%)    \\
     \bottomrule
   \end{tabularx}
-   \caption{\textbf{Hosts vulnerable to special DROWN.} A server is vulnerable to special DROWN if its key is exposed by a host with the CVE-2016-0703 bug. Since the attack is fast enough to enable man-in-the-middle attacks, a server is also vulnerable (to impersonation) if any name in its certificate is found in any trusted certificate with an exposed key.}
+   \caption{\textbf{Hosts vulnerable to special DROWN}\,---\,%
+   A server is vulnerable to special DROWN if its key is exposed by a host with the CVE-2016-0703 bug. Since the attack is fast enough to enable man-in-the-middle attacks, a server is also vulnerable (to impersonation) if any name in its certificate is found in any trusted certificate with an exposed key.}
    \label{table:special}
 \end{table*}
 }

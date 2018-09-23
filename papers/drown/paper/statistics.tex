@@ -13,7 +13,7 @@ serving a browser-trusted certificate is vulnerable to a special DROWN
 man-in-the-middle if any name on the certificate appears on any other
 certificate containing a key that is exposed by a special DROWN oracle.
 
-We used ZMap~\cite{zmap13} to perform full IPv4 scans on eight different ports
+We used ZMap~\cite{zmap-2013} to perform full IPv4 scans on eight different ports
 during late January and February 2016.  We examined port 443 (HTTPS), and
 common email ports 25 (SMTP with STARTTLS), 110 (POP3 with STARTTLS), 143 (IMAP
 with STARTTLS), 465 (SMTPS), 587 (SMTP with STARTTLS), 993 (IMAPS), and 995
@@ -40,33 +40,30 @@ certificate, are directly vulnerable to general DROWN\@.
 \input{\DrownPaper/openssl-selection-vuln}
 
 \paragraph{Widespread public key reuse.}
-Reuse of RSA key material across hosts and certificates is widespread~\cite{2016holz_analysis_tls-based_protocols_electronic_communication,weak-keys-2012}.
-Often this is benign: organizations may issue multiple TLS certificates for
-distinct domains with the same public key in order to
-simplify use of TLS acceleration hardware and load balancing.
-However, there is also evidence that system administrators may not entirely
-understand the role of the public key in certificates. For example, in the wake
-of the Heartbleed vulnerability, a substantial fraction of compromised
-certificates were reissued with the same public
-key~\cite{Durumeric:2014:MH:2663716.2663755}.  
-\ifext
+Reuse of RSA key material across hosts and certificates is
+widespread~\cite{mail-tls-holz-2016,weak-keys-2012}. Often this is benign:
+organizations may issue multiple TLS certificates for distinct domains with
+the same public key in order to simplify use of TLS acceleration hardware and
+load balancing. However, there is also evidence that system administrators
+may not entirely understand the role of the public key in certificates. For
+example, in the wake of the Heartbleed vulnerability, a substantial fraction
+of compromised certificates were reissued with the same public
+key~\cite{heartbleed-2014}.
+
 There are many reasons why the same public key or certificate would be reused
-across different ports and services within an organization. For example a mail
-server that serves SMTP, POP3, and IMAP from the same daemon would likely share
-the same TLS configuration.  Additionally, an organization might choose to
-purchase a single wildcard TLS certificate, and use it on both web servers and
-mail servers. Public keys have also been observed to be widely shared across
-independent organizations due to default certificates and public keys that are
-shipped with networked devices and software, improperly configured virtual
-machine images, and random number generation flaws.
-\fi
+across different ports and services within an organization. For example a
+mail server that serves SMTP, POP3, and IMAP from the same daemon would
+likely share the same TLS configuration. Additionally, an organization might
+choose to purchase a single wildcard TLS certificate, and use it on both web
+servers and mail servers. Public keys have also been observed to be widely
+shared across independent organizations due to default certificates and
+public keys that are shipped with networked devices and software, improperly
+configured virtual machine images, and random number generation flaws.
+
 The number of hosts vulnerable to DROWN rises significantly when we take RSA
 key reuse into account. For HTTPS, 17\% of hosts are vulnerable to general
-DROWN because they support both TLS and \ssltwo on the HTTPS port, but 33\% are vulnerable when considering RSA keys used by
-another service.
-\ifext Appendix~\ref{sec:pub_key_reuse}
-gives more detailed statistics on the reuse of RSA key material across hosts
-and ports. \fi
+DROWN because they support both TLS and \ssltwo on the HTTPS port, but 33\%
+are vulnerable when considering RSA keys used by another service.
 
 \paragraph{Special DROWN\@.}
 As shown in Table~\ref{table:special},
