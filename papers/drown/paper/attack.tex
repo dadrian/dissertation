@@ -195,7 +195,7 @@ Alternatively, the server might be running a version of OpenSSL prior to January
 % to remove this, at least for now.
 \ifext
 \paragraph{Correct Bleichenbacher countermeasure.}
-We assume the server implements the recommended countermeasure against Bleichenbacher's attack in all protocol versions, including \ssltwo. If the decrypted RSA ciphertext has invalid padding, the server generates a random \pms or \texttt{master\_key} and continues the handshake with this random string. We assume this countermeasure is implemented correctly and the server is neither vulnerable to timing nor flush-and-reload side-channel attacks~\cite{Meyer14,Zhang:2014:CSA:2660267.2660356}.
+We assume the server implements the recommended countermeasure against Bleichenbacher's attack in all protocol versions, including \ssltwo. If the decrypted RSA ciphertext has invalid padding, the server generates a random \pms or \texttt{master\_key} and continues the handshake with this random string. We assume this countermeasure is implemented correctly and the server is neither vulnerable to timing nor flush-and-reload side-channel attacks~\cite{Meyer14,zhang-2014}.
 \fi
 
 %\paragraph{Computing power.}
