@@ -1,0 +1,335 @@
+% !TEX root = subgroup.tex
+
+\section{IPsec}
+
+%Description of IKEv1 and IKEv2.
+
+IPsec is a set of Layer-3 protocols which add confidentiality, data protection,
+sender authentication, and access control to IP traffic. IPsec is commonly used
+to implement VPNs.
+%IPsec provides two types of security service: Authentication Header (AH),
+%which provides sender authentication, and Encapsulating Security Payload
+%(ESP), which provides both sender authentication and payload encryption.  Each
+%of these services requires the communicating parties to establish shared
+%state, which includes the cryptographic algorithms used to provide the service
+%and the keys used as input for the cryptographic algorithms.
+IPsec uses the Internet Key Exchange (IKE) protocol to determine the keys used
+to secure a session. IPsec may use IKEv1~\cite{rfc2409} or
+IKEv2~\cite{rfc7296}. While IKEv2 is not backwards-compatible with IKEv1, the
+two protocols are similar in message structure and purpose. Both versions use
+Diffie-Hellman to negotiate shared secrets. The groups used are limited to a
+fixed set of pre-determined choices, which include the DSA groups from
+RFC~5114, each assigned a number by IANA~\cite{rfc3526,rfc5114,rfc7296}.
+
+% IKE versions
+\paragraph{IKEv1}
+%IKEv1 is a hybrid protocol built upon three other protocols:
+%ISAKMP~\cite{rfc2408}, which establishes a framework for authentication and
+%key exchange; Oakley~\cite{rfc2412}, which defines a series of key exchanges
+%and services based on the Diffie-Hellman key exchange; and
+%SKEME~\cite{krawczyk1996skeme}, a key exchange protocol that provides
+%anonymity, repudiability, and quick key refreshement.  IKEv1 is formally
+%defined in RFCs 2407~\cite{rfc2407}, 2408~\cite{rfc2408}, and
+%2409~\cite{rfc2409}. 
+IKEv1~\cite{rfc2407,rfc2408,rfc2409} has two basic methods for authenticated
+key exchange: Main Mode and Aggressive Mode. Main Mode requires six messages to
+establish the requisite state. The initiator sends a Security Association
+(\texttt{SA}) payload, containing a selection of cipher suites and
+Diffie-Hellman groups they are willing to negotiate. The responder selects a
+cipher and responds with its own \texttt{SA} payload. After the cipher suite is
+selected, the initiator and responder both transmit Key Exchange (\texttt{KE})
+payloads containing public Diffie-Hellman values for the chosen group. At this
+point, both parties compute shared key materials, denoted \texttt{SKEYID}. When
+using signatures for authentication, \texttt{SKEYID} is computed
+$\texttt{SKEYID} = \operatorname{prf}(N_i | N_r, g^{x_ix_r})$.  For the other
+two authentication modes, pre-shared key and public-key encryption,
+\texttt{SKEYID} is derived from the pre-shared key and session cookies,
+respectively, and does not depend on the negotiated Diffie-Hellman shared
+secret.
+
+Each party then in turn sends an authentication message (\texttt{AUTH}) derived
+from a hash over \texttt{SKEYID} and the handshake. The authentication messages
+are encrypted and authenticated using keys derived from the Diffie-Hellman
+secret $g^{x_i x_r}$.  The responder only sends her \texttt{AUTH} message after
+receiving and validating the initiator's \texttt{AUTH} message.
+
+Aggressive Mode operates identically to Main Mode, but in order to reduce
+latency, the initiator sends \texttt{SA} and \texttt{KE} messages together, and
+the responder replies with its \texttt{SA}, \texttt{KE}, and \texttt{AUTH}
+messages together. In aggressive mode, the responder sends an authentication
+message first, and the authentication messages are not encrypted.
+
+
+\paragraph{IKEv2}
+%IKE Version 2 (IKEv2) was released in RFC 4306~\cite{rfc4306} to replace IKEv1
+%and the plethora of RFCs that define it. RFC 7296~\cite{rfc7296} gives the
+%current version of the IKEv2 specification.
+IKEv2~\cite{rfc4306,rfc7296} combines the \texttt{SA} and \texttt{KE} messages
+into a single message. The initiator provides a best guess ciphersuite for the
+\texttt{KE} message. If the responder accepts that proposal and chooses not to
+renegotiate, the responder replies with a single message containing both
+\texttt{SA} and \texttt{KE} payloads. Both parties then send and verify
+\texttt{AUTH} messages, starting with the initiator.  The authentication
+messages are encrypted using session keys derived from the \texttt{SKEYSEED}
+value which is derived from the negotiated Diffie-Hellman shared secret. The
+standard authentication modes use public-key signatures over the handshake
+values.
+
+%IKE Group~23, the 2048-bit MODP group with a 224-bit subgroup, is particularly
+%vulnerable as shown in Section~\ref{sec:ecm}.
+
+\subsection{Small Subgroup Attacks in IPsec} There are several variants of
+small subgroup attacks against IKEv1 and IKEv2.  We describe the attacks
+against these protocols together in this section.
+
+\paragraph{Small subgroup confinement attacks} First, consider attacks that can
+be carried out by an attacking initiator or responder. In IKEv1 Main Mode and
+in IKEv2, either peer can carry out a small subgroup confinement attack against
+the other by sending a generator of a small subgroup as its key exchange value.
+The attacking peer must then guess the other peer's view of the Diffie-Hellman
+shared secret to compute the session keys to encrypt its authentication
+message, leading to a mostly online attack. However, in IKEv1 Aggressive Mode,
+the responder sends its \texttt{AUTH} message before the initiator, and this
+value is not encrypted with a session key. If signature authentication is being
+used, the \texttt{SKEYID} and resulting hashes are derived from the
+Diffie-Hellman shared secret, so the initiator can perform an offline
+brute-force attack against the responder's authentication message to learn
+their exponent in the small subgroup.
+
+Now, consider a man-in-the-middle attacker. Bhargavan, Delignat-Lavaud, and
+Pironti~\cite{conf/ndss/BhargavanDP15} describe a transcript synchronization
+attack against IKEv2 that relies on a small subgroup confinement attack.  A
+man-in-the-middle attacker initiates simultaneous connections with an initiator
+and a responder using identical nonces, and sends a generator $g_i$ for a
+subgroup of small order $q_i$ to each as its \texttt{KE} message.  The two
+sides have a $1/q_i$ chance of negotiating an identical shared secret, so an
+authentication method depending only on nonces and shared secrets could be
+forwarded, and the session keys would be identical.
+
+If the attacker also has knowledge of the secrets used for authentication, more
+attacks are possible.  Similar to the attack described for TLS, such an
+attacker can use a small subgroup confinement attack to force a connection to
+use weak encryption. The attacker only needs to rewrite a small number of
+handshake messages; any further encrypted communications can then be decrypted
+at leisure without requiring the man-in-the-middle attacker to continuously
+rewrite the connection. We consider a man-in-the-middle attacker who modifies
+the key exchange message from both the initiator and the responder to
+substitute a generator $g_i$ of a subgroup of small order $q_i$.  The attacker
+must then replace the handshake authentication messages, which would require
+knowledge of the long-term authentication secret.  We describe this attack for
+each of pre-shared key, signatures, and public-key authentication. 
+
+For pre-shared key authentication in IKEv1 Main Mode, IKEv1 Aggressive Mode,
+and IKEv2, the man-in-the-middle attacker must only know the pre-shared key to
+construct the authentication hash; the authentication message does not depend
+on the negotiated Diffie-Hellman shared secret. With probability $1/q_i$, the
+two parties will agree on the Diffie-Hellman shared secret. The attacker can
+then brute force this value after viewing messages encrypted with keys derived
+from it.
+
+For signature authentication in IKEv1 Main Mode and in IKEv2, the signed hash
+transmitted from each side is derived from the nonces and the negotiated shared
+secret, which is confined to one of $q_i$ possible values.  The attacker must
+know the private signing keys for both initiator and responder and brute force
+\texttt{SKEYID} from the received signature in order to forge the modified
+authentication signatures on each side. The communicating parties will have a
+$q_i$ chance of agreeing on the same value for the shared secret to allow the
+attack to succeed. For IKEv1 Aggressive Mode, the attack can be made to succeed
+every time. The responder's key exchange message is sent together with their
+signature which depends on the negotiated shared secret, so the
+man-in-the-middle attacker can brute force the $q_i$ possible values of the
+responders private key $x_r$ and replace the responder's key exchange message
+with $q_i^{x_r}$, forging an appropriate signature with their knowledge of the
+signing key.
+
+For public key authentication in IKEv1 Main Mode, IKEv1 Aggressive Mode, and
+IKEv2, the attacker must know the private keys corresponding to the public keys
+used to encrypt the ID and nonce values on both sides in order to forge a valid
+authentication hash.  Since the authentication does not depend on the shared
+Diffie-Hellman negotiated value, a man-in-the-middle attacker must then brute
+force the negotiated shared key once they receives a message encrypted with the
+derived key.  The two parties will agree on their view of the shared key with
+probability $1/q_i$, allowing the attack to succeed.
+
+\paragraph{Small subgroup key recovery attacks} Similar to TLS, an IKE
+responder that reuses private exponents and does not verify that the initiator
+key exchange values are in the correct subgroup is vulnerable to a small
+subgroup key recovery attack. The most recent version of the IKEv2
+specification has a section discussing reuse of Diffie-Hellman exponents,
+and states that ``because computing Diffie-Hellman exponentials is
+computationally expensive, an endpoint may find it advantageous to reuse those
+exponentials for multiple connection setups''~\cite{rfc7296}. Following this
+recommendation could leave a host open to a key recovery attack, depending on
+how exponent reuse is implemented. A small subgroup key recovery attack on IKE
+would be primarily offline for IKEv1 with signature authentication and for
+IKEv2 against the initiator.
+
+For each subgroup of order $q_i$, the attacker's goal is to obtain a responder
+\texttt{AUTH} message, which depends on the secret chosen by the responder. If
+an \texttt{AUTH} message can be obtained, the attacker can brute-force the
+responder's secret within the subgroup offline. This is possible if the server
+supports IKEv1 Aggressive Mode, since the server authenticates before the
+client, and signature authentication produces a value dependent on the
+negotiated secret.  In all other IKE modes, the client authenticates first,
+leading to an online attack. The flow of the attack is identical to TLS; for
+more details see Section~\ref{sec:tls}.
+
+Ferguson and Schneier~\cite{ferguson2000cryptographic} describe a hypothetical
+small-subgroup attack against the initiator where a man-in-the-middle attacker
+abuses undefined behavior with respect to UDP packet retransmissions. A
+malicious party could ``retransmit'' many key exchange messages to an initiator
+and potentially receive a different authentication message in response to each,
+allowing a mostly offline key recovery attack.
+
+%The attacker must choose their key exchange value to be a generator of the
+%selected subgroup, which we call $g_i$.  When the responder computes the
+%shared secret, $g_i^a$, it will lie within the chosen subgroup.  The attacker
+%must guess $g_i^a \bmod q_i$, and construct their \texttt{AUTH} message
+%accordingly.  The responder will reply with an \texttt{AUTH} message in the
+%event of a correct guess, and an error message otherwise.  With repeated
+%guessing, the attacker can learn the value of $g_i^a$ for each subgroup, and
+%take advantage of the Pollard labmda algorithm to solve for the rest of the
+%secret offline within the reduced search space.
+
+\subsection{Implementations}
+
+We examined several open-source IKE implementations to understand server
+behavior.  In particular, we looked for implementations that generate small
+Diffie-Hellman exponents, repeat exponents across multiple connections, or do
+not correctly validate subgroup order. Despite the suggestion in IKEv2 RFC 7296
+to reuse exponents~\cite{rfc7296}, none of the implementations that we examined
+reused secret exponents. 
+
+% This is already included in the intro
+%RFC 6989~\cite{rfc6989} (``Additional Diffie-Hellman Tests for IKEv2'')
+%specifies additional checks that IKE implementations supporting MODP groups
+%with small subgroups should perform. The RFC requries IKE implementations to
+%choose between either checking that the peer's public value is in the correct
+%subgroup, or it must never reuse Diffie-Hellman private values. 
+
+All implementations we reviewed are based on FreeS/WAN~\cite{freeswan}, a
+reference implementation of IPSec. The final release of FreeS/Wan, version
+2.06, was released in 2004. Version 2.04 was forked into
+Openswan~\cite{openswan} and strongSwan\cite{strongswan}, with a further fork
+of Openswan into Libreswan~\cite{libreswan} in 2012.  The final release of
+FreeS/WAN used constant length 256-bit exponents but did not support RFC~5114
+DSA groups, offering only the Oakley 1024-bit and 1536-bit groups that use safe
+primes.
+
+\IKEGroupSupportAndValidationTable
+
+Openswan does not generate keys with short exponents. By default, RFC~5114
+groups are not supported, although there is a compile-time option that can be
+explicitly set to enable support for DSA groups.  strongSwan both supports
+RFC~5114 groups and has explicit hard-coded exponent sizes for each group. The
+exponent size for each of the RFC~5114 DSA groups matches the subgroup size.
+However, these exponent sizes are only used if the
+\texttt{dh\_exponent\_ansi\_x9\_42} configuration option is set. It also
+includes a routine inside an \texttt{\#ifdef} that validates subgroup order by
+checking that $g^q \equiv 1 \bmod p$, but validation is not enabled by default.
+Libreswan uses Mozilla Network Security Services (NSS)~\cite{nss-overview} to
+generate Diffie-Hellman keys. As discussed in Section~\ref{subsec:nss}, NSS
+generates short exponents for Diffie-Hellman groups. Libreswan was forked from
+Openswan after support for RFC~5114 was added, and retains support for those
+groups if it is configured to use them. 
+
+Although none of the implementations we examined were configured to reuse
+Diffie-Hellman exponents across connections, the failure to validate subgroup
+orders even for the pre-specified groups renders these implementations fragile
+to future changes and vulnerable to subgroup confinement attacks.
+
+Several closed source implementations also provide support for RFC~5114
+Group~24. These include Cisco's IOS~\cite{ciscogroup24}, Juniper's
+Junos~\cite{junosgroup24}, and Windows Server 2012 R2~\cite{windowsgroup24}. We
+were unable to examine the source code for these implementations to determine
+whether or not they validate subgroup order.
+
+%\IKEGroupSupportAndValidationTable
+
+\subsection{Measurements}
+
+We performed a series of Internet scans using ZMap to identify IKE responders.
+In our analysis, we only consider hosts that respond to our ZMap scan probes.
+Many IKE hosts that filter their connections based on IP are excluded from our
+results.  We further note that, depending on VPN server configurations, some
+responders may continue with a negotiation that uses weak parameters until they
+are able to identify a configuration for the connecting initiator. At that
+point, they might reject the connection. As an unauthenticated initiator, we
+have no way of distinguishing this behavior from the behaviour of a VPN server
+that legitimately accepts weak parameters. For a more detailed explanation of
+possible IKE responder behaviors in response to scanning probes, see
+Wouters~\cite{paul-wouters}.
+
+In October 2016, we performed a series of scans offering the most common cipher
+suites and group parameters we found in implementations to establish a baseline
+population for IKEv1 and IKEv2 responses. For IKEv1, the baseline scan offered
+Oakley groups 2 and 14 and RFC~5114 groups 22, 23, and 24 for the group
+parameters; SHA1 or SHA256 for the hash function; pre-shared key or RSA
+signatures for the authentication method; and AES-CBC, 3DES, and DES for the
+encryption algorithm.  Our IKEv2 baseline scan was similar, but also offered
+the 256-bit and 384-bit ECP groups and AES-GCM for authenticated encryption.
+
+On top of the baseline scans, we performed additional scans to measure support
+for the non-safe RFC~5114 groups and for key exchange parameter validation.
+Table~\ref{tab:ikegroupsupportandvalidation} shows the results of the October
+IKE scans.  For each RFC~5114 DSA group, we performed four handshakes with each
+host; the first tested for support by sending a valid client key exchange
+value, and the three others tested values that should be rejected by a
+properly-validating host. We did not scan using the key exchange value $0$
+because of a vulnerability present in unpatched Libreswan and Openswan
+implementations that causes the IKE daemon to restart when it receives such a
+value~\cite{cve-2015-3240}.
+
+We considered a host to accept our key exchange value if after receiving the
+value, it continued the handshake without any indication of an error. We found
+that 33.2\% of IKEv1 hosts and 17.7\% of IKEv2 hosts that responded to our
+baseline scans supported using one of the RFC 5114 groups, and that a
+surprising number of hosts failed to validate key exchange values.  24.8\% of
+IKEv1 hosts that accepted Group 23 with a valid key exchange value also
+accepted $1 \bmod p$ or $-1 \bmod p$ as a key exchange value, even though this
+is explicitly warned against in the RFC~\cite{rfc2412}.  This behavior leaves
+these hosts open to a small subgroup confinement attack even for safe primes,
+as described in Section~\ref{subsec:small-subgroup-attack}.
+
+For safe groups, a check that the key exchange value is strictly between $1$
+and $p-1$ is sufficient validation. However, when using non-safe DSA primes, it
+is also necessary to verify that the key exchange value lies within the correct
+subgroup (\ie, $y^q \equiv 1 \bmod p$). To test this case, we constructed a
+generator of a subgroup that was not the intended DSA subgroup, and offered
+that as our key exchange value. We did not find any IKEv1 hosts that rejected
+this key exchange value after previously accepting a valid key exchange value
+for the given group. For IKEv2, the results were similar with the exception of
+Group 24, where still over 93\% of hosts accepted this key exchange value. This
+suggests that almost no hosts supporting DSA groups are correctly validating
+subgroup order. 
+
+We observed that across all of the IKE scans, 109 IKEv1 hosts and 52 IKEv2
+hosts repeated a key exchange value. This may be due to entropy issues in key
+generation rather than static Diffie-Hellman exponents; we also found 15,891
+repeated key exchange values across different IP addresses. We found no hosts
+that used both repeated key exchange values and non-safe groups. We summarize
+these results in Table~\ref{tab:scandata}. 
+
+%The results of these scans are presented in Table~\ref{tab:scandata}.  To get
+%a an estimate of the number of hosts that support each IKE version, we
+%conducted scans of 1\% of the IPv4 address space using Zmap. If the host
+%responded with a valid message for the IKE version we were scanning for, we
+%considered it to support that version. The numbers present for IKE support in
+%Table~\ref{tab:scandata} are extrapolated from these 1\% scans.
+
+%To measure support for each of the RFC 5114 DSA groups, we conducted
+%additional 1\% scans for IKEv1 Main Mode and IKEv2. We advertised a variety of
+%common ciphersuite parameters, but only a single Diffie-Hellman group for each
+%of these scans.  We considered a host willing to negotiate that group if they
+%responded with a valid key exchange payload.  Table~\ref{tab:scandata} shows
+%the number of hosts that were willing to negotiate any of the RFC 5114 DSA
+%groups for IKEv1 Main Mode and IKEv2.  These hosts fit at least one of the
+%four conditions for the small subgroup attack by using a prime $p$ where $p-1$
+%has small factors.
+
+%We performed additional scans to measure if any hosts repeated Diffie-Hellman
+%key exchange values. First, we performed two simultaneous IKEv1 Main Mode
+%scans proposing Group 23 only. In this scan, we did not observe any repeated
+%key exchange values. However, across all the IKE scans that we performed, we
+%observed that 109 hosts for IKEv1 and 52 hosts for IKEv2 repeated key exchange
+%values at least once with Group 2 (a 1024-bit MODP group).

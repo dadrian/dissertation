@@ -1,0 +1,34 @@
+\documentclass{sig-alternate-05-2015}
+\usepackage{epsfig}
+\usepackage[T1]{fontenc}
+\usepackage[%
+    breaklinks=true,colorlinks=true,linkcolor=black,%
+    citecolor=black,urlcolor=black,bookmarks=true,bookmarksopen=false,%
+    ,pdftex]{hyperref}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+%\usepackage{lmodern}
+%\usepackage{mathptmx}\renewcommand{\ttdefault}{cmtt}
+\usepackage[protrusion=true,expansion=true,kerning]{microtype}
+\SetExtraKerning{encoding=*,font=*}{\textemdash={120,120}} % Add space around emdashes
+\usepackage[margin=0pt]{caption}
+\usepackage{color,soul}
+\usepackage{booktabs}
+\usepackage{xspace}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{url}\urlstyle{rm}
+\usepackage{balance}
+\usepackage[style=base]{caption}
+
+\newcommand{\twolinecell}[2][r]{%
+\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+
+\begin{document}
+
+\input{measurements}
+
+\GroupOrderFactorization
+
+\end{document}

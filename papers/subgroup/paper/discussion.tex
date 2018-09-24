@@ -1,0 +1,137 @@
+% !TEX root = subgroup.tex
+
+\section{Discussion}
+
+The small subgroup attacks require a number of special conditions to go wrong
+in order to be feasible. For the case of small subgroup confinement attacks, a
+server must both use a non-safe group and fail to validate subgroup order; the
+widespread failure of implementations to implement or enable group order validation
+means that large numbers of hosts using non-``safe'' primes are vulnerable to this type of attack.
+
+For a full key recovery attack to be possible the server must additionally
+reuse a small static exponent.  In one sense, it is surprising that any
+implementations might satisfy all of the requirements for a full key recovery
+attack at once.  However, when considering all of the choices that
+cryptographic libraries leave to application developers when using
+Diffie-Hellman, it is surprising that any protocol implementations manage to
+use Diffie-Hellman securely at all. 
+
+We now use our results to draw lessons for the security and cryptographic
+communities, provide recommendations for future cryptographic protocols, and
+suggest further research.
+
+\paragraph{RFC 5114 Design Rationale} Neither NIST SP 800-56A nor RFC~5114 give
+a technical justification for fixing a much smaller subgroup order than the
+prime size. Using a shorter private exponent comes with performance benefits.
+However, there are no known attacks that would render a short exponent used with
+a safe prime less secure than an equivalently-sized exponent used with in a
+subgroup with order matched to the exponent length. The cryptanalyses of both short 
+exponents and small subgroups are decades old.
+
+If anything, the need to
+perform an additional modular exponentiation to validate subgroup order makes
+Diffie-Hellman over DSA groups \textit{more} expensive than the safe prime
+case, for identical exponent lengths. As a more minor effect, a number field
+sieve-based cryptanalytic attack against a DSA prime is computationally
+slightly easier than against a safe prime.  The design rationale may have its
+roots in preferring to implicitly use the assumption that Diffie-Hellman is
+secure for a small prime-order subgroup without conditions on exponent length,
+rather than assuming Diffie-Hellman with short exponents is secure inside a
+group of much larger order.  Alternatively, this insistence may stem from the
+fact that the security of DSA digital signatures requires the secret exponent
+to be uniformly random, although no such analogous attacks are known for
+Diffie-Hellman key exchange.~\cite{Nguyen2002}
+Unfortunately, our empirical results show that the necessity to specify and validate subgroup order for Diffie-Hellman key exchange makes implementations more fragile in practice.
+
+\paragraph{Cryptographic API design}
+Most cryptographic libraries are designed with a large number of potential
+options and knobs to be tuned, leaving too many security-critical choices to
+the developers, who may struggle to remain current with the diverse and
+ever-increasing array of cryptographic attacks. These exposed knobs are likely
+due to a prioritization of performance over security. These confusing options in
+cryptographic implementations are not confined to primitive design: Georgiev et al.~\cite{Georgiev:2012:MDC:2382196.2382204} discovered that SSL certificate validation was broken in a large number of non-browser TLS applications due to developers misunderstanding and misusing library calls.  In the case of the small
+subgroup attacks, activating most of the conditions required for the attack
+will provide slight performance gains for an application: using a small
+exponent decreases the work required for exponentiation, reusing Diffie-Hellman
+exponents saves time in key generation, and failing to validate subgroup order
+saves another exponentiation. It is not reasonable to assume that applications
+developers have enough understanding of algebraic groups to be able to make the
+appropriate choices to optimize performance while still providing sufficient
+security for their implementation.
+
+\paragraph{Cryptographic standards}
+Cryptographic recommendations from standards committees are often too weak or
+vague, and, if strayed from, provide little recourse. The purpose of
+standardized groups and standardized validation procedures is to help remove
+the onus from application developers to know and understand the details of the
+cryptographic attacks. A developer should not have to understand the inner
+workings of Pollard lambda and the number field sieve in order to size an
+exponent; this should be clearly and unambiguously defined in a standard.
+However, the tangle of RFCs and standards attempting to define current best practices
+in key generation and parameter sizing do not paint a clear picture, and instead 
+describe complex combinations of approaches and
+parameters, exposing the fragility of the cryptographic ecosystem. As a result,
+developers often forget or ignore edge cases, leaving many implementations of
+Diffie-Hellman too close to vulnerable for comfort. Rather than provide the
+bare minimums for security, the cryptographic recommendations from standards
+bodies should be designed for defense-in-depth such that a single mistake on the
+part of a developer does not have disastrous consequences for security.  The
+principle of defense-in-depth has been a staple of the systems security
+community; cryptographic standards should similarly be designed to avoid
+fragility.
+
+\paragraph{Protocol design}
+The interactions between cryptographic primitives and the needs of protocol designs
+can be complex.  The after-the-fact introduction of RFC 5114 primes illustrates some of the
+unexpected difficulties: both IKE and SSH specified group validation only for safe primes, and
+a further RFC specifying extra group validation checks needed to be defined for IKE.
+Designing protocols to encompass many
+unnecessary functions, options, and extensions leaves room for implementation
+errors and makes security analysis burdensome. 
+IKE is a notorious example of a difficult-to-implement protocol with many edge cases. 
+Just Fast Keying (JFK), a protocol created as a successor to IKEv1, was designed to be an
+exceedingly simple key exchange protocol without the unnecessarily complicated
+negotiations present in IKE~\cite{aiello2004just}. However, the IETF instead
+standardized IKEv2, which is nearly as complicated as IKEv1. Protocols and
+cryptosystems should be designed with the developer in mind\textemdash easy
+to implement and verify, with limited edge cases. The worst possible
+outcome is a system that appears to work, but provides less security than
+expected. 
+
+To construct such cryptosystems, secure-by-default primitives are key. As we
+show in this paper, finite-field based Diffie-Hellman has many edge cases that
+make its correct use difficult, and which occasionally arise as bugs at the
+protocol level. For example, SSH and TLS allow the server to generate arbitrary
+group parameters and send them to the client, but provide no mechanism for the
+server to specify the group order so that the client can validate the
+parameters.  Diffie-Hellman key exchange over groups with different properties
+cannot be treated as a black-box primitive at the protocol level.
+
+\paragraph{Recommendations}
+As a concrete recommendation, modern Diffie-Hellman implementations should
+prefer elliptic curve groups over safe curves with proper point
+validation~\cite{safecurves}. These groups are much more efficient and have
+shorter key sizes than finite-field Diffie-Hellman at equivalent security
+levels. The TLS 1.3 draft includes a list of named curves designed to modern
+security standards~\cite{tls13draft16}.  If elliptic curve Diffie-Hellman is
+not an option, then implementations should follow the guidelines outlined in
+RFC~7919 for selecting finite field Diffie-Hellman primes~\cite{rfc7919}.
+Specifically, implementations should prefer ``safe'' primes of documented
+provenance of at least 2048 bits, validate that key exchange values are
+strictly between $1$ and $p-1$, use ephemeral key exchange values for every
+connection, and use exponents of at least 224 bits.
+
+%Finite field Diffie-Hellman can be implemented securely, but implementers must
+%follow the recommendations of NIST SP 800-56A to the letter.
+
+%\todo{should we recommend ECC? Should we make a stronger argument for phasing out finite-field DH?}
+%\todo{we should add a paragraph that has concrete recommendations on how to implement diffie-hellman correctly in terms of sizing exponents}
+%Finite-field based Diffie-Hellman has many flaws, and should be phased out of future standards.
+
+%We recommend only using safe primes and that library implementers ensure that exponent lengths are always matched to
+%the length of the prime. It is also vital that libraries ensure that fresh exponents are generated with each request for a new key.
+%This adds minimal effort for the library implementers but reduces the overal fragility of the cryptosystem and reduces the burden on application developers. Furthermore, if developers introduce errors into their code, the defense-in-depth strategy will ensure that the overall security of the system ins't compromised.
+%
+%Library implementations at the time of writing, required a careful sequence of options and calls to ensure keys were generated in a safe manner. Implementors should minimize the number of options available to the user, as such options introduce room for error and increase the number of edge cases. Documentation of existing libraries is often dense and users must navigate multiple levels of redirection in order to determineappropriate practices for their case. The documentation provides recommendations that often include instructions on how to trade between security and resource consumption. Provided recommendations instead need to err on the side of safety as users can not be trusted to successfully navigate the details, given the fragility of the systems.  
+
+%- Whit was totally not right.

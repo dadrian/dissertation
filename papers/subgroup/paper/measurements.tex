@@ -1,0 +1,464 @@
+\newcommand{\ScanTable}{
+\begin{table*}[]
+    \centering\small
+    \begin{tabularx}{\textwidth}{Xrrrrrr}
+          \toprule
+          \hfill & \hfill & \hfill & \multicolumn{4}{c}{{\bfseries\itshape Number of hosts that use\dots}} \\
+          \cmidrule{4-7}
+          \textbf{Protocol} & \textbf{Scan Date} & \textbf{Total Hosts} & \textbf{Diffie-Hellman} & \twolinecell{\textbf{Non-Safe}\\ \textbf{Primes}} & \twolinecell{\textbf{Static}\\ \textbf{Exponents}} & \twolinecell{\textbf{Static Exponents and}\\\textbf{Non-Safe Primes}} \\
+          \midrule
+          HTTPS         & 2/2016  & 40,578,754 & 10,827,565 & 1,661,856   & 964,356 & 309,891 \\
+          POP3S         & 10/2015  & 4,368,656  & 3,371,616  & 26,285      & 32,215  & 25      \\
+          STARTTLS	& 10/2015  & 3,426,360  & 3,036,408  & 1,186,322   & 30,017  & 932     \\
+          SSH           & 10/2015  & 15,226,362 & 10,730,527 & 281         & 1,147   & 0       \\
+          IKEv1         & 2/2016  & 2,571,900  & 2,571,900  & 340,300     & 109     & 0       \\
+          IKEv2         & 2/2016  & 1,265,800  & 1,265,800  & 177,000     & 52      & 0       \\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{IPv4 non-safe prime and static exponent usage}---%
+    Although non-safe primes see widespread use across most protocols, only a
+    small number of hosts reuse exponents and use non-safe primes; these hosts
+    are prime candidates for a small subgroup key recovery attack.
+    }
+    \label{tab:scandata}
+\end{table*}
+}
+
+\newcommand{\HTTPSPrimeTable}{
+\begin{table}[]
+    \centering\small
+    \begin{tabularx}{l|l}
+          \toprule
+          Prime & Host Count \\ 
+          \midrule
+          RFC 5114 Group 22& 1,938,215 \\
+          Amazon Load Balancer & 344,148 \\
+          Java 768/160 group &  168,949 \\
+          Java 1024/160 group & 59,952 \\
+          RFC 5114 Group 24 & 3,684 \\
+          Java 2048/224 group & 1,142\\
+          Epson Devices & 639 \\
+          RFC 5114 Group 23 & 437 \\
+          \midrule
+          Total Using Non-safe Primes & 2,523,493\\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{Top HTTPS non-safe primes\@.}  }
+    \label{tab:scandata1}
+\end{table}
+}
+
+\newcommand{\SMTPPrimeTable}{
+\begin{table}[]
+    \centering\small
+    \begin{tabular}{l|l}
+          \toprule
+          Prime & Host Count \\
+          \midrule
+          RFC5114 2048/224 group & 1,140,363\\
+          Java 1024/160 group & 2,445\\
+          Mistyped OpenSSL 512 group & 717 \\
+          Java 768/160 group & 671 \\
+          \midrule
+          Total Using Non-safe Primes & 1,186,322\\
+          \bottomrule
+    \end{tabular}
+    \caption{\textbf{Top SMTP non-safe primes\@.}  }
+    \label{tab:scandata2}
+\end{table}
+}
+
+\newcommand{\POPPrimeTable}{
+\begin{table}[t]
+    \centering\small
+    \begin{tabular}{l|l}
+          \toprule
+          Prime & Host Count \\
+          \midrule
+          Java 768/160 group & 16,515 \\
+          Java 1024/160 group & 9,510 \\
+          RFC5114 1024/160 group  & 86 \\
+          Java 2048/224 group & 20\\
+          \midrule
+          Total Using Non-safe Primes & 26,285\\
+          \bottomrule
+    \end{tabular}
+    \caption{\textbf{Top POP3S Non-safe primes\@.}  }
+    \label{tab:scandata3}
+\end{table}
+}
+
+\newcommand{\IKEGroupSupportTable}{
+\begin{table}[t]
+    \centering\small
+    \begin{tabularx}{\columnwidth}{Xrr}
+          \toprule
+          \textbf{Group} & \textbf{IKEv1} & \textbf{IKEv2} \\
+          \midrule
+          Group 22 & 320.7\,K    & 170.1\,K   \\
+          Group 23 & 323.5\,K    & 169.7\,K   \\
+          Group 24 & 340.3\,K    & 177\,K   \\
+          \midrule
+          Baseline & 1907.1\,K  & 1265.8\,K \\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{IKE support for RFC5114 groups}---%
+    We measured support for RFC5114 DSA groups in IKEv1 and IKEv2 by performing
+    100\% IPv4 scans and counting how many hosts reply with a valid key exchange
+    message for the selected group.}
+    \label{tab:ikegroupsupport}
+\end{table}
+}
+
+\newcommand{\IKEHostValidationTable}{
+\begin{table}[t]
+    \centering\small
+    \begin{tabularx}{\columnwidth}{Xrr}
+          \toprule
+          \textbf{KE Value}      & \textbf{IKEv1} & \textbf{IKEv2} \\
+          \midrule
+          $1 \bmod p$   & 89.1\,K  & 1        \\
+          $-1 \bmod p$  & 88.7\,K  & 0        \\
+          $g_3 \bmod p$ & 318.8\,K & 164.9\,K   \\
+          \midrule
+          Group 23 Support         & 323.5\,K & 169.7\,K   \\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{IKE validation}---%
+    In a 100\% IPv4 scan in February 2016, we measured the number of IKE hosts that accepted various key exchange
+    values from Group 23. $g_3$ is a generator of a subgroup with order 3.}
+    \label{tab:ikevalidation}
+\end{table}
+}
+
+\newcommand{\IKEGroupSupportAndValidationTable}{
+  \begin{table*}[]
+    \centering\small
+    \begin{tabularx}{\textwidth}{rXrrrr}
+      \toprule
+      
+      \hfill & \hfill & \hfill & \multicolumn{3}{c}{{\bfseries\itshape Client key exchange public values offered\dots}} \\
+      \cmidrule{4-6}
+      \textbf{Protocol} & \textbf{Groups Offered} & \textbf{Support} & \boldmath{$1 \bmod p$} & \boldmath{$-1 \bmod p$} & \boldmath{$g_s \bmod p$} \\
+      \midrule
+      % Note: Changing the numbers in the support column to be max{support, 1, -1, g_s}
+      \textbf{IKEv1} & Group 22 & 332.4\,K & 82.6\,K & 78.5\,K & 332.4\,K \\
+      & Group 23 & 333.4\,K & 82.5\,K & 82.5\,K & 333.4\,K \\
+      & Group 24 & 379.8\,K & 93.9\,K & 95.2\,K & 379.8\,K \\
+      & Baseline (Groups 2, 14, 22, 23, 24) & 1139.3\,K & -- & -- & -- \\
+      \midrule
+      \textbf{IKEv2} & Group 22 & 182.1\,K & 553 & 553 & 181.9\,K \\
+      & Group 23 & 181.9\,K & 542 & 550 & 180.1\,K \\
+      & Group 24 & 213.0\,K & 2245 & 2173 & 200.0\,K \\
+      & Baseline (Groups 2, 14, 19, 20, 22, 23, 24) & 1203.7\,K & -- & -- & -- \\
+      \bottomrule
+    \end{tabularx}
+    \caption{\textbf{IKE group support and validation\@.}---%
+    We measured support for RFC5114 DSA groups in IKEv1 and IKEv2 and test for key exchange validation by performing a series of 100\% IPv4 scans in October 2016. For Group 23, $g_s$ is a generator of a subgroup with order 3, and for Groups 22 and 24, $g_s$ is a generator of a subgroup of order 7. }
+    \label{tab:ikegroupsupportandvalidation}
+  \end{table*}
+}
+
+\newcommand{\TLSHostValidationTable}{
+\begin{table}[b]
+    \centering\small
+    \begin{tabularx}{\columnwidth}{Xrr}
+          \toprule
+          \textbf{Key Exchange Value} & \textbf{Support DHE} & \textbf{Accepted} \\
+          \midrule
+          %$ \texttt{baseline} \bmod p$ & 142.2\,K & 139.2\,K \\
+          $0 \bmod p$       & 143.5\,K & 87 \\
+          $1 \bmod p$       & 142.2\,K & 4.9\,K \\
+          $-1 \bmod p$      & 143.5\,K & 7.6\,K \\
+          $g_7 \bmod p$     & 10.7\,K  & 1.5\,K \\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{TLS key exchange validation}---% 
+    We performed a 1\% HTTPS scan in August 2016 to check if servers validated received client key exchange values, offering generators of subgroups of order $1$, $2$ and $7$.  Our baseline DHE support number counts hosts willing to
+    negotiate a DHE key exchange, and in the case of $g_7$, if $p-1$ is
+    divisible by $7$. We count hosts as ``Accepted'' if they reply to the
+    \texttt{ClientKeyExchange} message with a \texttt{Finished} message.  For $g_7$, we expect this to happen with probability $1/7$, suggesting that nearly all of the hosts in our scan did not validate subgroup order.}
+    \label{tab:tlsvalidation}
+\end{table}
+}
+
+\newcommand{\SSHHostValidationTable}{
+\begin{table}[b]
+    \centering\small
+    \begin{tabularx}{\columnwidth}{Xrr}
+          \toprule
+          \textbf{Key Exchange Value} & \textbf{Handshake Initiated} & \textbf{Accepted} \\
+          \midrule
+          $0 \bmod p$       & 175.6\,K & 5.7\,K \\
+          $1 \bmod p$       & 175.0\,K & 43.9\,K \\
+          $-1 \bmod p$      & 176.0\,K & 59.0\,K \\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{SSH validation}---% 
+    In a 1\% SSH scan performed in February 2016, we sent the key exchange
+    values $y_c = 0, 1$ and $p-1$. We count hosts as having initiated a handshake if they send a
+    \texttt{SSH\_MSG\_KEX\_DH\_GEX\_GROUP}, and we count hosts as ``Accepted'' if
+    they reply to the client key exchange message with a \texttt{SSH\_MSG\_KEX\_DH\_GEX\_REPLY}.}
+    \label{tab:sshvalidation}
+\end{table}
+}
+
+\newcommand{\TLSGroupSupport}{
+\begin{table}[b]
+    \centering\small
+    \begin{tabularx}{\columnwidth}{Xlr}
+          \toprule
+          \textbf{Company} & \textbf{Product(s)} & \textbf{Count} \\
+          \midrule
+          Ubiquiti Networks         & airOS/EdgeOS      & 272,690 \\
+          Cisco                     & DPC3848VM Gateway & 65,026  \\
+          WatchGuard                & Fireware XTM      & 62,682  \\
+          Supermicro                & IPMI              & 42,973  \\
+          ASUS                      & AiCloud           & 39,749  \\
+          Electric Sheep Fencing    & pfSense           & 14,218  \\
+          Bouygues Telecom          & Bbox              & 13,387  \\
+          Other                     & ---               & 135,432 \\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{HTTPS support for RFC5114 Group 22}---% 
+    In a 100\% HTTPS scan performed in October 2016, we found that of the
+    12,835,911 hosts that accepted Diffie-Hellman key exchange, 901,656
+    used Group~22. We were able to download default web pages for 646,157 of these hosts, which we examined to
+    identify companies and products.}
+    \label{tab:tls-group22-support}
+\end{table}
+}
+
+
+
+\newcommand{\ECMDistributionTable}{
+\begin{table*}[t]
+  \centering\small
+    \begin{tabularx}{\textwidth}{Xrrrrrrrrr}
+    \toprule
+      \textbf{Prime} & \multicolumn{7}{c}{\textbf{Exact Order Known}} & \multicolumn{2}{c}{\textbf{Exact Order Unknown}}\\
+      \cmidrule(lr){1-1} \cmidrule(lr){2-8} \cmidrule(lr){9-10}
+      $\lg(p)$ & 160 bits   & 224 bits  & 256 bits  & 300 bits   & $\lg(p) - 8$   & $\lg(p) - 32$  & $\lg(p) - 64$  & Unlikely DSA & Likely DSA \\ 
+      \midrule
+      512   & 3  & 0 & 0 & 0 & 5     & 0   & 0   & 760   & 43     \\
+      768   & 4  & 0 & 0 & 4 & 2,685 & 0   & 0   & 220   & 1,402  \\
+      1024  & 29 & 0 & 0 & 0 & 323   & 944 & 176 & 1,559 & 26,881 \\
+      2048  & 0  & 1 & 1 & 0 & 0     & 0   & 0   & 1,128 & 4,890   \\
+      3072  & 0  & 0 & 0 & 0 & 0     & 5   & 0   & 9     & 152    \\
+      4096  & 4  & 0 & 0 & 0 & 0     & 0   & 0   & 20    & 183    \\
+      8192  & 0  & 0 & 0 & 0 & 0     & 0   & 0   & 0     & 1      \\
+      Other & 0  & 0 & 0 & 0 & 0     & 0   & 0   & 400   & 15     \\
+        
+      \bottomrule
+    \end{tabularx}
+    \caption{\textbf{Distribution of orders for groups with non-safe primes}---%
+    For groups for which we were able to determine the subgroup order exactly,
+    160-bits subgroup orders are common. We classify other groups to
+    be likely DSA groups if we know that the subgroup order is at least 8 bits
+    smaller than the prime.
+    }
+  \label{tab:ecm-distribution}
+\end{table*}
+}
+
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
+\newcommand{\ECMBreakableGroups}{
+\begin{table*}[t]
+    \centering\small
+    \begin{tabularx}{\textwidth}{lrrRRRRRR}
+      \toprule
+      & \multicolumn{2}{c}{{\bfseries\itshape Work (bits)}} & \multicolumn{2}{c}{{\bfseries\itshape HTTPS}} & \multicolumn{2}{c}{{\bfseries\itshape MAIL}} & \multicolumn{2}{c}{{\bfseries\itshape SSH}} \\
+       \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
+      \textbf{Exponent} & \textbf{Online}    & \textbf{Offline}   & \textbf{Groups}    & \textbf{Hosts} & \textbf{Groups}    & \textbf{Hosts}     & \textbf{Groups}    & \textbf{Hosts}  \\ 
+      \midrule
+      160       & 20        & 30        & 3         & 2     & 3         & 7         & 0         & 0      \\ 
+      160       & 30        & 45        & 517       & 1,996 & 1963      & 1,143,524 & 11        & 10     \\ 
+      160       & 40        & 60        & 3,701     & 8,495 & 13,547    & 1,159,853 & 109       & 68     \\ 
+      224       & 20        & 30        & 0         & 0     & 0         & 0         & 0         & 0      \\ 
+      224       & 30        & 45        & 2         & 2     & 14        & 16        & 0         & 0      \\ 
+      224       & 40        & 60        & 307       & 691   & 1039      & 1,141,840 & 3         & 1      \\ 
+      256       & 20        & 30        & 0         & 0     & 0         & 0         & 0         & 0      \\ 
+      256       & 30        & 45        & 0         & 0     & 1         & 1         & 0         & 0      \\ 
+      256       & 40        & 60        & 42        & 478   & 180       & 1,140,668 & 0         & 0      \\ 
+      \bottomrule
+    \end{tabularx}
+    \caption{\textbf{Full key recovery attack complexity}---%  
+    We estimate the amount of work required to carry out a small subgroup key
+    recovery attack, and show the prevalence of those groups in the wild. Hosts
+    are vulnerable if they reuse exponents and fail to check subgroup order.
+    }
+  \label{tab:ecm-breakable}
+\end{table*}
+}
+
+\newcommand{\ECMRFCFiveFiveOneFourGroups}{
+\begin{table}[b]
+    \centering\small
+    \begin{tabularx}{\columnwidth}{Xrrr}
+          \toprule
+          \textbf{Group} & \textbf{Exponent Size} & \textbf{Online Work} & \textbf{Offline Work} \\
+          \midrule
+          Group 22 & 160 & 8  & 72 \\
+          Group 23 & 224 & 33 & 47 \\
+          Group 24 & 256 & 32 & 94 \\
+          \bottomrule
+    \end{tabularx}
+    \caption{\textbf{Attacking RFC 5114 groups}---%
+    We show the log of the amount of work in bits required to perform a small
+    subgroup key recovery attack against a server that both uses a static
+    Diffie-Hellman exponent of the same size as the subgroup order and fails to
+    check group order.
+    }
+    \label{tab:ecm-rfc5114}
+\end{table}
+}
+
+\newcommand{\PrimesAllTLS}{
+\begin{table*}[t]
+    \centering\small
+    \begin{tabularx}{\textwidth}{Xrrrrrr}
+        \toprule
+        \multicolumn{3}{c}{{\bfseries\itshape Group}} & \multicolumn{4}{c}{{\bfseries\itshape Host Counts}} \\
+        \cmidrule(lr){1-3} \cmidrule(lr){4-7}
+        \textbf{Source} & \textbf{Prime Size} & \textbf{Subgroup Size} & \textbf{HTTPS} & \textbf{SMTP} & \textbf{POP3S} & \textbf{SSH} \\
+        \midrule
+        RFC 5114 Group 22            & 1024 & 160    & 1,173,147 & 145       & 86     & 0   \\
+        Amazon Load Balancer       & 1024 & 160    & 277,858   & 0         & 1      & 0   \\
+        JDK                        & 768  & 160    & 146,491   & 671       & 16,515 & 0   \\
+        JDK                        & 1024 & 160    & 52,726    & 2,445     & 9,510  & 0   \\
+        RFC 5114 Group 24            & 2048 & 256    & 3,543     & 5         & 0      & 6   \\
+        JDK                        & 2048 & 224    & 982       & 12        & 20     & 0   \\
+        Epson Device               & 1024 & $<948$ & 372       & 0         & 0      & 0   \\
+        RFC 5114 Group 23            & 2048 & 224    & 371       & 1,140,363 & 2      & 0   \\
+        Mistyped OpenSSL 512       & 512  & 497    & 0         & 717       & 0      & 0   \\
+        \midrule
+        Other Non-Safe Primes      & ---  & ---    & 6,366     & 41,964    & 151    & 275 \\ 
+        Safe Primes & --- & --- & 9,165,709 & 1,850,086 & 3,345,331 & 10,730,246 \\
+        \midrule
+        Total & \hfill & \hfill & 10,827,565 & 3,036,408 & 3,371,616 & 10,730,527 \\
+        \bottomrule
+    \end{tabularx}
+    \caption{\textbf{IPv4 top non-safe primes}---%
+    Nine non-safe primes account for the majority of hosts using non-safe
+    primes.
+    }
+    \label{tab:primes}
+\end{table*}
+}
+
+\newcommand{\TLSLibraryTable}{
+  \begin{table*}[t]
+    \centering\small
+    \begin{tabularx}{\textwidth}{Xlllll}
+        \toprule
+        \textbf{Implementation} & \textbf{RFC 5114 Support} & \textbf{Allows Short Exponents} &
+        \textbf{Reuses Exponents} & \textbf{Validates Subgroup} &  \\
+        \midrule
+        Mozilla NSS   & No & Yes, hardcoded                        
+                      & No                         & $g \leq 2$         &  \\
+        OpenJDK       & No & Yes, uses max of p\_size / 2 and 384  
+                      & No                         & $g \leq 2$         &  \\
+        OpenSSL~1.0.2 & Yes & Yes, if $q$ set or if user sets a shorter length
+                      & Default until Jan '16      & Yes, as of Jan '16 &  \\
+        BouncyCastle  & Yes & No                                    
+                      & Application dependent      & $g \leq 2$         &  \\
+        Cryptlib      & No & Yes, uses quadratic curve calculation 
+                      & Application dependent      & $g \leq 2$         &  \\
+        libTomCrypt   & No & Yes, hardcoded                        
+                      & Application dependent      & No                 &  \\
+        CryptoPP      & No & Yes, uses work factor calculation     
+                      & Application dependent      & No                 &  \\
+        Botan         & Yes & Yes, uses work factor calculation     
+                      & No                         & No                 &  \\
+        GnuTLS        & Application dependent & Yes, restricts to q\_size (max 256)   
+                      & Application dependent      & $g \leq 2$         &  \\ 
+        \bottomrule
+    \end{tabularx}
+    \caption{\textbf{TLS Library Behavior}---%
+    We examined popular TLS libraries to determine which weaknesses from
+    Section~\ref{subsec:small-subgroup-attack} were present. Reuse of exponents
+    often depends on the use of the library; the burden is on the application
+    developer to appropriately regenerate exponents. Botan and libTomCrypt both
+    hardcode their own custom groups, while GnuTLS allows users to specify
+    their own parameters.
+    }
+    \label{tab:tls-implementations}
+\end{table*}
+}
+
+\newcommand{\GroupOrderFactorization}{
+\begin{table*}[ht]
+    \centering\footnotesize
+    \begin{tabularx}{\textwidth}{lcl}
+        \toprule
+                            & \textbf{Factored}     &  \\
+         \textbf{Source}    & \textbf{Completely?}  & \textbf{Order Factorization} \\
+        \midrule
+        RFC 5114 Group 22     & Yes & \tt 2\^{}3 * 7 * df * 183a872bdc5f7a7e88170937189 * 228c5a311384c02e1f287c6b7b2d * 5a85 \\
+                              &   & \tt 7d66c65a60728c353e32ece8be1 * f518aa8781a8df278aba4e7d64b7cb9d49462353 * 1a3adf8 \\
+                              &   & \tt d6a69682661ca6e590b447e66ebd1bbdeab5e6f3744f06f46cf2a8300622ed50011479f18143d471 \\
+                              &   & \tt a53d30113995663a447dcb8e81bc24d988edc41f21 \\
+        RFC 5114 Group 23     & No & \tt 3\^{}2 * 5 * 2b * 49 * 9d * 5e9a5 * 93ee1 * 2c3f0539 * 136c58359 * 1a30b7358d * 335 \\
+                              &   & \tt a378eb0d * 801c0d34c58d93fe997177101f80535a4738cebcbf389a99b36371eb * 22bbe4b573 \\
+                              &   & \tt f6fc6dc24fef3f56e1c216523b3210d27b6c078b32b842aa48d35f230324e48f6dc2a10dd23d28d3 \\
+                              &   & \tt 82843a78f264495542be4a95cb05e41f80b013f8b0e3ea26b84cd497b43cc932638530a068ecc44a \\
+                              &   & \tt f8ea3cc84139f0667100d426b60b9ab82b8de865b0cbd633f41366622011006632e0832e827febb7 \\
+                              &   & \tt 066efe4ab4f1b2e99d96adfaf1721447b167cb49c372efcb82923b3731433cecb7ec3ebbc8d67ef4 \\
+                              &   & \tt 41b5d11fb3328851084f74de823b5402f6b038172348a147b1ceac47722e31a72fe68b44ef4b \\
+        RFC 5114 Group 24     & Yes & \tt 7 * d * 9f5 * 22acf * bd9f34b1 * 8cf83642a709a097b447997640129da299b1a47d1eb3750 \\
+                              &   & \tt ba308b0fe64f5fbd3 * 15adfe949ebb242e5cd0978fac1b43fdbd2e5b0c5f48924fbbd370195c0e \\
+                              &   & \tt b20596d98ad0a9e3fd98876413d926f41a8b918d2ec4b018a30efe5e336bf3c7ce60d515cf46af5f \\
+                              &   & \tt acf3bb389f68ad0c4ed2f0b1dbb970293741eb6509c64e731802259a639a7f57d4a9c0d9445241f5 \\
+                              &   & \tt bcdbdc50555b76d9c335c1fa4e11a8351f1bf4730dd67ffed877cc13e8ea40c7d51441c1f4e59155 \\
+                              &   & \tt ef1159eca75a2359f5e0284cd7f3b982c32e5c51dbf51b45f4603ef46bae528739315ca679703c1f \\ 
+                              &   & \tt fcf3b44fe3da5999daadf5606eb828fc57e46561be8c6a866361 \\
+        Amazon Load           & No & \tt 2 * 3 * 5 * edb * 181ac5dbfe5ce13b * 18aa349859e9e9de09b7d65 * 9414a18a7b575e8f4 \\
+        Balancer              &   & \tt 2f6cb2dbc22eb1fc21d4929 * 2de9f1171a2493d46a31d508b63532cdf86d21db6f50f717736fc4 \\
+                              &   & \tt b0b722856a504ed4916e0484fe4ba5f5f4a9fff28a1233b728b3d043aec37c4f138ffd58fe7a8c3c \\
+                              &   & \tt 1e93cb52be527395e45db487b61daadded9c8ec35 \\
+        Mistyped OpenSSL      & Yes & \tt 5 * b * a9b461e1636f4b51ef * 1851583cf5f9f731364e4aa6cdc2cac4f01* 3f0b39cacfc086 \\
+        512 ``Prime'' Factors &   & \tt df4baf46c7fa7d1f4dfe184f9d22848325a91c519f79023a4526d8369e86b \\
+        Mistyped OpenSSL      & Yes & \tt 2\^{}13 * 3\^{}3 * 5\^{}2 * 11\^{}2 * 269 * 295 * 4d5 * 97c3 * 9acfe7 * 8cdd0e128f * 385 \\
+        512 Order Factors     &   & \tt b564eecd613536818f949 * 146d410923e999f8c291048dc6feffcebf8b9e99eec9a4d585f87422 \\
+                              &   & \tt e49b393256c23c9 \\
+        \bottomrule
+    \end{tabularx}
+    \caption{\textbf{Group order factorization for common non-safe primes}---%
+    We used the elliptic curve method to factor $(p-1)/2$ for each of the
+    non-safe primes we found while scanning, as well as the mistyped OpenSSL
+    ``prime''.
+    }
+    \label{tab:group-order-factorization}
+\end{table*}
+}
+
+\newcommand{\ApplicationsTable}{
+  \begin{table}[t]
+    \centering\small
+    \begin{tabularx}{\linewidth}{Xlll}
+        \toprule
+        \textbf{Application} & \textbf{Crypto}  & \textbf{Short}    & \textbf{Exponent} \\
+                             & \textbf{Library} & \textbf{Exponent} & \textbf{Reuse} \\
+        \midrule
+        OpenSSH     & OpenSSL     & No          & No    \\
+        Cerberus    & OpenSSL     & No          & Yes   \\
+        GNU lsh     & GnuTLS      & No          & No    \\
+        Dropbear    & LibTomCrypt & No          & No    \\
+        Lighttpd    & OpenSSL     & Yes         & No    \\
+        Unbound     & OpenSSL     & Yes         & Yes   \\
+        Exim        & OpenSSL     & Library     & Yes   \\
+                    &             & dependent   &       \\
+        Postfix     & OpenSSL     & No          & No    \\
+        \bottomrule
+    \end{tabularx}
+    \caption{\textbf{Common application behavior}---%
+    Applications make a diverse set of decisions on how to handle
+    Diffie-Hellman exponents, likely due to the plethora of conflicting,
+    confusing, and incorrect recommendations available. 
+    }
+    \label{tab:common-applications}
+\end{table}
+}
+
+

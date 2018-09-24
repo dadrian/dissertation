@@ -1,0 +1,143 @@
+% !TEX root = subgroup.tex
+ 
+\section{Introduction}
+ 
+Diffie-Hellman key exchange is one of the most common public-key cryptographic
+methods in use in the Internet. It is a fundamental building block for IPsec,
+SSH, and TLS\@. In the textbook presentation of finite field Diffie-Hellman,
+Alice and Bob agree on a large prime $p$ and an integer $g$ modulo $p$. Alice
+chooses a secret integer $x_a$ and transmits a public value $g^{x_a} \bmod p$;
+Bob chooses a secret integer $x_b$ and transmits his public value $g^{x_b}
+\bmod p$. Both Alice and Bob can reconstruct a shared secret $g^{x_a x_b} \bmod
+p$, but the best known way for a passive eavesdropper to reconstruct this
+secret is to compute the discrete log of either Alice or Bob's public value.
+Specifically, given $g$, $p$, and $g^x \bmod p$, an attacker must calculate
+$x$.
+
+In order for the discrete log problem to be hard, Diffie-Hellman parameters
+must be chosen carefully. A typical recommendation is that $p$ should be a
+``safe'' prime, that is, that $p = 2q+1$ for some prime $q$, and that $g$
+should generate the group of order $q$ modulo $p$. For $p$ that are not safe,
+the group order $q$ can be much smaller than $p$. For security, $q$ must still
+be large enough to thwart known attacks, which for prime $q$ run in time
+$O(\sqrt{q})$. A common parameter choice is to use a 160-bit $q$ with a
+1024-bit $p$ or a 224-bit $q$ with a 2048-bit $p$, to match the security level
+under different cryptanalytic attacks. Diffie-Hellman parameters with $p$ and
+$q$ of these sizes were suggested for use and standardized in DSA
+signatures~\cite{dsa}. For brevity, we will refer to these non-safe primes as
+DSA primes, and to groups using DSA primes with smaller values of $q$ as  DSA
+groups.
+
+A downside of using DSA primes instead of safe primes for Diffie-Hellman is
+that implementations must perform additional validation checks to ensure the
+key exchange values they receive from the other party are contained in the
+correct subgroup modulo $p$. The validation consists of performing an extra
+exponentiation step. If implementations fail to validate, a 1997 attack of Lim
+and Lee~\cite{Lim1997} can allow an attacker to recover a static exponent by
+repeatedly sending key exchange values that are in very small subgroups. We
+describe several variants of small subgroup confinement attacks that allow an
+attacker with access to authentication secrets to mount a much more efficient
+man-in-the-middle attack against clients and servers that do not validate group
+orders. Despite the risks posed by these well-known attacks on DSA groups, NIST SP 800-56A, ``Recommendations
+for Pair-Wise Key Establishment Schemes Using Discrete Logarithm
+Cryptography''~\cite{barker2007sp} specifically recommends DSA group parameters
+for Diffie-Hellman, rather than recommending using safe primes. RFC
+5114~\cite{rfc5114} includes several DSA groups for use in IETF standards. 
+
+We observe
+that few Diffie-Hellman implementations actually validate subgroup orders, in spite of the fact 
+that small subgroup attacks and countermeasures are well-known and specified
+in every standard suggesting the use of DSA groups for Diffie-Hellman, and DSA
+groups are commonly implemented and supported in popular protocols. For some protocols, including
+TLS and SSH, that enable the server to unilaterally specify the group used for
+key exchange, this validation step is not possible for clients to perform with
+DSA primes---there is no way for the server to communicate to the client the
+intended order of the group. Many standards involving DSA groups further
+suggest that the order of the subgroup should be matched to the length of the
+private exponent.  Using shorter private exponents yields faster exponentiation
+times, and is a commonly implemented optimization. However, these standards
+provide no security justification for decreasing the size of the subgroup to
+match the size of the exponents, rather than using as large a subgroup as
+possible. We discuss possible motivations for these recommendations
+later in the paper.
+
+We conclude that adopting the Diffie-Hellman group recommendations from RFC
+5114 and NIST SP 800-56A may create vulnerabilities for organizations using
+existing cryptographic implementations, as many libraries allow
+user-configurable groups but have unsafe default behaviors.  This highlights the
+need to consider developer usability and implementation fragility when designing
+or updating cryptographic standards.
+
+\paragraph{Our Contributions}
+We study the implementation landscape of Diffie-Hellman from several
+perspectives and measure the security impact of the widespread 
+failure of implementations to follow best security practices:
+\begin{itemize}[leftmargin=12pt]
+\item We summarize the concrete impact of small-subgroup confinement attacks
+    and small subgroup key recovery attacks on TLS, IKE, and SSH handshakes.  
+\item We examined the code of a wide variety of cryptographic libraries to
+  understand their implementation choices. We find feasible full private
+  exponent recovery vulnerabilities in OpenSSL and the Unbound DNS resolver,
+  and a partial private exponent recovery vulnerability for the parameters used
+  by the Amazon Elastic Load Balancer. We observe that \emph{no} implementation
+  that we examined validated group order for subgroups of order larger than two
+  by default prior to January 2016, leaving users potentially vulnerable to
+  small subgroup confinement attacks.
+  %In addition, we observed that nearly every implementation uses short
+  %exponents by default, and several use ephemeral-static keys.
+\item We performed Internet-wide scans of HTTPS, POP3S, SMTP with STARTTLS,
+  SSH, IKEv1, and IKEv2, to provide a snapshot of the deployment of DSA groups
+  and other non-``safe'' primes for Diffie-Hellman, quantify the incidence of
+  repeated public exponents in the wild, and quantify the lack of validation
+  checks even for safe primes.
+  %Our work adds to the growing literature of empirical
+  %studies of cryptographic implementation behavior on the Internet. 
+%\item We surveyed the protocol-level susceptibility to small subgroup attack
+%    scenarios for TLS, IKE, and SSH.  While several of these attacks are well
+%    known or have been described elsewhere, we are unaware of a comprehensive
+%    reference that summarizes the state of protocol landscape from this
+%    perspective. We describe variants of these attacks that we have not
+%    seen elsewhere.
+\item We performed a best-effort attempt to factor $p-1$ for all non-safe primes that we found in the
+    wild, using \textasciitilde100,000 core-hours
+    of computation. Group 23 from RFC 5114, a 2048-bit prime, is particularly vulnerable
+    to small subgroup key recovery attacks; for TLS a full key recovery
+    requires $2^{33}$ online work and $2^{47}$ offline work to recover a
+    224-bit exponent.
+\end{itemize}
+
+\paragraph{Disclosure and Mitigations}
+We reported the small subgroup key recovery vulnerability to OpenSSL in January
+2016~\cite{asanso-unredacted}. OpenSSL issued a patch to add additional
+validation checks and generate single-use private exponents by
+default~\cite{cve-2016-0701}. We reported the Amazon load balancer
+vulnerability in November 2015. Amazon responded to our report informing us
+that they have removed Diffie-Hellman from their recommmended ELB security
+policy, and have reached out to their customers to recommend that they use
+these latest policies. Based on scans performed in February and May 2016, 88\%
+of the affected hosts appear to have corrected their exponent generation
+behavior. We found several libraries that had vulnerable combinations of
+behaviours, including Unbound DNS, GnuTLS, LibTomCrypt, and Exim. We disclosed
+to the developers of these libraries. Unbound issued a patch, GnuTLS
+acknowledged the report but did not patch, and LibTomCrypt did not respond.
+Exim responded to our bug report stating that they would use their own
+generated Diffie-Hellman groups by default, without specifying subgroup order
+for validation~\cite{exim-blog,exim-bug-report}.  We found products from Cisco,
+Microsoft, and VMWare lacking validation that key exchange values were in
+the range $(1,p-1)$. We informed these companies, and discuss their responses
+in Section~\ref{sec:tls-measurements}.
+
+%In May 2016, we submitted bug reports to the developers
+%of several applications and libraries that had vulnerable combinations of
+%behaviours, including the Unbound DNS resolver, the Exim mail server, and the
+%LibTomCrypt and GnuTLS libraries.  Developers of the Unbound DNS resolver
+%informed us that a fix would be included in the next release. The GnuTLS
+%developers acknowledged the issue but have not yet applied patches. In October
+%2016, Exim responded to our bug report stating that they would use their own
+%generated Diffie-Hellman groups by default, without specifying subgroup order
+%for validation~\cite{exim-blog,exim-bug-report}.  There was no response from
+%LibTomCrypt. We found that products of several noteworthy companies, including
+%Microsoft, Cisco, and VMWare, do not validate that a key exchange value is in
+%the range $(1, p-1)$.  We informed these companies and others about this
+%missing check, and discuss their responses in
+%Section~\ref{sec:tls-measurements}.

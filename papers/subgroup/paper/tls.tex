@@ -1,0 +1,351 @@
+% !TEX root = subgroup.tex
+\ApplicationsTable
+
+\section{TLS}\label{sec:tls}
+
+TLS (Transport Layer Security) is a transport layer protocol designed to provide confidentiality,
+integrity and (most commonly) one-side authentication for application sessions. 
+It is widely used to protect HTTP and mail protocols. 
+
+A TLS client initiates a TLS handshake with the \texttt{Client\-Hello} message.
+This message includes a list of supported cipher suites, and a client random
+nonce $r_c$. The server responds with a \texttt{Server\-Hello} message containing
+the chosen cipher suite and server random nonce $r_s$, and a
+\texttt{Certificate} message that includes the server's X.509 certificate. If
+the server selects a cipher suite using ephemeral Diffie-Hellman key exchange,
+the server additionally sends a \texttt{Server\-Key\-Exchange} message containing
+the server's choice of Diffie-Hellman parameters $p$ and $g$, the server's
+Diffie-Hellman public value $y_s = g^{x_s} \bmod p$, a signature by the
+server's private key over both the client and server nonces ($r_c$ and $r_s$),
+and the server's Diffie-Hellman parameters ($p$, $g$, and $y_s$). The client
+then verifies the signature using the public key from the server's certificate,
+and responds with a \texttt{Client\-Key\-Exchange} message containing the client's
+Diffie-Hellman public value $y_c = g^{x_c} \bmod p$. The Diffie-Hellman shared
+secret $Y = g^{x_s x_c} \bmod p$ is used to derive encryption and MAC keys. The
+client then sends \texttt{Change\-Cipher\-Spec} and \texttt{Finished} messages. The
+\texttt{Finished} message contains a hash of the handshake transcript, and is
+encrypted and authenticated using the derived encryption and MAC keys. Upon
+decrypting and authenticating this message, the server verifies that the hash
+of the transcript matches the expected hash.  Provided the hash matches, the
+server then sends its own \texttt{Change\-Cipher\-Spec} and \texttt{Finished}
+messages, which the client then verifies. If either side fails to decrypt or
+authenticate the \texttt{Finished} messages, or if the transcript hashes do not
+match, the connection fails immediately~\cite{rfc5246}.
+
+TLS also specifies a mode of using Diffie-Hellman with fixed parameters from the server's certificate~\cite{rfc3279}. This mode is not forward secret, was never widely adopted, and has been removed from all modern browsers due to dangerous protocol flaws~\cite{kcitls}. The only widely used form of Diffie-Hellman in TLS today is ephemeral Diffie-Hellman, described above.
+
+\subsection{Small Subgroup Attacks in TLS}
+\label{sec:tls-subgroup-attack}
+
+\paragraph{Small subgroup confinement attacks}
+A malicious TLS server can perform a variant of the small subgroup attack
+against a client by selecting group parameters $g$ and $p$ such that $g$
+generates an insecure group order. TLS versions prior to 1.3 give the server
+complete liberty to choose the group, and they do not include any method for
+the server to specify the desired group order $q$ to the client.  This means a
+client has no feasible way to validate that the group sent by the server has the
+desired level of security or that a server's key exchange value is in
+the correct group for a non-safe prime.
+\looseness=-1
+
+Similarly, a man in the middle with knowledge of the server's long-term private
+signing key can use a small subgroup confinement attack to more easily
+compromise perfect forward secrecy, without having to rewrite an entire
+connection. The attack is similar to the those described by Bhargavan and
+Delignat-Lavaud~\cite{conf/ndss/BhargavanDP15}. The attacker modifies the
+server key exchange message, leaving the prime unchanged, but substituting a
+generator $g_i$ of a subgroup of small order $q_i$ for the group generator and 
+$g_i$ for the server's key exchange value $y_s$. The attacker then forges a correct signature for the modified server key exchange message and passes it to the client.  The client then
+responds with a client key exchange message $y_c = g_i^{x_c} \bmod p$, which
+the man-in-the-middle leaves unchanged. The server's view of the shared secret
+is then $g_i^{x_c x_s} \bmod p$, and the client's view of the shared secret is
+$g_i^{x_c} \bmod p$. These views are identical when ${x_s} \equiv 1 \bmod q_i$,
+so this connection will succeed with probability $1/q_i$. For small enough
+$q_i$, this enables a man in the middle to use a compromised server signing key to
+decrypt traffic from forward-secret ciphersuites with a reasonable probability
+of success, while only requiring tampering with a single handshake message,
+rather than having to actively rewrite the entire connection for the duration of the session.
+
+Furthermore, if the server uses a static Diffie-Hellman key exchange value,
+then the attacker can perform a small subgroup key-recovery attack as the
+client in order to learn the server's static exponent $x_s \bmod q_i$ for the
+small subgroup. This enables the attacker to calculate a custom generator such
+that the client and server views of the shared secret are always identical,
+raising the above attack to a 100\% probability of success.
+
+\TLSLibraryTable
+
+\paragraph{Small subgroup key recovery attacks} In TLS, the client must
+authenticate the handshake before the server, by providing a valid
+\texttt{Finished} message. This forces a small subgroup key recovery attack
+against TLS to be primarily online. To perform a Lim-Lee small subgroup key
+recovery attack against a server static exponent, a malicious client initiates
+a TLS handshake and sends a generator $g_i$ of a small subgroup of order $q_i$
+as its client key exchange message $y_c$.  The server will calculate $Y_s =
+g_i^{x_s} \bmod p$ as the shared secret. The server's view of the shared secret
+is confined to the subgroup of order $q_i$.  However, since $g_i$ and $g$
+generate separate subgroups, the server's public value $y_s = g^x_s$ gives the
+attacker no information about the value of the shared secret $Y_s$. Instead,
+the attacker must guess a value for $x_s \bmod q_i$, and send the corresponding
+client \texttt{Finished} message. If the server continues the handshake, the
+attacker learns that the guess is correct.  Therefore, assuming the server is
+reusing a static value for $x_s$, the attacker needs to perform at most $q_i$
+queries to learn the  server's secret $x_s \bmod q_i$~\cite{Lim1997}. This
+attack is feasible if $q_i$ is small enough and the server reuses
+Diffie-Hellman exponents for sufficiently many requests.
+
+The attacker repeats this process for many different primes $q_i$, and uses the
+Chinese remainder theorem to combine them modulo the product of the primes
+$q_i$.  The attacker can also use the Pollard lambda algorithm to reconstruct
+any remaining bits of the exponent~\cite{Lim1997}.
+
+
+
+We note that the TLS False Start extension allows the
+server to send application data before receiving the client's authentication~\cite{tls-falsestart}.
+The specification only allows this behavior for abbreviated handshakes, which
+do not include a full key exchange.  If a full key exchange were allowed, the
+fact that the server authenticates first would allow a malicious client to
+mount a mostly offline key recovery attack.
+%\todo{Add discussion of the old unused TLS extension that makes this offline. \ref{tls-falsestart}}
+
+
+
+\subsection{OpenSSL}
+
+Prior to early 2015, OpenSSL defaulted to using static-ephemeral Diffie-Hellman
+values. Server applications generate a fresh Diffie-Hellman secret exponent on
+startup, and reuse this exponent until they are restarted.  A server would be
+vulnerable to small subgroup attacks if it chose a DSA prime, explicitly
+configured the \texttt{dh->length} parameter to generate a short exponent, and
+failed to set \texttt{SSL\_OP\_SINGLE\_DH\_USE} to prevent repeated exponents.
+OpenSSL provides some test code for key generation which configures DSA group
+parameters, sets an exponent length to the group order, and correctly sets the
+\texttt{SSL\_OP\_SINGLE\_DH\_USE} to generate new exponents on every
+connection.  We found this test code widely used across many applications.  We
+discovered that Unbound, a DNS resolver, used the same parameters as the tests,
+but without setting \texttt{SSL\_OP\_SINGLE\_DH\_USE}, rendering them
+vulnerable to a key recovery attack.  A number of other applications including
+Lighttpd used the same or similar code with non-safe primes, but correctly set
+\texttt{SSL\_OP\_SINGLE\_DH\_USE}.
+
+In spring 2015, OpenSSL added explicit support for RFC~5114
+groups~\cite{openssl-changelog-102}, including the ability for servers to
+specify a subgroup order in a set of Diffie-Hellman group parameters. When the
+subgroup order is specified, the exponent length is automatically adjusted to
+match the subgroup size.  However, the update did not contain code to validate
+subgroup order for key exchange values, leaving OpenSSL users vulnerable to
+precisely the key recovery attack outlined in
+Section~\ref{sec:tls-subgroup-attack}.
+
+We disclosed this vulnerability to OpenSSL in January 2016. The vulnerability
+was patched by including code to validate subgroup order when a subgroup was
+specified in a set of Diffie-Hellman parameters and setting
+\texttt{SSL\_OP\_SINGLE\_DH\_USE} by default~\cite{openssl-secadv-subgroup}.
+Prior to this patch, any code using OpenSSL for DSA-style Diffie-Hellman
+parameters was vulnerable to small subgroup attacks by default.
+
+Exim~\cite{exim}, a popular mail server that uses OpenSSL, provides a clear
+example of the fragile situation created by this update. By default, Exim uses
+the RFC~5114 Group 23 parameters with OpenSSL, does not set an exponent length,
+and does not set \texttt{SSL\_OP\_SINGLE\-\_DH\_USE}. In a blog post, an Exim
+developer explains that because of ``numerous issues with automatic generation
+of DH parameters'', they added support for fixed groups specified in RFCs and picked
+Group~23 as the default~\cite{exim-blog}.  Exim narrowly avoided being fully
+vulnerable to a key recovery attack by not including the size of the subgroup
+generated by $q$ in the Diffie-Hellman parameters that it passes to OpenSSL.
+Had this been included, OpenSSL would have automatically shortened the exponent
+length, leaving the server fully vulnerable to a key recovery attack.  For this
+group, an attacker can recover 130 bits of information about the secret
+exponent using $2^{33}$ online queries, but this does not allow the attacker to
+recover the server's 2048-bit exponent modulo the correct 224-bit group order
+$q$ as the small subgroup orders $q_i$ are all relatively prime to $q$.
+
+We looked at several other applications as well, but did not find them to be
+vulnerable to key recovery attacks (Table~\ref{tab:common-applications}).
+
+
+
+% comprising 53.62\% of all such servers~\cite{esoft2016}.
+
+% Exim can be compiled either with GNU TLS or with OpenSSL. When compiled with OpenSSL,
+% it supports single use DH keys with an option that is off by default
+% (as of version 4.87, the latest at time of writing). In OpenSSL mode, it
+% includes checks for unsafe primes and incorrect generators, however it
+% ignores the generator check when the generator is not 2 or 5, due to a known
+% bug in OpenSSL. More significantly, it utilizes the DSA primes with small
+% subgroups. Their code comments note ``These have been thoroughly reviewed as
+% meeting certain eligibility criteria, which is more than can be said for primes
+% generated quickly''. However, they fail to note the difference in criteria for
+% the DSA primes as opposed to the others, resulting in the selection of vulnerable
+% groups. The subgroup size $q$ was not included in the Exim's default DSA parameter, saving 
+% a default Exim installation from being vulnerable to the attack described 
+% in Section~\ref{sec:tls-subgroup-attack} due the fact that OpenSSL did not have the possibility 
+% to match the exponent length to subgroup size. Said that, if the DSA parameter would have been generated using the 
+% OpenSSL's genpkey utility~\cite{genpkey} all the conditions to perform the Small subgroup key recovery attack
+% as per Section ~\ref{sec:tls-subgroup-attack} would have been met.
+% In comparison Postfix an MX  utilized for 32.80\% of mail servers~\cite{esoft2016}
+% suggests generating a group at install time but neglects to set the single use OpenSSL option
+% and includes two hardcoded groups by default.
+
+
+
+\ScanTable
+
+\subsection{Other Implementations} \label{subsec:nss}
+
+We examined the source code of multiple TLS implementations
+(Table~\ref{tab:tls-implementations}). Prior to January 2016, no TLS
+implementations that we examined validated group order, even for the well-known
+DSA primes from RFC~5114, leaving them vulnerable to small subgroup confinement attacks.
+
+Most of the implementations we examined attempt to match exponent length to the
+perceived strength of the prime. For example, Mozilla Network Security Services
+(NSS), the TLS library used in the Firefox browser and some versions of
+Chrome~\cite{nss-overview,chrome-to-openssl}, uses NIST's ``comparable key strength'' recommendations
+on key management~\cite{nist-sp-800-57-rev2,nist-sp-800-57-rev4} to determine secret exponent lengths from the length of the prime.~\cite{nss-line-of-code}  Thus NSS uses 160-bit exponents with a 1024-bit prime, and 224-bit exponents with a 2048-bit prime.
+ In fall 2015, NSS added an additional check to ensure that the
+shared secret $g^{x_ax_b} \not \equiv 1 \bmod p$~\cite{nss-code-secret-not-one}.
+
+Several implementations go to elaborate lengths to match exponent length to
+perceived prime strength.  The Cryptlib library fits a quadratic curve to the
+small exponent attack cost table in the original van~Oorschot
+paper~\cite{van1996diffie} and uses the fitted curve to determine safe key
+lengths~\cite{cryptlib-fitted-curve}. The Crypto++ library uses an explicit
+``work factor'' calculation, evaluating the function $2.4 n^{1/3} (\log
+n)^{2/3}$~\cite{cryptoplusplus-work-factor}. Subgroup order and exponent
+lengths are set to twice the calculated work factor. The work factor
+calculation is taken from a 1995 paper by Odlyzko on integer
+factorization~\cite{odlyzko95}. Botan, a C++ cryptography and TLS library,
+uses a similar work factor calculation, derived from RFC~3766~\cite{rfc3766},
+which describes best practices as of 2004 for selecting public key strengths
+when exchanging symmetric keys. RFC~3766 uses a similar work factor algorithm
+to Odlyzko, intended to model the running time of the number-field
+sieve. Botan then doubles the length of the work factor to obtain subgroup and
+exponent lengths~\cite{botan-double}.
+
+% Apple Safari on OS X and iOS performed no validation of
+% Diffie-Hellman prime lengths until July 2015, and supported connections where
+% the server offered a trivially-broken group using a 16-bit prime~\cite{weakdh-ccs15}.
+
+\subsection{Measurements}
+\label{sec:tls-measurements}
+
+We used ZMap~\cite{zmap} to probe the public IPv4 address space for hosts
+serving three TLS-based protocols: HTTPS, SMTP+STARTTLS, and POP3S\@.  To
+determine which primes servers were using, we sent a \texttt{ClientHello}
+message containing only ephemeral Diffie-Hellman cipher suites.  We combined
+this data with scans from Censys~\cite{censys} to determine the overall
+population.  The results are summarized in Table~\ref{tab:scandata}. 
+
+\TLSHostValidationTable
+
+\PrimesAllTLS
+
+In August 2016, we conducted additional scans of a random 1\% sample
+of HTTPS hosts on the Internet.  First, we checked for nontrivial
+small subgroup attack vulnerability. For servers that sent us a prime
+$p$ such that $p-1$ was divisible by 7, we attempted a handshake using
+a client key exchange value of $g_7\bmod p$, where $g_7$ is a
+generator of a subgroup of order $7$.  (7 is the smallest prime factor
+of $p-1$ for Group 22.) When we send $g_7$, we expect to correctly
+guess the \texttt{PreMasterSecret} and complete the handshake with one
+seventh of hosts that do not validate subgroup order. In our scan, we
+were able to successfully complete a handshake with $1477$ of $10714$
+hosts that offered a prime such that $p-1$ was divisible by $7$,
+implying that approximately 96\% of these hosts fail to validate
+subgroup order six months after OpenSSL pushed a patch adding group
+order validation for correctly configured groups.
+
+Second, we measured how many hosts performed even the most basic
+validation of key exchange values. We attempted to connect to HTTPS hosts with
+the client key exchange values of $y_c = 0 \bmod p, 1 \bmod p, -1 \bmod p$. As
+Table~\ref{tab:tlsvalidation} shows, we found that over 5\% of hosts that
+accepted DHE ciphersuites accepted the key exchange value of $-1 \bmod p$ and
+derived the \texttt{PreMasterSecret} from it. These implementations are
+vulnerable to a trivial version of the small subgroup confinement attacks
+described in Section~\ref{sec:tls-subgroup-attack}, for \emph{any} prime
+modulus $p$. By examining the default web pages of many of these hosts,
+we identified products from several notable companies including Microsoft,
+Cisco, and VMWare. When we disclosed these findings, VMWare notified us that
+they had already applied the fix in the latest version of their products;
+Microsoft acknowledged the missing checks but chose not to include them since
+they only use safe primes, and adding the checks may break functionality
+for some clients that were sending unusual key exchange values; and Cisco
+informed us that they would investigate the issue.
+
+Of 40.6\,M total HTTPS hosts found in our scans, 10.8\,M~(27\%) supported
+ephemeral Diffie-Hellman, of which 1.6\,M~(4\%) used a non-safe prime, and
+309\,K~(0.8\%) used a non-safe prime and reused exponents across multiple
+connections, making them likely candidates for a small subgroup key recovery
+attack.  We note that the numbers for hosts reusing exponents are an
+underestimate, since we only mark hosts as such if we found them using the same
+public Diffie-Hellman value across multiple connections, and some load
+balancers that cycle among multiple values might have evaded detection.
+
+While 77\%~of POP3S hosts and 39\%~of SMTP servers used a non-safe prime, a
+much smaller number used a non-safe prime and reused exponents (<0.01\% in both
+protocols), suggesting that the popular implementations (Postfix and
+Dovecot~\cite{mail-imc15}) that use these primes follow recommendations to use
+ephemeral Diffie-Hellman values with DSA primes.
+
+Table~\ref{tab:primes} shows nine groups that accounted for the majority of
+non-safe primes used by hosts in the wild. Over 1.17\,M hosts across all of our
+HTTPS scans negotiated Group~22 in a key exchange. To get a better picture of
+which implementations provide support for this group, we examined the default
+web pages of these hosts to identify companies and products, which we show in
+Table~\ref{tab:tls-group22-support}.
+
+\TLSGroupSupport
+
+
+Of the the 307\,K HTTPS hosts that both use non-safe primes and reuse
+exponents, 277\,K~(90\%) belong to hosts behind Amazon's Elastic Load
+Balancer~\cite{amazon-elb}. These hosts use a 1024-bit prime with a 160-bit
+subgroup. We set up our own load balancer instance and found that the
+implementation failed to validate subgroup order. We were able to use a
+small-subgroup key recovery attack to compute 17 bits of our load balancer's
+private Diffie-Hellman exponent $x_s$ in only 3813 queries.  We responsibly
+disclosed this vulnerability to Amazon. Amazon informed us that they have
+removed Diffie-Hellman from their recommended ELB security policy, and are
+encouraging customers to use the latest policy.  In May 2016, we performed
+additional scans and found that 88\% of hosts using this prime no longer
+repeated exponents.   We give a partial factorization for $p-1$ in
+Table~\ref{tab:group-order-factorization}; the next largest subgroups have 61
+and 89 bits and an offline attack against the remaining bits of a 160-bit
+exponent would take $2^{71}$ time.  For more details on the computation, see
+Section~\ref{sec:ecm}.
+
+SSLeay~\cite{ssleay}, a predecessor for OpenSSL, includes several default
+Diffie-Hellman primes, including a 512-bit prime. We found that 717 SMTP
+servers used a version of the OpenSSL 512-bit prime with a single character
+difference in the hexadecimal representation.  The resulting modulus that these
+servers use for their Diffie-Hellman key exchange is no longer prime. We
+include the factorization of this modulus along with the factors of the
+resulting group order in Table~\ref{tab:group-order-factorization}. The use of
+a composite modulus further decreases the work required to perform a small
+subgroup attack.
+
+Although TLS also includes static Diffie-Hellman cipher suites that require a
+DSS certificate, we did not include them in our study; no browser supports
+static Diffie-Hellman~\cite{kcitls}, and Censys shows no hosts with DSS
+certificates, with only 652 total hosts with non-RSA or ECDSA certificates.
+
+%In February 2016, we conducted an additional scan of a random 1\% sample of the
+%Internet to check how many hosts performed even the most basic validation of
+%key exchange values. We attempted to connect to HTTPS hosts with a client
+%key exchange message of $y_c = 1$. We found that 322 of 589,241 hosts accepted
+%this key exchange value and derived the \texttt{PreMasterSecret} from it. 248
+%of these hosts were Cisco devices, another 28 were VMware Horizon View servers,
+%and the remaining 46 devices did not fit into any clear category. These
+%implementations are vulnerable to a trivial version of the small subgroup
+%confinement attacks described in Section~\ref{sec:tls-subgroup-attack}.\todo{did we disclose this? we need to. also what about validation of values other than 0?}
+
+
+%\TODO{classify implementations again and disclose to Cisco, etc}
+
+
+
+
+
+

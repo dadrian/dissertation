@@ -1,0 +1,97 @@
+% !TEX root = subgroup.tex
+
+\section{SSH}
+
+SSH contains three key agreement methods that make use of Diffie-Hellman. The
+``Group 1'' and ``Group 14'' methods denote Oakley Group 2 and Oakley Group
+14, respectively~\cite{rfc4253}. Both of these groups use safe primes. The
+third method, ``Group Exchange'', allows server to select a custom
+group~\cite{rfc4419}. The group exchange RFC specifies that all custom groups
+should use safe primes. Despite this, RFC~5114 notes that group exchange method
+allows for its DSA groups in SSH, and advocates for their immediate
+inclusion~\cite{rfc5114}.
+
+In all Diffie-Hellman key agreement methods, after negotiating cipher selection and group parameters, 
+the SSH client generates a public
+key exchange value $y_c = g^{x_c} \bmod p$ and sends it to the server. The
+server computes its own Diffie-Hellman public value $y_s = g^{x_s} \bmod p$ and
+sends it to the client, along with a signature from its host key over the
+resulting shared secret $Y = g^{x_s x_c} \bmod p$ and the hash of the handshake
+so far.  The client verifies the signature before continuing.
+
+\subsection{Small Subgroup Attacks in SSH}
+
+\paragraph{Small subgroup confinement attacks}
+An SSH client could execute a small subgroup confinement attack against an SSH
+server by sending a generator $g_i$ for a subgroup of small order $q_i$ as its
+client key exchange, and immediately receive the server's key exchange $g^{x_s}
+\bmod p$ together with a signature that depends on the server's view of the
+shared secret $Y_s = g_i^{x_s} \bmod p$. For small $q_i$, this allows the
+client to brute force the value of $x_s \bmod q_i$ offline and compare to the
+server's signed handshake to learn the correct value of $x_s \bmod q_i$. To
+avoid this, the SSH RFC specifically recommends using safe primes, and to use
+exponents at least twice the length of key material derived from the shared
+secret~\cite{rfc4419}. 
+
+% LUKEV: Avoid describing the mitm attack in all it's detail again.
+If client and server support Diffie-Hellman group exchange and the server uses
+a non-safe prime, a man in the middle with knowledge of the server's long-term
+private signing key can use a small subgroup confinement attack to
+man-in-the-middle the connection without having to rewrite every message.  The
+attack is similar to the case of TLS: the man in the middle modifies the server
+group and key exchange messages, leaving the prime unchanged, but substituting
+a generator $g_i$ of a subgroup of small order $q_i$ for the group generator
+and $g_i$ for the server's key exchange value $y_s$.  The client then responds
+with a client key exchange message $y_c = g_i^{x_c} \bmod p$, which the man in
+the middle leaves unchanged.  The attacker then forges a correct signature for
+the modified server group and key exchange messages and passes it to the
+client.  The server's view of the shared secret is $g_i^{x_c x_s} \bmod p$, and
+the client's view of the shared secret is $g_i^{x_c} \bmod p$.  As in the
+attack described for TLS, these views are identical when $x_s \equiv 1 \bmod
+q_i$, so this connection will succeed with probability $1/q_i$.  For a small
+enough $q_i$, this enables a man in the middle to use a compromised server
+signing key to decrypt traffic with a reasonable probability of success, while
+only requiring tampering with the initial handshake messages, rather than
+having to actively rewrite the entire connection for the duration of the
+session.
+
+\paragraph{Small subgroup key recovery attacks}
+Since the server immediately sends a signature over the public values and the
+Diffie-Hellman shared secret, an implementation using static exponents and non-safe primes that is
+vulnerable to a small subgroup confinement attack would also be vulnerable to a
+mostly offline key recovery attack, as a malicious client would only need to
+send a single key exchange message per subgroup.
+
+
+\SSHHostValidationTable
+
+\ECMDistributionTable
+
+\subsection{Implementations}
+
+Censys~\cite{censys} SSH banner scans show that the two most common SSH server implementations
+are Dropbear and OpenSSH. Dropbear group exchange uses hard-coded safe prime parameters from the Oakley groups and validates that client key exchange values are greater than 1 and less than $p - 1$. While OpenSSH
+only includes safe primes by default, it does provide the ability to add additional primes and
+does not provide the ability to specify subgroup orders. Both OpenSSH and Dropbear generate fresh
+exponents per connection.
+
+We find one SSH implementation, Cerberus SFTP server (FTP over SSH), repeating server exponents across connections. 
+Cerberus uses OpenSSL, but fails to set \texttt{SSL\_OP\_SINGLE\-\_DH\_USE}, which was required
+to avoid exponent reuse prior to OpenSSL 1.0.2f.
+
+\subsection{Measurements}
+
+Of the 15.2\,M SSH servers on Censys, of which 10.7\,M support Diffie-Hellman
+group exchange, we found that 281 used a non-safe prime, and that
+1.1\,K reused Diffie-Hellman exponents. All but 26 of the hosts that reused exponents had banners identifying the Cerberus SFTP server. We
+encountered no servers that both reused exponents and used non-safe primes.
+
+We performed a scan of 1\% of SSH hosts in February 2016 offering the key
+exchange values of $y_c = 0 \bmod p, 1 \bmod p$ and $p-1 \bmod p$. As
+Table~\ref{tab:sshvalidation} shows, 33\% of SSH hosts failed to validate group
+order when we sent the key exchange value $p-1 \bmod p$. Even when safe groups
+are used, this behaviour allows an attacker to learn a single bit of the
+private exponent, violating the decisional Diffie-Hellman assumption and
+leaving the implementation open to a small subgroup confinement attack
+(Section~\ref{sec:tls-subgroup-attack}).
+
