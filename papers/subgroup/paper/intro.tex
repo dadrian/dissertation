@@ -1,7 +1,7 @@
 % !TEX root = subgroup.tex
- 
+
 \section{Introduction}
- 
+
 Diffie-Hellman key exchange is one of the most common public-key cryptographic
 methods in use in the Internet. It is a fundamental building block for IPsec,
 SSH, and TLS\@. In the textbook presentation of finite field Diffie-Hellman,
@@ -42,10 +42,10 @@ orders. Despite the risks posed by these well-known attacks on DSA groups, NIST 
 for Pair-Wise Key Establishment Schemes Using Discrete Logarithm
 Cryptography''~\cite{barker2007sp} specifically recommends DSA group parameters
 for Diffie-Hellman, rather than recommending using safe primes. RFC
-5114~\cite{rfc5114} includes several DSA groups for use in IETF standards. 
+5114~\cite{rfc5114} includes several DSA groups for use in IETF standards.
 
 We observe
-that few Diffie-Hellman implementations actually validate subgroup orders, in spite of the fact 
+that few Diffie-Hellman implementations actually validate subgroup orders, in spite of the fact
 that small subgroup attacks and countermeasures are well-known and specified
 in every standard suggesting the use of DSA groups for Diffie-Hellman, and DSA
 groups are commonly implemented and supported in popular protocols. For some protocols, including
@@ -70,11 +70,11 @@ or updating cryptographic standards.
 
 \paragraph{Our Contributions}
 We study the implementation landscape of Diffie-Hellman from several
-perspectives and measure the security impact of the widespread 
+perspectives and measure the security impact of the widespread
 failure of implementations to follow best security practices:
-\begin{itemize}[leftmargin=12pt]
+\begin{itemize}
 \item We summarize the concrete impact of small-subgroup confinement attacks
-    and small subgroup key recovery attacks on TLS, IKE, and SSH handshakes.  
+    and small subgroup key recovery attacks on TLS, IKE, and SSH handshakes.
 \item We examined the code of a wide variety of cryptographic libraries to
   understand their implementation choices. We find feasible full private
   exponent recovery vulnerabilities in OpenSSL and the Unbound DNS resolver,
@@ -91,7 +91,7 @@ failure of implementations to follow best security practices:
   repeated public exponents in the wild, and quantify the lack of validation
   checks even for safe primes.
   %Our work adds to the growing literature of empirical
-  %studies of cryptographic implementation behavior on the Internet. 
+  %studies of cryptographic implementation behavior on the Internet.
 %\item We surveyed the protocol-level susceptibility to small subgroup attack
 %    scenarios for TLS, IKE, and SSH.  While several of these attacks are well
 %    known or have been described elsewhere, we are unaware of a comprehensive

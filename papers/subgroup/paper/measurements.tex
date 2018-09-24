@@ -29,7 +29,7 @@
     \centering\small
     \begin{tabularx}{l|l}
           \toprule
-          Prime & Host Count \\ 
+          Prime & Host Count \\
           \midrule
           RFC 5114 Group 22& 1,938,215 \\
           Amazon Load Balancer & 344,148 \\
@@ -136,7 +136,7 @@
     \centering\small
     \begin{tabularx}{\textwidth}{rXrrrr}
       \toprule
-      
+
       \hfill & \hfill & \hfill & \multicolumn{3}{c}{{\bfseries\itshape Client key exchange public values offered\dots}} \\
       \cmidrule{4-6}
       \textbf{Protocol} & \textbf{Groups Offered} & \textbf{Support} & \boldmath{$1 \bmod p$} & \boldmath{$-1 \bmod p$} & \boldmath{$g_s \bmod p$} \\
@@ -173,7 +173,7 @@
           $g_7 \bmod p$     & 10.7\,K  & 1.5\,K \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{TLS key exchange validation}---% 
+    \caption{\textbf{TLS key exchange validation}---%
     We performed a 1\% HTTPS scan in August 2016 to check if servers validated received client key exchange values, offering generators of subgroups of order $1$, $2$ and $7$.  Our baseline DHE support number counts hosts willing to
     negotiate a DHE key exchange, and in the case of $g_7$, if $p-1$ is
     divisible by $7$. We count hosts as ``Accepted'' if they reply to the
@@ -194,7 +194,7 @@
           $-1 \bmod p$      & 176.0\,K & 59.0\,K \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{SSH validation}---% 
+    \caption{\textbf{SSH validation}---%
     In a 1\% SSH scan performed in February 2016, we sent the key exchange
     values $y_c = 0, 1$ and $p-1$. We count hosts as having initiated a handshake if they send a
     \texttt{SSH\_MSG\_KEX\_DH\_GEX\_GROUP}, and we count hosts as ``Accepted'' if
@@ -220,7 +220,7 @@
           Other                     & ---               & 135,432 \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{HTTPS support for RFC5114 Group 22}---% 
+    \caption{\textbf{HTTPS support for RFC5114 Group 22}---%
     In a 100\% HTTPS scan performed in October 2016, we found that of the
     12,835,911 hosts that accepted Diffie-Hellman key exchange, 901,656
     used Group~22. We were able to download default web pages for 646,157 of these hosts, which we examined to
@@ -238,7 +238,7 @@
     \toprule
       \textbf{Prime} & \multicolumn{7}{c}{\textbf{Exact Order Known}} & \multicolumn{2}{c}{\textbf{Exact Order Unknown}}\\
       \cmidrule(lr){1-1} \cmidrule(lr){2-8} \cmidrule(lr){9-10}
-      $\lg(p)$ & 160 bits   & 224 bits  & 256 bits  & 300 bits   & $\lg(p) - 8$   & $\lg(p) - 32$  & $\lg(p) - 64$  & Unlikely DSA & Likely DSA \\ 
+      $\lg(p)$ & 160 bits   & 224 bits  & 256 bits  & 300 bits   & $\lg(p) - 8$   & $\lg(p) - 32$  & $\lg(p) - 64$  & Unlikely DSA & Likely DSA \\
       \midrule
       512   & 3  & 0 & 0 & 0 & 5     & 0   & 0   & 760   & 43     \\
       768   & 4  & 0 & 0 & 4 & 2,685 & 0   & 0   & 220   & 1,402  \\
@@ -248,7 +248,7 @@
       4096  & 4  & 0 & 0 & 0 & 0     & 0   & 0   & 20    & 183    \\
       8192  & 0  & 0 & 0 & 0 & 0     & 0   & 0   & 0     & 1      \\
       Other & 0  & 0 & 0 & 0 & 0     & 0   & 0   & 400   & 15     \\
-        
+
       \bottomrule
     \end{tabularx}
     \caption{\textbf{Distribution of orders for groups with non-safe primes}---%
@@ -261,8 +261,6 @@
 \end{table*}
 }
 
-\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
-
 \newcommand{\ECMBreakableGroups}{
 \begin{table*}[t]
     \centering\small
@@ -270,20 +268,20 @@
       \toprule
       & \multicolumn{2}{c}{{\bfseries\itshape Work (bits)}} & \multicolumn{2}{c}{{\bfseries\itshape HTTPS}} & \multicolumn{2}{c}{{\bfseries\itshape MAIL}} & \multicolumn{2}{c}{{\bfseries\itshape SSH}} \\
        \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-      \textbf{Exponent} & \textbf{Online}    & \textbf{Offline}   & \textbf{Groups}    & \textbf{Hosts} & \textbf{Groups}    & \textbf{Hosts}     & \textbf{Groups}    & \textbf{Hosts}  \\ 
+      \textbf{Exponent} & \textbf{Online}    & \textbf{Offline}   & \textbf{Groups}    & \textbf{Hosts} & \textbf{Groups}    & \textbf{Hosts}     & \textbf{Groups}    & \textbf{Hosts}  \\
       \midrule
-      160       & 20        & 30        & 3         & 2     & 3         & 7         & 0         & 0      \\ 
-      160       & 30        & 45        & 517       & 1,996 & 1963      & 1,143,524 & 11        & 10     \\ 
-      160       & 40        & 60        & 3,701     & 8,495 & 13,547    & 1,159,853 & 109       & 68     \\ 
-      224       & 20        & 30        & 0         & 0     & 0         & 0         & 0         & 0      \\ 
-      224       & 30        & 45        & 2         & 2     & 14        & 16        & 0         & 0      \\ 
-      224       & 40        & 60        & 307       & 691   & 1039      & 1,141,840 & 3         & 1      \\ 
-      256       & 20        & 30        & 0         & 0     & 0         & 0         & 0         & 0      \\ 
-      256       & 30        & 45        & 0         & 0     & 1         & 1         & 0         & 0      \\ 
-      256       & 40        & 60        & 42        & 478   & 180       & 1,140,668 & 0         & 0      \\ 
+      160       & 20        & 30        & 3         & 2     & 3         & 7         & 0         & 0      \\
+      160       & 30        & 45        & 517       & 1,996 & 1963      & 1,143,524 & 11        & 10     \\
+      160       & 40        & 60        & 3,701     & 8,495 & 13,547    & 1,159,853 & 109       & 68     \\
+      224       & 20        & 30        & 0         & 0     & 0         & 0         & 0         & 0      \\
+      224       & 30        & 45        & 2         & 2     & 14        & 16        & 0         & 0      \\
+      224       & 40        & 60        & 307       & 691   & 1039      & 1,141,840 & 3         & 1      \\
+      256       & 20        & 30        & 0         & 0     & 0         & 0         & 0         & 0      \\
+      256       & 30        & 45        & 0         & 0     & 1         & 1         & 0         & 0      \\
+      256       & 40        & 60        & 42        & 478   & 180       & 1,140,668 & 0         & 0      \\
       \bottomrule
     \end{tabularx}
-    \caption{\textbf{Full key recovery attack complexity}---%  
+    \caption{\textbf{Full key recovery attack complexity}---%
     We estimate the amount of work required to carry out a small subgroup key
     recovery attack, and show the prevalence of those groups in the wild. Hosts
     are vulnerable if they reuse exponents and fail to check subgroup order.
@@ -333,7 +331,7 @@
         RFC 5114 Group 23            & 2048 & 224    & 371       & 1,140,363 & 2      & 0   \\
         Mistyped OpenSSL 512       & 512  & 497    & 0         & 717       & 0      & 0   \\
         \midrule
-        Other Non-Safe Primes      & ---  & ---    & 6,366     & 41,964    & 151    & 275 \\ 
+        Other Non-Safe Primes      & ---  & ---    & 6,366     & 41,964    & 151    & 275 \\
         Safe Primes & --- & --- & 9,165,709 & 1,850,086 & 3,345,331 & 10,730,246 \\
         \midrule
         Total & \hfill & \hfill & 10,827,565 & 3,036,408 & 3,371,616 & 10,730,527 \\
@@ -355,24 +353,24 @@
         \textbf{Implementation} & \textbf{RFC 5114 Support} & \textbf{Allows Short Exponents} &
         \textbf{Reuses Exponents} & \textbf{Validates Subgroup} &  \\
         \midrule
-        Mozilla NSS   & No & Yes, hardcoded                        
+        Mozilla NSS   & No & Yes, hardcoded
                       & No                         & $g \leq 2$         &  \\
-        OpenJDK       & No & Yes, uses max of p\_size / 2 and 384  
+        OpenJDK       & No & Yes, uses max of p\_size / 2 and 384
                       & No                         & $g \leq 2$         &  \\
         OpenSSL~1.0.2 & Yes & Yes, if $q$ set or if user sets a shorter length
                       & Default until Jan '16      & Yes, as of Jan '16 &  \\
-        BouncyCastle  & Yes & No                                    
+        BouncyCastle  & Yes & No
                       & Application dependent      & $g \leq 2$         &  \\
-        Cryptlib      & No & Yes, uses quadratic curve calculation 
+        Cryptlib      & No & Yes, uses quadratic curve calculation
                       & Application dependent      & $g \leq 2$         &  \\
-        libTomCrypt   & No & Yes, hardcoded                        
+        libTomCrypt   & No & Yes, hardcoded
                       & Application dependent      & No                 &  \\
-        CryptoPP      & No & Yes, uses work factor calculation     
+        CryptoPP      & No & Yes, uses work factor calculation
                       & Application dependent      & No                 &  \\
-        Botan         & Yes & Yes, uses work factor calculation     
+        Botan         & Yes & Yes, uses work factor calculation
                       & No                         & No                 &  \\
-        GnuTLS        & Application dependent & Yes, restricts to q\_size (max 256)   
-                      & Application dependent      & $g \leq 2$         &  \\ 
+        GnuTLS        & Application dependent & Yes, restricts to q\_size (max 256)
+                      & Application dependent      & $g \leq 2$         &  \\
         \bottomrule
     \end{tabularx}
     \caption{\textbf{TLS Library Behavior}---%
@@ -411,7 +409,7 @@
                               &   & \tt b20596d98ad0a9e3fd98876413d926f41a8b918d2ec4b018a30efe5e336bf3c7ce60d515cf46af5f \\
                               &   & \tt acf3bb389f68ad0c4ed2f0b1dbb970293741eb6509c64e731802259a639a7f57d4a9c0d9445241f5 \\
                               &   & \tt bcdbdc50555b76d9c335c1fa4e11a8351f1bf4730dd67ffed877cc13e8ea40c7d51441c1f4e59155 \\
-                              &   & \tt ef1159eca75a2359f5e0284cd7f3b982c32e5c51dbf51b45f4603ef46bae528739315ca679703c1f \\ 
+                              &   & \tt ef1159eca75a2359f5e0284cd7f3b982c32e5c51dbf51b45f4603ef46bae528739315ca679703c1f \\
                               &   & \tt fcf3b44fe3da5999daadf5606eb828fc57e46561be8c6a866361 \\
         Amazon Load           & No & \tt 2 * 3 * 5 * edb * 181ac5dbfe5ce13b * 18aa349859e9e9de09b7d65 * 9414a18a7b575e8f4 \\
         Balancer              &   & \tt 2f6cb2dbc22eb1fc21d4929 * 2de9f1171a2493d46a31d508b63532cdf86d21db6f50f717736fc4 \\
@@ -455,7 +453,7 @@
     \caption{\textbf{Common application behavior}---%
     Applications make a diverse set of decisions on how to handle
     Diffie-Hellman exponents, likely due to the plethora of conflicting,
-    confusing, and incorrect recommendations available. 
+    confusing, and incorrect recommendations available.
     }
     \label{tab:common-applications}
 \end{table}
