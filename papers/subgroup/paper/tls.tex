@@ -32,7 +32,11 @@ messages, which the client then verifies. If either side fails to decrypt or
 authenticate the \texttt{Finished} messages, or if the transcript hashes do not
 match, the connection fails immediately~\cite{rfc5246}.
 
-TLS also specifies a mode of using Diffie-Hellman with fixed parameters from the server's certificate~\cite{rfc3279}. This mode is not forward secret, was never widely adopted, and has been removed from all modern browsers due to dangerous protocol flaws~\cite{kcitls}. The only widely used form of Diffie-Hellman in TLS today is ephemeral Diffie-Hellman, described above.
+TLS also specifies a mode of using Diffie-Hellman with fixed parameters from
+the server's certificate~\cite{rfc3279}. This mode is not forward secret, was
+never widely adopted, and has been removed from all modern browsers due to
+dangerous protocol flaws~\cite{kci-tls-2015}. The only widely used form of
+Diffie-Hellman in TLS today is ephemeral Diffie-Hellman, described above.
 
 \subsection{Small Subgroup Attacks in TLS}
 \label{sec:tls-subgroup-attack}
@@ -52,7 +56,7 @@ Similarly, a man in the middle with knowledge of the server's long-term private
 signing key can use a small subgroup confinement attack to more easily
 compromise perfect forward secrecy, without having to rewrite an entire
 connection. The attack is similar to the those described by Bhargavan and
-Delignat-Lavaud~\cite{conf/ndss/BhargavanDP15}. The attacker modifies the
+Delignat-Lavaud~\cite{bhargavan-channel-bindings-2015}. The attacker modifies the
 server key exchange message, leaving the prime unchanged, but substituting a
 generator $g_i$ of a subgroup of small order $q_i$ for the group generator and 
 $g_i$ for the server's key exchange value $y_s$. The attacker then forges a correct signature for the modified server key exchange message and passes it to the client.  The client then
@@ -102,12 +106,12 @@ any remaining bits of the exponent~\cite{lim-1997}.
 
 
 We note that the TLS False Start extension allows the
-server to send application data before receiving the client's authentication~\cite{tls-falsestart}.
+server to send application data before receiving the client's authentication~\cite{rfc7918}.
 The specification only allows this behavior for abbreviated handshakes, which
 do not include a full key exchange.  If a full key exchange were allowed, the
 fact that the server authenticates first would allow a malicious client to
 mount a mostly offline key recovery attack.
-%\todo{Add discussion of the old unused TLS extension that makes this offline. \ref{tls-falsestart}}
+%\todo{Add discussion of the old unused TLS extension that makes this offline. \ref{rfc7918}}
 
 
 
@@ -203,7 +207,7 @@ Most of the implementations we examined attempt to match exponent length to the
 perceived strength of the prime. For example, Mozilla Network Security Services
 (NSS), the TLS library used in the Firefox browser and some versions of
 Chrome~\cite{nss-overview,chrome-to-openssl}, uses NIST's ``comparable key strength'' recommendations
-on key management~\cite{nist-sp-800-57-rev2,nist-sp-800-57-rev4} to determine secret exponent lengths from the length of the prime.~\cite{nss-line-of-code}  Thus NSS uses 160-bit exponents with a 1024-bit prime, and 224-bit exponents with a 2048-bit prime.
+on key management~\cite{sp800} to determine secret exponent lengths from the length of the prime.~\cite{nss-line-of-code}  Thus NSS uses 160-bit exponents with a 1024-bit prime, and 224-bit exponents with a 2048-bit prime.
  In fall 2015, NSS added an additional check to ensure that the
 shared secret $g^{x_ax_b} \not \equiv 1 \bmod p$~\cite{nss-code-secret-not-one}.
 
@@ -216,7 +220,7 @@ lengths~\cite{cryptlib-fitted-curve}. The Crypto++ library uses an explicit
 n)^{2/3}$~\cite{cryptoplusplus-work-factor}. Subgroup order and exponent
 lengths are set to twice the calculated work factor. The work factor
 calculation is taken from a 1995 paper by Odlyzko on integer
-factorization~\cite{odlyzko95}. Botan, a C++ cryptography and TLS library,
+factorization~\cite{odlyzko-1995}. Botan, a C++ cryptography and TLS library,
 uses a similar work factor calculation, derived from RFC~3766~\cite{rfc3766},
 which describes best practices as of 2004 for selecting public key strengths
 when exchanging symmetric keys. RFC~3766 uses a similar work factor algorithm
@@ -231,7 +235,7 @@ exponent lengths~\cite{botan-double}.
 \subsection{Measurements}
 \label{sec:tls-measurements}
 
-We used ZMap~\cite{zmap} to probe the public IPv4 address space for hosts
+We used ZMap~\cite{zmap-2013} to probe the public IPv4 address space for hosts
 serving three TLS-based protocols: HTTPS, SMTP+STARTTLS, and POP3S\@.  To
 determine which primes servers were using, we sent a \texttt{ClientHello}
 message containing only ephemeral Diffie-Hellman cipher suites.  We combined
@@ -286,7 +290,7 @@ balancers that cycle among multiple values might have evaded detection.
 While 77\%~of POP3S hosts and 39\%~of SMTP servers used a non-safe prime, a
 much smaller number used a non-safe prime and reused exponents (<0.01\% in both
 protocols), suggesting that the popular implementations (Postfix and
-Dovecot~\cite{mail-imc15}) that use these primes follow recommendations to use
+Dovecot~\cite{mail-2015}) that use these primes follow recommendations to use
 ephemeral Diffie-Hellman values with DSA primes.
 
 Table~\ref{tab:primes} shows nine groups that accounted for the majority of
@@ -328,7 +332,7 @@ subgroup attack.
 
 Although TLS also includes static Diffie-Hellman cipher suites that require a
 DSS certificate, we did not include them in our study; no browser supports
-static Diffie-Hellman~\cite{kcitls}, and Censys shows no hosts with DSS
+static Diffie-Hellman~\cite{kci-tls-2015}, and Censys shows no hosts with DSS
 certificates, with only 652 total hosts with non-RSA or ECDSA certificates.
 
 %In February 2016, we conducted an additional scan of a random 1\% sample of the

@@ -1,6 +1,29 @@
 % ARTICLES
 
-@Article{barker2007sp,
+@Article{pohlig1978improved,
+  title={An improved algorithm for computing logarithms over $\mathrm{GF}(p)$ and its cryptographic significance},
+  author={Pohlig, Stephen C. and Hellman, Martin E.},
+  journal={{IEEE} Transactions on Information Theory},
+  volume=24,
+  number=1,
+  year=1978
+}
+
+@Article{Pollard2000,
+    author={Pollard, M. J.},
+    title={Kangaroos, {M}onopoly and Discrete Logarithms},
+    journal={Journal of Cryptology},
+    year=2000,
+}
+
+@Article{gordon1993discrete,
+  title={Discrete Logarithms in {$\mathrm{GF}(p)$} Using the Number Field Sieve},
+  author={Gordon, Daniel M},
+  journal={SIAM Journal of Discrete Math},
+  year=1993,
+}
+
+@Article{sp800,
   title = {SP 800-56A. recommendation for pair-wise key establishment schemes using discrete logarithm cryptography (revised)},
   author = {Barker, Elaine B and Johnson, Don and Smid, Miles E},
   year = 2007,
@@ -36,6 +59,16 @@
   pages={514--534},
   year={1968},
   publisher={ACM}
+}
+
+@Article{pollard1975monte,
+  title = {A {M}onte {C}arlo method for factorization},
+  author = {Pollard, John M.},
+  journal = {BIT Numerical Mathematics},
+  volume = {15},
+  number = {3},
+  pages = {331--334},
+  year = {1975},
 }
 
 @Article{heartbleed-timeline,
@@ -124,11 +157,32 @@
 
 % PROCEEDINGS
 
+@InProceedings{anderson-1996,
+  author={Anderson, Ross and Vaudenay, Serge},
+  title={Minding your p's and q's},
+  booktitle={ASIACRYPT},
+  year=1996
+}
+
+@InProceedings{bhargavan-channel-bindings-2015,
+  author = {Bhargavan, Karthikeyan and Delignat-Lavaud, Antoine and Pironti, Alfredo},
+  booktitle = {Network and Distributed System Security Symposium},
+  title = {Verified Contributive Channel Bindings for Compound Authentication},
+  year = 2015
+}
+
 @InProceedings{bleichenbacher-1998,
   title = {Chosen ciphertext attacks against protocols based on the {RSA} encryption standard {PKCS} \#1},
   author = {Bleichenbacher, Daniel},
   booktitle = {Advances in Cryptology ({CRYPTO})},
   year = 1998
+}
+
+@InProceedings{censys,
+  author = {Zakir Durumeric and David Adrian and Ariana Mirian and Michael Bailey and J. Alex Halderman},
+  title = {A Search Engine Backed by {I}nternet-Wide Scanning},
+  booktitle = {22nd ACM Conference on Computer and Communications Security},
+  year = 2015
 }
 
 @InProceedings{chronology-tls-attacks-2013,
@@ -219,6 +273,13 @@
   year = 2005
 }
 
+@inproceedings{kci-tls-2015,
+  title = {Prying open {P}andora's box: {KCI} attacks against {TLS}},
+  author = {Hlauschek, Clemens and Gruber, Markus and Fankhauser, Florian and Schanes, Christian},
+  booktitle = {9th {USENIX} Workshop on Offensive Technologies ({WOOT} '15)},
+  year = 2015
+}
+
 @InProceedings{klima-rsa-tls-2003,
   title = {Attacking {RSA}-based sessions in {SSL/TLS}},
   author = {Klima, Vlastimil and Pokorn{\`y}, Ondrej and Rosa, Tom{\'a}{\v{s}}},
@@ -238,6 +299,13 @@
   author = {David Adrian and Karthikeyan Bhargavan and Zakir Durumeric and Pierrick Gaudry and Matthew Green and J. Alex  Halderman and Nadia Heninger and Drew Springall and Emmanuel Thom\'e and Luke Valenta and Benjamin VanderSloot and Eric Wustrow and Santiago Zanella-B\'eguelin and Paul Zimmermann},
   booktitle = {22nd ACM Conference on Computer and Communications Security},
   month = oct,
+  year = 2015
+}
+
+@InProceedings{mail-2015,
+  author = {Zakir Durumeric and David Adrian and Ariana Mirian and James Kasten and Kurt Thomas and Vijay Eranti and Nicholas Lidzborski and Elie Bursztein and Michael Bailey and J. Alex Halderman},
+  title = {The {M}atter of {H}eartbleed},
+  booktitle = {15th ACM Internet Measurement Conference},
   year = 2015
 }
 
@@ -291,6 +359,14 @@
   booktitle = {Network and Distributed System Security Symposium},
 	month = feb,
 	year = 2016
+}
+
+@InProceedings{shanks1971class,
+  title={Class number, a theory of factorization, and genera.},
+  author={Shanks, Daniel},
+  booktitle={Symposia in Pure Math},
+  volume=20,
+  year=1969,
 }
 
 @InProceedings{ssl-observatory-2010,
@@ -400,6 +476,13 @@
   year = 2014
 }
 
+@InProceedings{van1996diffie,
+  title = {On {D}iffie-{H}ellman key agreement with short exponents},
+  author = {Van Oorschot, Paul C and Wiener, Michael J},
+  booktitle = {EUROCRYPT},
+  year = 1996
+}
+
 @InProceedings{weak-keys-2012,
   author = {Nadia Heninger and Zakir Durumeric and Eric Wustrow and J. Alex Halderman},
   title = {Mining Your {P}s and {Q}s: {D}etection of Widespread Weak Keys in Network Devices},
@@ -438,6 +521,13 @@
   title = {No Need for Black Chambers: Testing {TLS} in the E-mail Ecosystem at Large},
   url = {http://arxiv.org/abs/1510.08646},
   year = 2015
+}
+
+@TechReport{odlyzko-1995,
+  title = {The future of integer factorization},
+  author = {Andrew M. Odlyzko},
+  note = {\url{http://www.dtc.umn.edu/~odlyzko/doc/future.of.factoring.pdf}},
+  year = 1995
 }
 
 % LEAKS
@@ -626,6 +716,76 @@
 }    
 
 % MISC
+
+@Misc{amazon-elb,
+  title = {{Amazon Elastic Load Balancer}},
+  note = {\url{https://aws.amazon.com/elasticloadbalancing/}},
+  year = 2016
+}
+
+@Misc{cryptoplusplus-work-factor,
+  title = {{Crypto++}},
+  author = {Jeffrey, Walton},
+  note = {\url{https://github.com/weidai11/cryptopp/blob/48809d4e85c125814425c621d8d0d89f95405924/nbtheory.cpp#L1029}},
+  year = 2015,
+}
+
+@Misc{botan-double,
+  title = {Botan},
+  note = {\url{https://github.com/randombit/botan}},
+  year = 2016
+}
+
+@misc{openssl-changelog-102,
+  title = {{OpenSSL} Changes},
+  note={\url{https://www.openssl.org/news/cl102.txt}},
+  month = jan,
+  year = 2015,
+}
+
+@misc{openssl-secadv-subgroup,
+  title = {{OpenSSL} Security Advisory {[28th Jan 2016]}},
+  month = jan,
+  note = {\url{https://www.openssl.org/news/secadv/20160128.txt}},
+  year = 2016
+}
+
+@Misc{openssl-test-code,
+  title = {{OpenSSL} ssltest.c},
+  note = {\url{https://github.com/openssl/openssl/blob/master/test/ssltest.c}},
+  year = 2016
+}
+
+@Misc{nss-overview,
+  title = {Overview of {NSS}},
+  month = sep,
+  note = {\url{https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/Overview}},
+  year = 2015
+}
+
+@Misc{nss-code-secret-not-one,
+  title = {{Mozilla} bug tracker},
+  note = {\url{https://bugzilla.mozilla.org/show_bug.cgi?id=1160139}},
+  month = nov,
+  year = 2015
+}
+
+@Misc{nss-line-of-code,
+  title = {{NSS dh.c}},
+  note = {\url{https://hg.mozilla.org/projects/nss/file/tip/lib/freebl/dh.c}}
+}
+
+@Misc{chrome-to-openssl,
+  title = {{G}oogle dumps plans for {OpenSSL} in {C}hrome, takes own {B}oring road},
+  author = {Sean Gallagher},
+  note = {\url{http://arstechnica.com/information-technology/2014/07/google-dumps-plans-for-openssl-in-chrome-takes-own-boring-road/}},
+  year = 2014,
+}
+
+@misc{nistffcsamples,
+  title = {Finite Field Cryptography based Samples},
+  note = {\url{http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/KS_FFC_All.pdf}}
+}
 
 @Misc{better-crypto,
   title                    = {Better Crypto: Applied Crypto Hardening},
@@ -923,6 +1083,13 @@
   year = 2000
 }
 
+@Misc{rfc3279,
+  title = {Algorithms and Identifiers for the Internet {X}.509 Public Key Infrastructure},
+  author = {Polk, W and Housley, R and Bassham, L},
+  howpublished = {{IETF RFC 3279}},
+  year = 2002
+}
+
 @Misc{rfc3546,
   title = {{Transport Layer Security ({TLS}) Extensions}},
   author = {S. Blake-Wilson and M. Nystrom and D. Hopwood and J. Mikkelsen and T. Wright},
@@ -930,11 +1097,25 @@
   year = 2003
 }
 
+@Misc{rfc3766,
+  title = {Determining Strengths For Public Keys Used For Exchanging Symmetric Keys},
+  author = {H., Orman and  Purple Streak Dev. and P., Hoffman and {VPN} Consortium},
+  howpublished = {{IETF RFC 3766}},
+  year = 2004
+}
+
 @Misc{rfc4109,
   author = {P. Hoffman},
   title = {Algorithms for {I}nternet {K}ey {E}xchange {V}ersion 1 ({IKEv1})},
   howpublished = {{IETF RFC 4109}},
   year = 2005
+}
+
+@Misc{rfc4253,
+  title = {The {S}ecure {S}hell ({SSH}) Transport Layer Protocol},
+  author = {T. Ylonen and C. Lonvick},
+  howpublished = {{IETF RFC 4253}},
+  year = 2006
 }
 
 @Misc{rfc4302,
@@ -991,6 +1172,13 @@
   author = {Hodges, Jeff and Jackson, Collin and Barth, Adam},
   howpublished = {{IETF RFC 6797}},
   year=2012
+}
+
+@Misc{rfc6989,
+  title = {Additional {D}iffie-{H}ellman Tests for the {I}nternet {K}ey {E}xchange Protocol Version 2 ({IKEv2})},
+  author = {Sheffer, Y and Fluhrer, S},
+  howpublished = {{IETF RFC 6989}},
+  year = 2013
 }
 
 @Misc{rfc7296,
