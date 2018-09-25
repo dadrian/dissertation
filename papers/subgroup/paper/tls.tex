@@ -90,14 +90,14 @@ the attacker must guess a value for $x_s \bmod q_i$, and send the corresponding
 client \texttt{Finished} message. If the server continues the handshake, the
 attacker learns that the guess is correct.  Therefore, assuming the server is
 reusing a static value for $x_s$, the attacker needs to perform at most $q_i$
-queries to learn the  server's secret $x_s \bmod q_i$~\cite{Lim1997}. This
+queries to learn the  server's secret $x_s \bmod q_i$~\cite{lim-1997}. This
 attack is feasible if $q_i$ is small enough and the server reuses
 Diffie-Hellman exponents for sufficiently many requests.
 
 The attacker repeats this process for many different primes $q_i$, and uses the
 Chinese remainder theorem to combine them modulo the product of the primes
 $q_i$.  The attacker can also use the Pollard lambda algorithm to reconstruct
-any remaining bits of the exponent~\cite{Lim1997}.
+any remaining bits of the exponent~\cite{lim-1997}.
 
 
 

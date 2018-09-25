@@ -1,5 +1,12 @@
 % ARTICLES
 
+@Article{barker2007sp,
+  title = {SP 800-56A. recommendation for pair-wise key establishment schemes using discrete logarithm cryptography (revised)},
+  author = {Barker, Elaine B and Johnson, Don and Smid, Miles E},
+  year = 2007,
+  publisher={National Institute of Standards \& Technology}
+}
+
 @Article{coppersmith-block-wiedemann-1994,
   author = {D. Coppersmith},
   title = {Solving linear equations over $\mathrm{GF}(2)$ via block {Wiedemann} algorithm},
@@ -217,6 +224,13 @@
   author = {Klima, Vlastimil and Pokorn{\`y}, Ondrej and Rosa, Tom{\'a}{\v{s}}},
   booktitle = {Cryptographic Hardware and Embedded Systems ({CHES})},
   year = 2003
+}
+
+@InProceedings{lim-1997,
+    author={Lim, Chae Hoon and Lee, Pil Joong},
+    title={A key recovery attack on discrete log-based schemes using a prime order subgroup},
+    booktitle={17th International Cryptology Conference}, 
+    year=1997,
 }
 
 @InProceedings{logjam-2015,
@@ -750,7 +764,6 @@
 @Misc{fips186,
   title = {{FIPS PUB 186-4}: Digital Signature Standard},
   author= {{NIST}},
-  doi = {10.6028/NIST.FIPS.186-4},
   year = 2013
 }
 
@@ -833,6 +846,53 @@
   year=2015
 }
 
+@misc{exim,
+  key = {zzz exim internet mailer},
+  title={{E}xim {I}nternet Mailer},
+  year=2015,
+  month=Jul,
+  note={\url{http://www.exim.org/}}
+}
+
+@misc{exim-blog,
+  key = {zzz exim tls security},
+  title={{Exim TLS Security, DH and standard parameters}},
+  year=2016,
+  month=Oct,
+  note={\url{https://lists.exim.org/lurker/message/20161008.231103.c70b2da8.en.html}}
+}
+
+@misc{exim-bug-report,
+  key = {zzz exim bug small},
+  title={{Bug 1837 - small subgroup attack}},
+  year=2016,
+  month=May,
+  note={\url{https://bugs.exim.org/show_bug.cgi?id=1837}}
+}
+
+@Misc{cve-2015-3240,
+  title={{CVE}-2015-3240},
+  howpublished={MITRE {CVE-ID} {CVE}-2015-3240.},
+  month=aug,
+  year=2015,
+  note={\url{http://cve.mitre.org/cgi-bin/cvename.cgi?name=2015-3240}}
+}
+
+@Misc{cve-2016-0701,
+  title={{CVE}-2016-0701},
+  howpublished={MITRE {CVE-ID} {CVE}-2016-0701.},
+  month=jan,
+  year=2016,
+  note={\url{http://cve.mitre.org/cgi-bin/cvename.cgi?name=2016-0701}}
+}
+
+@Misc{asanso-unredacted,
+  author = {Antonio Sanso},
+  title = {{OpenSSL} Key Recovery Attack on DH small subgroups},
+  note = {\url{http://blog.intothesymmetry.com/2016/01/openssl-key-recovery-attack-on-dh-small.html}},
+  year = 2016
+}
+
 % RFCS
 
 @Misc{rfc2313,
@@ -896,6 +956,13 @@
   title = {{I}nternet {K}ey {E}xchange ({IKEv2}) Protocol},
   howpublished = {{IETF RFC 4306}},
   year=2005
+}
+
+@Misc{rfc5114,
+  title = {Additional {D}iffie-{H}ellman Groups for Use with IETF Standards},
+  author = {Lepinski, M and Kent, S},
+  howpublished={{IETF RFC 5114}},
+  year = 2008
 }
 
 @Misc{rfc5246,

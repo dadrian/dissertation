@@ -24,7 +24,7 @@ $O(\sqrt{q})$. A common parameter choice is to use a 160-bit $q$ with a
 1024-bit $p$ or a 224-bit $q$ with a 2048-bit $p$, to match the security level
 under different cryptanalytic attacks. Diffie-Hellman parameters with $p$ and
 $q$ of these sizes were suggested for use and standardized in DSA
-signatures~\cite{dsa}. For brevity, we will refer to these non-safe primes as
+signatures~\cite{fips186}. For brevity, we will refer to these non-safe primes as
 DSA primes, and to groups using DSA primes with smaller values of $q$ as  DSA
 groups.
 
@@ -33,7 +33,7 @@ that implementations must perform additional validation checks to ensure the
 key exchange values they receive from the other party are contained in the
 correct subgroup modulo $p$. The validation consists of performing an extra
 exponentiation step. If implementations fail to validate, a 1997 attack of Lim
-and Lee~\cite{Lim1997} can allow an attacker to recover a static exponent by
+and Lee~\cite{lim-1997} can allow an attacker to recover a static exponent by
 repeatedly sending key exchange values that are in very small subgroups. We
 describe several variants of small subgroup confinement attacks that allow an
 attacker with access to authentication secrets to mount a much more efficient
