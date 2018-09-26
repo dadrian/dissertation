@@ -15,7 +15,7 @@
           IKEv2         & 2/2016  & 1,265,800  & 1,265,800  & 177,000     & 52      & 0       \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{IPv4 non-safe prime and static exponent usage}---%
+    \caption{\textbf{IPv4 non-safe prime and static exponent usage}\,---\,%
     Although non-safe primes see widespread use across most protocols, only a
     small number of hosts reuse exponents and use non-safe primes; these hosts
     are prime candidates for a small subgroup key recovery attack.
@@ -43,7 +43,7 @@
           Total Using Non-safe Primes & 2,523,493\\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{Top HTTPS non-safe primes\@.}  }
+    \caption{\textbf{Top HTTPS non-safe primes}}
     \label{tab:scandata1}
 \end{table}
 }
@@ -63,7 +63,7 @@
           Total Using Non-safe Primes & 1,186,322\\
           \bottomrule
     \end{tabular}
-    \caption{\textbf{Top SMTP non-safe primes\@.}  }
+    \caption{\textbf{Top SMTP non-safe primes}}
     \label{tab:scandata2}
 \end{table}
 }
@@ -83,7 +83,7 @@
           Total Using Non-safe Primes & 26,285\\
           \bottomrule
     \end{tabular}
-    \caption{\textbf{Top POP3S Non-safe primes\@.}  }
+    \caption{\textbf{Top POP3S Non-safe primes}}
     \label{tab:scandata3}
 \end{table}
 }
@@ -102,7 +102,7 @@
           Baseline & 1907.1\,K  & 1265.8\,K \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{IKE support for RFC5114 groups}---%
+    \caption{\textbf{IKE support for RFC5114 groups}\,---\,%
     We measured support for RFC5114 DSA groups in IKEv1 and IKEv2 by performing
     100\% IPv4 scans and counting how many hosts reply with a valid key exchange
     message for the selected group.}
@@ -124,7 +124,7 @@
           Group 23 Support         & 323.5\,K & 169.7\,K   \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{IKE validation}---%
+    \caption{\textbf{IKE validation}\,---,%
     In a 100\% IPv4 scan in February 2016, we measured the number of IKE hosts that accepted various key exchange
     values from Group 23. $g_3$ is a generator of a subgroup with order 3.}
     \label{tab:ikevalidation}
@@ -153,7 +153,7 @@
       & Baseline (Groups 2, 14, 19, 20, 22, 23, 24) & 1203.7\,K & -- & -- & -- \\
       \bottomrule
     \end{tabularx}
-    \caption{\textbf{IKE group support and validation\@.}---%
+    \caption{\textbf{IKE group support and validation}\,---\,%
     We measured support for RFC5114 DSA groups in IKEv1 and IKEv2 and test for key exchange validation by performing a series of 100\% IPv4 scans in October 2016. For Group 23, $g_s$ is a generator of a subgroup with order 3, and for Groups 22 and 24, $g_s$ is a generator of a subgroup of order 7. }
     \label{tab:ikegroupsupportandvalidation}
   \end{table*}
@@ -173,7 +173,7 @@
           $g_7 \bmod p$     & 10.7\,K  & 1.5\,K \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{TLS key exchange validation}---%
+    \caption{\textbf{TLS key exchange validation}\,---\,%
     We performed a 1\% HTTPS scan in August 2016 to check if servers validated received client key exchange values, offering generators of subgroups of order $1$, $2$ and $7$.  Our baseline DHE support number counts hosts willing to
     negotiate a DHE key exchange, and in the case of $g_7$, if $p-1$ is
     divisible by $7$. We count hosts as ``Accepted'' if they reply to the
@@ -194,7 +194,7 @@
           $-1 \bmod p$      & 176.0\,K & 59.0\,K \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{SSH validation}---%
+    \caption{\textbf{SSH validation}\,---\,%
     In a 1\% SSH scan performed in February 2016, we sent the key exchange
     values $y_c = 0, 1$ and $p-1$. We count hosts as having initiated a handshake if they send a
     \texttt{SSH\_MSG\_KEX\_DH\_GEX\_GROUP}, and we count hosts as ``Accepted'' if
@@ -220,7 +220,7 @@
           Other                     & ---               & 135,432 \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{HTTPS support for RFC5114 Group 22}---%
+    \caption{\textbf{HTTPS support for RFC5114 Group 22}\,---\,%
     In a 100\% HTTPS scan performed in October 2016, we found that of the
     12,835,911 hosts that accepted Diffie-Hellman key exchange, 901,656
     used Group~22. We were able to download default web pages for 646,157 of these hosts, which we examined to
@@ -251,7 +251,7 @@
 
       \bottomrule
     \end{tabularx}
-    \caption{\textbf{Distribution of orders for groups with non-safe primes}---%
+    \caption{\textbf{Distribution of orders for groups with non-safe primes}\,---\,%
     For groups for which we were able to determine the subgroup order exactly,
     160-bits subgroup orders are common. We classify other groups to
     be likely DSA groups if we know that the subgroup order is at least 8 bits
@@ -281,7 +281,7 @@
       256       & 40        & 60        & 42        & 478   & 180       & 1,140,668 & 0         & 0      \\
       \bottomrule
     \end{tabularx}
-    \caption{\textbf{Full key recovery attack complexity}---%
+    \caption{\textbf{Full key recovery attack complexity}\,---\,%
     We estimate the amount of work required to carry out a small subgroup key
     recovery attack, and show the prevalence of those groups in the wild. Hosts
     are vulnerable if they reuse exponents and fail to check subgroup order.
@@ -302,7 +302,7 @@
           Group 24 & 256 & 32 & 94 \\
           \bottomrule
     \end{tabularx}
-    \caption{\textbf{Attacking RFC 5114 groups}---%
+    \caption{\textbf{Attacking RFC 5114 groups}\,---\,%
     We show the log of the amount of work in bits required to perform a small
     subgroup key recovery attack against a server that both uses a static
     Diffie-Hellman exponent of the same size as the subgroup order and fails to
@@ -337,7 +337,7 @@
         Total & \hfill & \hfill & 10,827,565 & 3,036,408 & 3,371,616 & 10,730,527 \\
         \bottomrule
     \end{tabularx}
-    \caption{\textbf{IPv4 top non-safe primes}---%
+    \caption{\textbf{IPv4 top non-safe primes}\,---\,%
     Nine non-safe primes account for the majority of hosts using non-safe
     primes.
     }
@@ -373,7 +373,7 @@
                       & Application dependent      & $g \leq 2$         &  \\
         \bottomrule
     \end{tabularx}
-    \caption{\textbf{TLS Library Behavior}---%
+    \caption{\textbf{TLS Library Behavior}\,---\,%
     We examined popular TLS libraries to determine which weaknesses from
     Section~\ref{subsec:small-subgroup-attack} were present. Reuse of exponents
     often depends on the use of the library; the burden is on the application
@@ -422,7 +422,7 @@
                               &   & \tt e49b393256c23c9 \\
         \bottomrule
     \end{tabularx}
-    \caption{\textbf{Group order factorization for common non-safe primes}---%
+    \caption{\textbf{Group order factorization for common non-safe primes}\,---\,%
     We used the elliptic curve method to factor $(p-1)/2$ for each of the
     non-safe primes we found while scanning, as well as the mistyped OpenSSL
     ``prime''.
@@ -450,7 +450,7 @@
         Postfix     & OpenSSL     & No          & No    \\
         \bottomrule
     \end{tabularx}
-    \caption{\textbf{Common application behavior}---%
+    \caption{\textbf{Common application behavior}\,---\,%
     Applications make a diverse set of decisions on how to handle
     Diffie-Hellman exponents, likely due to the plethora of conflicting,
     confusing, and incorrect recommendations available.

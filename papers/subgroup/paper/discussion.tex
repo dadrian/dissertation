@@ -40,7 +40,7 @@ rather than assuming Diffie-Hellman with short exponents is secure inside a
 group of much larger order.  Alternatively, this insistence may stem from the
 fact that the security of DSA digital signatures requires the secret exponent
 to be uniformly random, although no such analogous attacks are known for
-Diffie-Hellman key exchange.~\cite{Nguyen2002}
+Diffie-Hellman key exchange.~\cite{nguyen-2002}
 Unfortunately, our empirical results show that the necessity to specify and validate subgroup order for Diffie-Hellman key exchange makes implementations more fragile in practice.
 
 \paragraph{Cryptographic API design}
@@ -49,7 +49,7 @@ options and knobs to be tuned, leaving too many security-critical choices to
 the developers, who may struggle to remain current with the diverse and
 ever-increasing array of cryptographic attacks. These exposed knobs are likely
 due to a prioritization of performance over security. These confusing options in
-cryptographic implementations are not confined to primitive design: Georgiev et al.~\cite{Georgiev:2012:MDC:2382196.2382204} discovered that SSL certificate validation was broken in a large number of non-browser TLS applications due to developers misunderstanding and misusing library calls.  In the case of the small
+cryptographic implementations are not confined to primitive design: Georgiev et al.~\cite{most-dangerous-code-2012} discovered that SSL certificate validation was broken in a large number of non-browser TLS applications due to developers misunderstanding and misusing library calls.  In the case of the small
 subgroup attacks, activating most of the conditions required for the attack
 will provide slight performance gains for an application: using a small
 exponent decreases the work required for exponentiation, reusing Diffie-Hellman
@@ -113,7 +113,7 @@ prefer elliptic curve groups over safe curves with proper point
 validation~\cite{safecurves}. These groups are much more efficient and have
 shorter key sizes than finite-field Diffie-Hellman at equivalent security
 levels. The TLS 1.3 draft includes a list of named curves designed to modern
-security standards~\cite{tls13draft16}.  If elliptic curve Diffie-Hellman is
+security standards~\cite{rfc8446}.  If elliptic curve Diffie-Hellman is
 not an option, then implementations should follow the guidelines outlined in
 RFC~7919 for selecting finite field Diffie-Hellman primes~\cite{rfc7919}.
 Specifically, implementations should prefer ``safe'' primes of documented
