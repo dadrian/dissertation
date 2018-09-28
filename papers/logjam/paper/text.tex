@@ -1,4 +1,4 @@
-\begin{abstract}
+%\begin{abstract}
 We investigate the security of Diffie-Hellman key exchange as used in popular
 Internet protocols and find it to be less secure than widely believed. First,
 we present Logjam, a novel flaw in TLS that lets a man-in-the-middle
@@ -10,7 +10,8 @@ early 2015.} for a specified 512-bit group, we can compute arbitrary discrete
 logs in that group in about a minute. We find that 82\% of vulnerable servers
 use a single 512-bit group, allowing us to compromise connections to 7\% of
 Alexa Top Million HTTPS sites. In response, major browsers have changed to
-reject short groups.\looseness=-1
+reject short groups.
+%\looseness=-1
 
 We go on to consider Diffie-Hellman with 768- and 1024-bit groups. We
 estimate that even in the 1024-bit case, the computations are plausible given
@@ -23,8 +24,7 @@ agency's attacks on VPNs are consistent with having achieved such a break. We
 conclude that moving to stronger key exchange methods should be a priority
 for the Internet community.
 %\looseness=-1
-
-\end{abstract}
+%\end{abstract}
 
 \section{Introduction}
 
