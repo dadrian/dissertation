@@ -8,41 +8,76 @@ General introduction. Broad claims. Thesis statement.
 
 No one will actually read past here.
 
-\section{First Paper Class}
+\section{Engineering Challenges}
 
-Introduction and claim group. Cite something~\cite{censys}.
+To do science, we have to collect data.
 
-\subsection{Paper One}
+To collect the data, we have to build things.
 
-Now we're cooking with gas!
+Determining what to build and how to build is also difficult.
 
-\paragraph{Important Note}
-This paper is more exciting and gets some breakout points.
+Engineering is very closely related to methodology, which is where the science is.
 
-\paragraph{Another Note}
-All this stuff is made up anyway.
+\subsection{Speed}
 
-\subsection{Another Paper}
+Assume we're using scanning.
 
-We talked about some stuff, and now we're gonna fly at left-field.
+TLS-Attacker is slow.
 
-\section{Second Paper Group}
+Performance matters, especially once you start cross-correlating.
 
-Let's cite a bunch of things that are related, then talk about them!
+Discovery and collection separate. (ZMap vs ZGrab)
 
-\subsection{A paper}
+\subsection{Data Processing}
 
-I published a thing.
+Beyond collecting data, you actually have to process it.
 
-\subsection{Analyzing the HTTPS Certificate Ecosystem}
+Straightforward for one-off studies.
 
-And another thing
+What if you want longitudinal data?
 
-\paragraph{Note}
-Another note.
+Take-away: This all requires work.
 
-\paragraph{Site Certificates}
-A second note.
+\section{Large-scale Empiriscism}
+
+Some people study cryptograpy usages in individual programs~/cite{most-dangerous-code-2012}.
+
+API design helps.
+
+But ultimately, what is happening? Are we impacting the security on the web as a whole?
+
+But what about ecosystems?
+
+Study usage across ecosystems.
+
+Usage is configuration.
+
+Design experiments to glean information into configuration.
+
+Talk about configuration of the ecosystem beyond just configuration of hosts (cross-protocol correlation).
+
+\subsection{Cryptography in the TLS Ecosystem}
+
+Configuration of web servers.
+
+Logjam.
+
+Diffie-Hellman. Subgroup.
+
+RFC 5114
+
+\subsection{Unexpected Interactions in Cryptography at Scale}
+
+SSLv2 affects TLS
+
+DROWN
+
+Generalize DROWN to cross-protocol key reusage
+
+\paragraph{Export Cryptography}
+Don't weaken cryptography.
+
+Takeaways from Black Hat talk.
 
 \chapter{Zippier}
 \input{papers/zippy/paper/paper}
