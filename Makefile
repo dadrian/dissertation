@@ -1,10 +1,10 @@
 all: proposal.pdf 
 
-proposal.pdf: proposal/proposal.tex papers/**/paper/*.tex refs.bib
-	pdflatex proposal/proposal
+proposal.pdf: proposal.tex proposal/*.tex papers/**/paper/*.tex refs.bib includes/*.tex
+	pdflatex proposal
 	bibtex proposal
-	pdflatex proposal/proposal
-	pdflatex proposal/proposal
+	pdflatex proposal
+	pdflatex proposal
 
 .PHONY: open
 open: proposal.pdf
