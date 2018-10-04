@@ -1,7 +1,9 @@
 % !TEX root ../proposal.tex
 
 Large-scale empirisicm, enabled by Internet-wide scanning, provides missing
-insight into the security of cryptography used on the Internet. 
+insight into the security of cryptography used on the Internet.
+
+Develop new tools enabling the use of measurement as a technique to better understand how we use, implement, and deploy cryptography.
 
 % What insight is "missing"? What are the other methods?
 
@@ -55,17 +57,44 @@ surrounding network communication for many programs, it does not provide
 insight into the security behavior of Internet ecosystems themselves.
 
 Large-scale empiricism enables us to understand the security behavior
-ecosystems, rather than \TK. To understand the behavior of users of cryptographic applications, 
+ecosystems, rather than \TK. To understand the behavior of users of
+cryptographic applications, we can study the public-facing aspects of the
+cryptographic applications: server configurations
 
 \subsection{Cryptography in the TLS Ecosystem}
 
-Configuration of web servers.
+TLS is the most widely deployed cryptographic protocol. Billions of users use
+TLS in their web browser daily. Although for many years, TLS was the state of
+the art for secure channels, the protocol has experienced major vulnerabilites
+due to design and implementation deficiencies over the
+years~\cite{beast-2011,crime-attack,poodle-2014}. Understanding the problems
+with TLS~1.2 and earlier informed the design decisions in TLS
+1.3~\cite{rfc8446} and QUIC~\cite{ietf-quic-transport-15}.
 
-Logjam.
+The TLS protocol had been analyzed in isolation since its release, leading to
+TLS~1.1 introducing further defenses against padding oracles and an improved
+session resumption mechanism. In 2012, Durumeric et al.~\cite{weakkeys-2012}
+used large-scale empirical methods to uncover vulnerabilites that were not
+visible from the perspective of individual hosts, finding that \TK\% of HTTPS
+servers on IPv4 shared a non-trivial factor in their private key. When examined
+in isolation the RSA keys appeared unfactorable and secure. When examined from
+a global perspective, these keys were trivially broken.
 
-Diffie-Hellman. Subgroup.
+\todo{pontificate about empiricism}
 
-RFC 5114
+\todo{logjam}
+
+The empiricism behind Logjam also revealed that many servers incorrectly use
+non-``safe'' primes for Diffie-Hellman, opening them up to small subgroup
+attacks. Large swaths of hosts used Diffie-Hellman parameters from RFC~5114, a
+largely looked-over RFC containing prime-order groups intended for use with
+DSA~\cite{rfc5114}, but which open up Diffie-Hellman to small-subgroup
+attacks. Similar to Logjam, the cryptography behind small
+subgroup confinement~\cite{van1996diffie,anderson-1996} and small subgroup key
+recovery~\cite{lim-1997} attacks has been known for over a decade.
+Cryptographers assumed that implementations were either validating subgroups or 
+using safe primes. Internet-wide measurement of the behavior of Diffie-Hellman 
+server implementations showed this assumption to be false~\cite{subgroup-2017}.
 
 \subsection{Unexpected Interactions in Cryptography at Scale}
 
@@ -96,43 +125,106 @@ of otherwise secure TLS connections using modern cryptography.
 
 \paragraph{Cross-protocol interactions between TLS and SSLv2}
 
-SSLv2
+The DROWN attack~\cite{drown-2016} exposed two interesting cross-protocol
+interactions between TLS and SSLv2. The first is that the existence of obsolete
+and weakened cryptography in a second protocol (SSLv2), can in some situations,
+be used as an oracle to attack protocols using more modern cryptography
+(TLSv1.2). The second is that implementation vulnerabilites in one protocol,
+can be used to attack a second, correctly implemented protocol.
 
-DROWN
+SSLv2 was released in \TK and replaced by \TK, due to severe man-in-the-middle
+issues identified by \TK. Despite being over a decade old, in 2016, SSLv2 was
+still enabled on \TK web servers, and over \TK mail servers. While this 
+initially may seem harmless, since no modern web browser has supported SSLv2
+in over \TK years, due to similarities and malleability in how RSA is used
+during the key exchange process, it was possible to leverage both
+``export-grade'' cryptography support in SSLv2, and a one-byte information leak
+vulnerability in OpenSSL's SSLv2 implementation, to attack TLS connections.
 
-Generalize DROWN to cross-protocol key reusage
+The first case, using export-grade cryptography in SSLv2 to attack TLS
+connections, is the more general variant of DROWN. It leverages multiple
+protocol flaws \TK.
 
-\paragraph{Export Cryptography}
-Don't weaken cryptography.
+The second case applies the general technique in combination
+with an unnoticed decade-old implementation flaw in OpenSSL. This variant
+drastically lowers the cost of the exploit, making it feasible to man-in-middle
+live connections, instead of just decrypting recorded connections.
 
-Takeaways from Black Hat talk.
+Beyond SSLv2, the DROWN attack is the culmination of multiple obsolete but not
+broken cryptographic constructs, working together to completely break the
+security of TLS\@. The \PKCS padding scheme for RSA has been superseded by
+OEAP. RSA key exchange should be replaced by (EC)DHE schemes. While
+vulnerabilites stemming from misuse of these schemes have been known for
+decades~\cite{bleichenbacher-1998,bleichenbacher-three}, they remained part of
+the TLS standard for legacy reasons. When viewed in isolation, this seemed
+fine, as the TLS implementations and specifications contain countermeasures to
+padding-oracle attacks. The TLS protocol is not broken simply because it
+supports \PKCS. The insecurity of DROWN is only revealed when viewing TLS
+through large cross-protocol lens.
 
-\section{Engineering Challenges}
+\paragraph{General cross-protocol vulnerability in TLS}
+Beyond DROWN, the TLS protocol has a fundamentally cross-protocol attack
+surface. X.509 certificates are not bound to any particular protocol or port.
+Furthermore, even if distinct services, such as mail and web servers, use
+different keys, so long as they share any name on the certificate, the
+transport-layer security of all connections to that name are limited to the
+security of the weakest TLS implementation or configuration.
 
-To do science, we have to collect data.
+Even traditionally web-based padding oracle attacks, such as
+POODLE~\cite{poodle-2014}, or the AES-NI padding-oracle in
+OpenSSL~\cite{aes-ni-cve}, can be exploited using non-web servers against web
+users by active attackers, who rewrite the TCP connection to an alternative
+port, and fill-in any pre-handshake protocol dialouge (\eg sending an SMTP
+\texttt{EHLO} or \texttt{STARTTLS}.
 
-To collect the data, we have to build things.
+\subsection{Export Cryptography}
 
-Determining what to build and how to build is also difficult.
+\todo{describe export cryptography}
 
-Engineering is very closely related to methodology, which is where the science is.
+As shown by Freak, Logjam, and DROWN, the security of TLS and export
+cryptography are fundamentally linked. The entire goal of export cryptography
+is a unique constraint: weaken cryptography, without weakening cryptograpy. We
+can apply Internet measurement techniques to show that the export regulations
+weakened protocol design to the point where the regulations are directly
+harmful to the security of the Internet today. These empirical techniques show
+that these attacks are not theoretical, leveraging protocols that have
+long-since disappeared, but instead are a dark side of backwards compatibility,
+harming real users today.  Although the regulations went out of effect by
+1999~\cite{djb-timeline}, the cryptography remains. At their respective times
+of disclosure, \TK\% of IPv4 HTTPS hosts were vulnerable to FREAK, \TK\% were
+vulnerable to Logjam, and \TK\% were vulnerable to DROWN. All forms of export
+cryptograpy have been broken: export RSA key exchange, broken by FREAK; export
+Diffie-Hellman key exchange, broken by Logjam; and export symmetric ciphers,
+broken by DROWN.
 
-\subsection{Speed}
+\todo{link back to empiricism}
 
-Assume we're using scanning.
-
-TLS-Attacker is slow.
-
-Performance matters, especially once you start cross-correlating.
-
-Discovery and collection separate. (ZMap vs ZGrab)
-
-\subsection{Data Processing}
-
-Beyond collecting data, you actually have to process it.
-
-Straightforward for one-off studies.
-
-What if you want longitudinal data?
-
-Take-away This all requires work.
+%\section{Engineering Challenges}
+%
+%To do science, we have to collect data.
+%
+%To collect the data, we have to build things.
+%
+%Determining what to build and how to build is also difficult.
+%
+%Engineering is very closely related to methodology, which is where the science is.
+%
+%\subsection{Speed}
+%
+%Assume we're using scanning.
+%
+%TLS-Attacker is slow.
+%
+%Performance matters, especially once you start cross-correlating.
+%
+%Discovery and collection separate. (ZMap vs ZGrab)
+%
+%\subsection{Data Processing}
+%
+%Beyond collecting data, you actually have to process it.
+%
+%Straightforward for one-off studies.
+%
+%What if you want longitudinal data?
+%
+%Take-away This all requires work.
