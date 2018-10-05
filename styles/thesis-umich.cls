@@ -266,7 +266,7 @@
 
 %% ---- TITLE PAGE -----------------------------------------------------
 % The fields to be used for the title page
-\renewcommand{\@title}{Understanding Cryptography with Large-Scale Empiriscism and Engineering}
+\renewcommand{\@title}{Understanding Cryptography with Large-Scale Empiriscism}
 \renewcommand{\@author}{David Adrian}
 \newcommand{\@degree}{Doctor of Philosophy}
 \newcommand{\@department}{Computer Science and Engineering}

@@ -1,230 +1,207 @@
 % !TEX root ../proposal.tex
 
-Large-scale empirisicm, enabled by Internet-wide scanning, provides missing
-insight into the security of cryptography used on the Internet.
+Cryptography is a field born from mathematics, and much of cryptographic
+research is concerned with proving correctness of both of primitives and
+protocols, given some set of assumptions. Cryptography is one of the only
+components of security that can be provably secure. As a result, the
+cryptography is often considered to be one of the strongest components of
+security.
 
-Develop new tools enabling the use of measurement as a technique to better understand how we use, implement, and deploy cryptography.
+Yet historically, cryptography has been one of the most fragile aspects of
+security. This is not because of issues with the underlying math or the
+underlying primitives being insecure, but is instead security that is lost in
+translation between the cryptographers and the implementers.
 
-% What insight is "missing"? What are the other methods?
+The process of going from paper to program, or from proof-of-concept to
+production, introduces mistakes and misunderstandings, which leads to
+cryptographic failures and insecurity. To address this, the cryptographic
+research community is beginning to introduce and study new concepts such as
+misuse-resistant cryptography, and simplified cryptographic APIs.
+Unfortunately, the state of the art in cryptography engineering remains
+considerably behind the state of art in research.
 
-We gain additional insight into cryptography from large-scale empiricism.
+To understand where mistakes are being made, and understand where complexity
+arises from, we must understand how cryptography is actually being used. To
+better use cryptography to secure the Internet, we must first under how
+cryptography is being used. Examining CVE databases and trawling through
+cryptographic code provides one lens into real-world deployments of
+cryptography, but it does not necessarily reflect the state of the Internet.
 
-The Internet is a large, distributed system with a diverse set of clients and
-servers~\cite{something}. Compatibility with legacy clients remains a top priority 
-for many operators~\cite{something} and protocol designers~\cite{something}.
+Large-scale empirical methods allow us to characterize how cryptography is
+being used on the Internet, today. Although cryptography is a formal and
+mathematical science, empirical methods provide additional insight into the
+fundamental nature of the use of cryptography to secure communication. We have
+already used empirical methods to make a tangible and measurable impact on the
+security of the Internet today. We can further use the insights gained from
+empirical methods to better secure the Internet in the future. 
 
-% High-level questions that empiricism helps with. (TLS 1.3 compatibility woes?)
-%
-% List of insights that help with this.
+Applying empirical methods to cryptography requires solving engineering
+challenges. A fundamental methodology underlying the empirical study of
+cryptography is Internet-wide scanning. While tooling such as ZMap drastically
+reduced the barrier to entry, Internet-wide scanning still requires additional
+application-layer tooling to be useful to study cryptography (e.g. the ability
+to perform large numbers of TLS handshakes), as well as careful experimental
+design to extract the necessary information from every web server on the
+Internet, in a systematic, repeatable and consistent method. Data collected
+from a single scan often approaches one terabyte in size, and correlating
+across multiple scans may involve processing billions of application-layer
+handshakes.
 
-We can use that insight to improve the overall security of the Internet, today.
+In this dissertation I show contributions made to the measurement field itself,
+and show three different cases where empiricism enabled additional insight when
+combined with other methods cryptography research.
 
-We can use that insight to better inform the design of the Internet in the future.
+\paragraph{Faster Internet-Wide Scanning}
+I show improvements to the ZMap scanner, which
+enable it to operate at a full 10Gbps line rate. While ZMap enabled the use of
+Internet-wide scanning accessible as a measurement method, this work moves
+towards enabling hourly or real-time measurement of the cryptographic behavior
+of all Internet-connected systems.
 
-The latest version of TLS 1.3~\cite{rfc8446} was drafted over the course of \TK years, with countermeasures
-in place for both known cryptographic vulnerabilites in earlier version of TLS, as well as with updated negotation and parameter selection processes, designed to prevent deployment failures that had traditionally been considered outside of the scope of standards.
+\paragraph{Cost-Effective Global Attacks}
+Discrete-log and factoring based attacks are generally considered out of reach
+of attackers.  However, informing such attacks with measurement data allows for
+cost-effective attacks that leverage a single, expensive pre-computation to
+cheaply attack TLS connections. Furthermore, when combined with broad support
+for cryptography that was assumed to be “dead”, these attacks become even
+cheaper.
 
-We can use it alongside analysis of individual components. (With our power combined!)
+\paragraph{Cross-Protocol Attacks}
+Reusing TLS keys across multiple protocols, such as HTTPS, SMTP, and IMAP,
+leads to an increased attack surface. Empirical methods allow us to understand
+the attack surface increase from key reuse. Furthermore, specific
+vulnerabilities in the TLS protocol and older implementations can be utilized
+in a cross-protocol context to attack users of a web service without explicitly
+compromising the private key. This is best shown by the DROWN vulnerability, in
+which the mere existence of an \ssltwo host that shared a key with a TLS host
+enabled decryption of otherwise secure TLS connections using modern
+cryptography.
 
-Using large-scale empiriscism requires solving engineering challenges.
+\paragraph{Fragile Cryptographic Ecosystems}
+Often, cryptographers are aware of attacks for decades, but there is a
+knowledge gap between the implementers and researchers. A specific example of
+this is prime-field based Diffie-Hellman key exchange, in which implementation
+and hosts often use groups which unnecessarily open up the likelihood of
+small-subgroup confinement and key recovery attacks. Empirical techniques
+provide insight into the Diffie-Hellman group selection at Internet-scale.
 
-\section{Large-scale Empiricism}
+\section{Faster Internet-Wide Scanning}
 
-% Some people study cryptograpy usages in individual programs~\cite{most-dangerous-code-2012}.
-% 
-% API design helps.
-% 
-% But ultimately, what is happening? Are we impacting the security on the web as a whole?
-% 
-% But what about ecosystems?
-% 
-% Study usage across ecosystems.
-% 
-% Usage is configuration.
-% 
-% Design experiments to glean information into configuration.
-% 
-% Talk about configuration of the ecosystem beyond just configuration of hosts (cross-protocol correlation).
+When originally introduced, ZMap was capable of saturating a 1Gbps uplink from
+a single host, enabling an Internet-wide TCP SYN scan of IPv4 to be performed
+in forty-five minutes. However, when used with a 10Gbps network interface, ZMap
+reached barely above the 1Gbps mark. The required thread synchronization during
+address generation restricted the performance benefit of threading, and limited
+the ability to leverage multi-core systems. Furthermore, the copy from user
+space to kernel memory when sending a packet limited total throughput. Scanning
+a 10Gbps requires sending nearly 15 million packets per second continuously,
+which allows for only 200 cycles per packet on a 3 GHz system.
 
-Security research often involves searching for new classes of
-vulnerabilites~\cite{something}, or identifying vulnerabilites within
-existing systems~\cite{something}. Other research has concerned identifying
-misuse of security-critical APIs~\cite{gutmann-lessons}, including systematic
-misuse among large swaths of library code
-users~\cite{most-dangerous-code-2012}. While improving API design and
-secure-by-default programming models certainly improve the security behavior
-surrounding network communication for many programs, it does not provide
-insight into the security behavior of Internet ecosystems themselves.
+We describe performance improvements to address both of these constraints, and
+enable ZMap to fully utilize a 10Gbps network link, bringing the total time for
+a TCP SYN scan of IPv4 to under five minutes from a single host. While
+Internet-measurement is often used to provide coarse-grain understanding of the
+shape of the Internet as a whole, improvements in measurement-collection begin
+to move the field towards being able to continuously understand the behavior of
+individual hosts, but at global scale.
 
-Large-scale empiricism enables us to understand the security behavior
-ecosystems, rather than \TK. To understand the behavior of users of
-cryptographic applications, we can study the public-facing aspects of the
-cryptographic applications: server configurations
+\section{Cost-Effective Global Attacks}
 
-\subsection{Cryptography in the TLS Ecosystem}
+The security of Diffie-Hellman key exchange relies on the hardness of solving
+discrete logs in certain groups. We uncovered several weaknesses in how
+finite-field Diffie-Hellman key exchange was deployed, which drastically
+affected the cost of decrypting large amounts of TLS traffic. The algorithmic
+complexity of calculating discrete logs modulo p is exponential. However, the
+bulk of this computation is dependent on the prime used, not the individual
+secrets chosen by each party. If many hosts use the same groups, then the
+precomputation cost may be amortized across all the connections across these
+hosts, rather than requiring core-centuries per observed key exchange. This
+raise an obvious empirical question: do many hosts share the same set of
+Diffie-Hellman parameters, and what is the strength of the parameters?
 
-TLS is the most widely deployed cryptographic protocol. Billions of users use
-TLS in their web browser daily. Although for many years, TLS was the state of
-the art for secure channels, the protocol has experienced major vulnerabilites
-due to design and implementation deficiencies over the
-years~\cite{beast-2011,crime-attack,poodle-2014}. Understanding the problems
-with TLS~1.2 and earlier informed the design decisions in TLS
-1.3~\cite{rfc8446} and QUIC~\cite{ietf-quic-transport-15}.
+The TLS protocol contains ``export-grade'' Diffie-Hellman ciphers which use
+short 512-bit groups. We show that there is a protocol vulnerability in TLS,
+named Logjam, which allows an attacker who can calculate 512-bit discrete logs
+to downgrade connections to export-grade Diffie-Hellman ciphers, and decrypt
+them. If a TLS session were to use 512-bit Diffie-Hellman, it may first appear
+that individual connections could be broken in \TK core-years, or \TK hours on
+commodity hardware. While this is certainly insecure, at first glance it would
+appear these connections have a small amount forward secrecy, by virtue of
+using ephemeral Diffie-Hellman key, e.g. each connection would require another
+\TK hours to be decrypted. This slow process would prohibit active attacks and
+limit the risk to passive decryption after the fact. This again falls prey to
+precomputation: if many hosts were to support the same weak parameters, then
+the computation could be amortized, and individual connections could be broken
+in real-time, enabling active attacks. In fact, shared sets of parameters is
+what enables the downgrade. In this case, empirical measurement showed that
+80\% of vulnerable hosts used the same set of parameters, moving this attack
+from the theoretical to the practical. While recently there has been a trend
+towards elliptic curve cryptography, prime-field based Diffie-Hellman remained
+common in TLS until \TK, when both Firefox and Chrome removed it from their
+default cipher suites as a result of our work.
 
-The TLS protocol had been analyzed in isolation since its release, leading to
-TLS~1.1 introducing further defenses against padding oracles and an improved
-session resumption mechanism. In 2012, Durumeric et al.~\cite{weakkeys-2012}
-used large-scale empirical methods to uncover vulnerabilites that were not
-visible from the perspective of individual hosts, finding that \TK\% of HTTPS
-servers on IPv4 shared a non-trivial factor in their private key. When examined
-in isolation the RSA keys appeared unfactorable and secure. When examined from
-a global perspective, these keys were trivially broken.
+\section{Cross-Protocol Attacks}
 
-\todo{pontificate about empiricism}
+The DROWN attack further exploited export-grade cryptography with an additional
+novel insight: Bleichenbacher oracles need not be present in the target
+protocol under attack, so long as the key is shared between the two protocols.
+Specifically, DROWN shows how to use protocol vulnerabilities in \ssltwo to
+attack TLS 1.2. The \ssltwo protocol includes support export symmetric ciphers
+which are seeded via only five bytes of key material encrypted using RSA \PKCS.
+The \ssltwo protocol also requires the server to send data to the client that is
+derived from the shared secret, without first verifying that the client has
+possession of the secret. When combined with the malleability of RSA,
+culminates in a Bleichenbacher oracle that can be used to attack TLS 1.2
 
-\todo{logjam}
-
-The empiricism behind Logjam also revealed that many servers incorrectly use
-non-``safe'' primes for Diffie-Hellman, opening them up to small subgroup
-attacks. Large swaths of hosts used Diffie-Hellman parameters from RFC~5114, a
-largely looked-over RFC containing prime-order groups intended for use with
-DSA~\cite{rfc5114}, but which open up Diffie-Hellman to small-subgroup
-attacks. Similar to Logjam, the cryptography behind small
-subgroup confinement~\cite{van1996diffie,anderson-1996} and small subgroup key
-recovery~\cite{lim-1997} attacks has been known for over a decade.
-Cryptographers assumed that implementations were either validating subgroups or 
-using safe primes. Internet-wide measurement of the behavior of Diffie-Hellman 
-server implementations showed this assumption to be false~\cite{subgroup-2017}.
-
-\subsection{Unexpected Interactions in Cryptography at Scale}
-
-Beyond examining individual protocols at the global perspective, new issues can
-be identified by looking across multiple similar protocols. Although it is
-tempting to consider the security of any given system in isolation, complex
-interactions between systems necessarily impacts security.
-
-At the most-basic level, cross-protocol key-reuse links the security of any two
-protocols together in key-compromise scenarios. When the same server private
-key is used for both a mail server and a web server, compromising the often
-less-secured mail server effectively compromises the web
-server~\cite{mail-2015}.
-
-Looking past simply key reuse, name reuse across protocols utilizing TLS opens
-additional attack vectors. Any service with a certificate chaining to a
-publicly trusted root that shares a Common Name or Subject Alternative Name
-with a web server, or that covers the web address under a wildcard name, can be
-used to impersonate the web server if the key is compromised.
-
-Furthermore, specific vulnerabilites in the TLS protocol and implementations
-can be utilized in a cross-protocol context to attack users of a web service
-using an unpatched ``forgotten-about'' server, such as a mail server, without
-even explicitly compromising the private key of the service. The best example
-of this is the DROWN vulnerability~\cite{drown-2016}, in which the mere
-existence of an SSLv2 host that shared a key with a TLS host enabled decryption
-of otherwise secure TLS connections using modern cryptography.
-
-\paragraph{Cross-protocol interactions between TLS and SSLv2}
-
-The DROWN attack~\cite{drown-2016} exposed two interesting cross-protocol
-interactions between TLS and SSLv2. The first is that the existence of obsolete
-and weakened cryptography in a second protocol (SSLv2), can in some situations,
-be used as an oracle to attack protocols using more modern cryptography
-(TLSv1.2). The second is that implementation vulnerabilites in one protocol,
-can be used to attack a second, correctly implemented protocol.
-
-SSLv2 was released in \TK and replaced by \TK, due to severe man-in-the-middle
-issues identified by \TK. Despite being over a decade old, in 2016, SSLv2 was
-still enabled on \TK web servers, and over \TK mail servers. While this 
-initially may seem harmless, since no modern web browser has supported SSLv2
-in over \TK years, due to similarities and malleability in how RSA is used
-during the key exchange process, it was possible to leverage both
-``export-grade'' cryptography support in SSLv2, and a one-byte information leak
-vulnerability in OpenSSL's SSLv2 implementation, to attack TLS connections.
-
-The first case, using export-grade cryptography in SSLv2 to attack TLS
-connections, is the more general variant of DROWN. It leverages multiple
-protocol flaws \TK.
-
-The second case applies the general technique in combination
-with an unnoticed decade-old implementation flaw in OpenSSL. This variant
-drastically lowers the cost of the exploit, making it feasible to man-in-middle
-live connections, instead of just decrypting recorded connections.
-
-Beyond SSLv2, the DROWN attack is the culmination of multiple obsolete but not
-broken cryptographic constructs, working together to completely break the
-security of TLS\@. The \PKCS padding scheme for RSA has been superseded by
-OEAP. RSA key exchange should be replaced by (EC)DHE schemes. While
-vulnerabilites stemming from misuse of these schemes have been known for
-decades~\cite{bleichenbacher-1998,bleichenbacher-three}, they remained part of
-the TLS standard for legacy reasons. When viewed in isolation, this seemed
-fine, as the TLS implementations and specifications contain countermeasures to
-padding-oracle attacks. The TLS protocol is not broken simply because it
-supports \PKCS. The insecurity of DROWN is only revealed when viewing TLS
-through large cross-protocol lens.
-
-\paragraph{General cross-protocol vulnerability in TLS}
 Beyond DROWN, the TLS protocol has a fundamentally cross-protocol attack
 surface. X.509 certificates are not bound to any particular protocol or port.
 Furthermore, even if distinct services, such as mail and web servers, use
 different keys, so long as they share any name on the certificate, the
 transport-layer security of all connections to that name are limited to the
-security of the weakest TLS implementation or configuration.
+security of the weakest TLS implementation or configuration. Even traditionally
+web-based padding oracle attacks, such as POODLE, or the AES-NI padding-oracle
+in OpenSSL, non-web servers can be exploited by active attackers targeting web
+users. The attacker can rewrite the TCP connection to an alternative port, and
+fill-in any pre-handshake protocol dialogue (e.g. by sending an EHLO or
+STARTTLS command in SMTP). Ignoring vulnerabilities in TLS itself, an unpatched
+piece of software with a known RCE using the same key as a well-configured and
+up to date web server places web clients, should the key be stolen via
+traditional software exploitation. We can place an upper bound on the increased
+attack surface, by measuring key and name reuse across TLS in different
+application-layer protocols on different ports.
 
-Even traditionally web-based padding oracle attacks, such as
-POODLE~\cite{poodle-2014}, or the AES-NI padding-oracle in
-OpenSSL~\cite{aes-ni-cve}, can be exploited using non-web servers against web
-users by active attackers, who rewrite the TCP connection to an alternative
-port, and fill-in any pre-handshake protocol dialouge (\eg sending an SMTP
-\texttt{EHLO} or \texttt{STARTTLS}.
+\section{Weaknesses from Export Cryptography}
 
-\subsection{Export Cryptography}
-
-\todo{describe export cryptography}
+\todo{background on export crypto}
 
 As shown by Freak, Logjam, and DROWN, the security of TLS and export
-cryptography are fundamentally linked. The entire goal of export cryptography
-is a unique constraint: weaken cryptography, without weakening cryptograpy. We
-can apply Internet measurement techniques to show that the export regulations
-weakened protocol design to the point where the regulations are directly
-harmful to the security of the Internet today. These empirical techniques show
-that these attacks are not theoretical, leveraging protocols that have
-long-since disappeared, but instead are a dark side of backwards compatibility,
-harming real users today.  Although the regulations went out of effect by
-1999~\cite{djb-timeline}, the cryptography remains. At their respective times
-of disclosure, \TK\% of IPv4 HTTPS hosts were vulnerable to FREAK, \TK\% were
+cryptography are fundamentally linked. Export cryptography is a unique
+constraint with a fundamentally dangerous goal: weaken cryptography, without
+weakening cryptography. Internet measurement techniques show us that the export
+regulations weakened protocol design to the point where the regulations are
+directly harmful to the security of the Internet today. These empirical
+techniques show that these attacks are not theoretical, leveraging protocols
+that have long-since disappeared, but instead are a dark side of backwards
+compatibility, harming real users today. Although the regulations went out of
+effect by 1999, the cryptography remains. At their respective times of
+disclosure, \TK\% of IPv4 HTTPS hosts were vulnerable to FREAK, \TK\% were
 vulnerable to Logjam, and \TK\% were vulnerable to DROWN. All forms of export
-cryptograpy have been broken: export RSA key exchange, broken by FREAK; export
-Diffie-Hellman key exchange, broken by Logjam; and export symmetric ciphers,
-broken by DROWN.
+cryptography have been broken: export RSA key exchange was broken by FREAK,
+export Diffie-Hellman key exchange was broken by Logjam, and export symmetric
+ciphers were broken by DROWN. In all cases, empirical research enabled the full
+understanding of the effects and impacts of these issues.
 
-\todo{link back to empiricism}
+% CONCLUSION THOUGHTS
+% 
+% ENGINERING?
+% 
+% Applying empirical measurement techniques accurately requires careful
+% application of the scientific method and experiment design. However, the field
+% of Internet-measurement has strong engineering underpinnings which are often
+% overlooked. ZMap now provides efficient transport-layer scanning, but
+% application-layer scanning has not yet reached the same efficiency as ZMap.
+% Tooling such as ZGrab helps fill in some of these gaps, but is not yet
+% transformative. Similarly, simply studying HTTPS at scale creates unique
+% engineering constraints, such as how to batch parse and validate X.509
+% certificates.
 
-%\section{Engineering Challenges}
-%
-%To do science, we have to collect data.
-%
-%To collect the data, we have to build things.
-%
-%Determining what to build and how to build is also difficult.
-%
-%Engineering is very closely related to methodology, which is where the science is.
-%
-%\subsection{Speed}
-%
-%Assume we're using scanning.
-%
-%TLS-Attacker is slow.
-%
-%Performance matters, especially once you start cross-correlating.
-%
-%Discovery and collection separate. (ZMap vs ZGrab)
-%
-%\subsection{Data Processing}
-%
-%Beyond collecting data, you actually have to process it.
-%
-%Straightforward for one-off studies.
-%
-%What if you want longitudinal data?
-%
-%Take-away This all requires work.
