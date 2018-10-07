@@ -124,21 +124,21 @@ short 512-bit groups. We show that there is a protocol vulnerability in TLS,
 named Logjam, which allows an attacker who can calculate 512-bit discrete logs
 to downgrade connections to export-grade Diffie-Hellman ciphers, and decrypt
 them. If a TLS session were to use 512-bit Diffie-Hellman, it may first appear
-that individual connections could be broken in \TK core-years, or \TK hours on
-commodity hardware. While this is certainly insecure, at first glance it would
-appear these connections have a small amount forward secrecy, by virtue of
-using ephemeral Diffie-Hellman key, e.g. each connection would require another
-\TK hours to be decrypted. This slow process would prohibit active attacks and
-limit the risk to passive decryption after the fact. This again falls prey to
-precomputation: if many hosts were to support the same weak parameters, then
-the computation could be amortized, and individual connections could be broken
-in real-time, enabling active attacks. In fact, shared sets of parameters is
-what enables the downgrade. In this case, empirical measurement showed that
-80\% of vulnerable hosts used the same set of parameters, moving this attack
-from the theoretical to the practical. While recently there has been a trend
-towards elliptic curve cryptography, prime-field based Diffie-Hellman remained
-common in TLS until \TK, when both Firefox and Chrome removed it from their
-default cipher suites as a result of our work.
+that individual connections could be broken in 60,000 core-hours, or 120 hours
+in parallel on commodity hardware. While this is certainly insecure, at first
+glance it would appear these connections have a small amount forward secrecy,
+by virtue of using ephemeral Diffie-Hellman key, e.g. each connection would
+require another 120 hours to be decrypted. This slow process would prohibit
+active attacks and limit the risk to passive decryption after the fact. This
+again falls prey to precomputation: if many hosts were to support the same weak
+parameters, then the computation could be amortized, and individual connections
+could be broken in real-time, enabling active attacks. In fact, shared sets of
+parameters is what enables the downgrade. In this case, empirical measurement
+showed that 80\% of vulnerable hosts used the same set of parameters, moving
+this attack from the theoretical to the practical. While recently there has
+been a trend towards elliptic curve cryptography, prime-field based
+Diffie-Hellman remained common in TLS until 2016, when both Firefox and Chrome
+removed it from their default cipher suites as a result of our work.
 
 \section{Cross-Protocol Attacks}
 
@@ -172,7 +172,18 @@ application-layer protocols on different ports.
 
 \section{Weaknesses from Export Cryptography}
 
-\todo{background on export crypto}
+Cryptography has been a regulated as part of the International Traffic in Arms
+Regulations (ITAR), for decades. In the 1990s, the Department of State chose to
+implement these regulations by limiting any ``exported'' cryptography to
+40-bits of security for symmetric ciphers, and 512-bits for security for
+public-key cryptography. Authentication strength (\eg MAC length), was not
+regulated. After several court cases started in 1995 surrounding Daniel J.
+Bernstein's ``Snuffle'' cryptosystem, the regulations were weakened and moved
+from the Department of State to the Department of Commerce. The litigation
+ended in 1999. However, during this time \ssltwo was designed and deprecated,
+SSLv3 was created and then renamed to TLS and moved into the purview of the
+IETF, which standardized TLSv1.0 in 1999. All three of these protocols
+contained compliance mechanisms for ``export cryptography''.
 
 As shown by Freak, Logjam, and DROWN, the security of TLS and export
 cryptography are fundamentally linked. Export cryptography is a unique
