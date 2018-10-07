@@ -51,12 +51,6 @@ In this dissertation I show contributions made to the measurement field itself,
 and show three different cases where empiricism enabled additional insight when
 combined with other methods cryptography research.
 
-\paragraph{Faster Internet-Wide Scanning}
-I show improvements to the ZMap scanner, which
-enable it to operate at a full 10Gbps line rate. While ZMap enabled the use of
-Internet-wide scanning accessible as a measurement method, this work moves
-towards enabling hourly or real-time measurement of the cryptographic behavior
-of all Internet-connected systems.
 
 \paragraph{Cost-Effective Global Attacks}
 Discrete-log and factoring based attacks are generally considered out of reach
@@ -87,6 +81,23 @@ provide insight into the Diffie-Hellman group selection at Internet-scale.
 
 \section{Faster Internet-Wide Scanning}
 
+I first discuss contributions to the measurement field, which underlies
+cryptographic empiricisim. There is an abundance of tooling for both active and
+passive network measurement. It is tempting to assume that the tools required
+to study cryptography at Internet-scale already exist, however this is often
+not the case. If the tooling does exist, it often requires herculean effort to
+answer simple questions, such as ``how many HTTPS hosts still support 512-bit
+key Diffie-Hellman key exchange?''. While often overlooked, understanding,
+contributing, and building tooling is a key aspect of participating in
+empirical cryptographic research.
+
+As a single example of contributions in this space, in \S\ref{chapter:zippier},
+I show improvements to the ZMap scanner which enable it to operate at a full
+10Gbps line rate~\cite{zippier-zmap-2014}.  While ZMap enabled the use of
+Internet-wide scanning accessible as a measurement method, this work moves
+towards enabling hourly or real-time measurement of the cryptographic behavior
+of all Internet-connected systems.
+
 When originally introduced, ZMap was capable of saturating a 1Gbps uplink from
 a single host, enabling an Internet-wide TCP SYN scan of IPv4 to be performed
 in forty-five minutes. However, when used with a 10Gbps network interface, ZMap
@@ -97,7 +108,7 @@ space to kernel memory when sending a packet limited total throughput. Scanning
 a 10Gbps requires sending nearly 15 million packets per second continuously,
 which allows for only 200 cycles per packet on a 3 GHz system.
 
-We describe performance improvements to address both of these constraints, and
+I introduced performance improvements to address both of these constraints, and
 enable ZMap to fully utilize a 10Gbps network link, bringing the total time for
 a TCP SYN scan of IPv4 to under five minutes from a single host. While
 Internet-measurement is often used to provide coarse-grain understanding of the
