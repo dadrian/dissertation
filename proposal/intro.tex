@@ -51,34 +51,6 @@ In this dissertation I show contributions made to the measurement field itself,
 and show three different cases where empiricism enabled additional insight when
 combined with other methods cryptography research.
 
-
-\paragraph{Cost-Effective Global Attacks}
-Discrete-log and factoring based attacks are generally considered out of reach
-of attackers.  However, informing such attacks with measurement data allows for
-cost-effective attacks that leverage a single, expensive pre-computation to
-cheaply attack TLS connections. Furthermore, when combined with broad support
-for cryptography that was assumed to be “dead”, these attacks become even
-cheaper.
-
-\paragraph{Cross-Protocol Attacks}
-Reusing TLS keys across multiple protocols, such as HTTPS, SMTP, and IMAP,
-leads to an increased attack surface. Empirical methods allow us to understand
-the attack surface increase from key reuse. Furthermore, specific
-vulnerabilities in the TLS protocol and older implementations can be utilized
-in a cross-protocol context to attack users of a web service without explicitly
-compromising the private key. This is best shown by the DROWN vulnerability, in
-which the mere existence of an \ssltwo host that shared a key with a TLS host
-enabled decryption of otherwise secure TLS connections using modern
-cryptography.
-
-\paragraph{Fragile Cryptographic Ecosystems}
-Often, cryptographers are aware of attacks for decades, but there is a
-knowledge gap between the implementers and researchers. A specific example of
-this is prime-field based Diffie-Hellman key exchange, in which implementation
-and hosts often use groups which unnecessarily open up the likelihood of
-small-subgroup confinement and key recovery attacks. Empirical techniques
-provide insight into the Diffie-Hellman group selection at Internet-scale.
-
 \section{Faster Internet-Wide Scanning}
 
 I first discuss contributions to the measurement field, which underlies
@@ -118,17 +90,52 @@ individual hosts, but at global scale.
 
 \section{Cost-Effective Global Attacks}
 
-The security of Diffie-Hellman key exchange relies on the hardness of solving
-discrete logs in certain groups. We uncovered several weaknesses in how
-finite-field Diffie-Hellman key exchange was deployed, which drastically
-affected the cost of decrypting large amounts of TLS traffic. The algorithmic
-complexity of calculating discrete logs modulo p is exponential. However, the
-bulk of this computation is dependent on the prime used, not the individual
-secrets chosen by each party. If many hosts use the same groups, then the
-precomputation cost may be amortized across all the connections across these
-hosts, rather than requiring core-centuries per observed key exchange. This
-raise an obvious empirical question: do many hosts share the same set of
-Diffie-Hellman parameters, and what is the strength of the parameters?
+Discrete-log and factoring based attacks are generally considered out of reach
+of attackers.  However, informing such attacks with measurement data allows for
+cost-effective attacks that leverage a single, expensive pre-computation to
+cheaply attack TLS connections. Furthermore, when combined with broad support
+for cryptography that was assumed to be “dead”, these attacks become even
+cheaper.
+
+
+
+\paragraph{Export Cryptography}
+Cryptography has been a regulated as part of the International Traffic in Arms
+Regulations (ITAR), for decades. In the 1990s, the Department of State chose to
+implement these regulations by limiting any ``exported'' cryptography to
+40-bits of security for symmetric ciphers, and 512-bits for security for
+public-key cryptography. Authentication strength (\eg MAC length), was not
+regulated. After several court cases started in 1995 surrounding Daniel J.
+Bernstein's ``Snuffle'' cryptosystem, the regulations were weakened and moved
+from the Department of State to the Department of Commerce. The litigation
+ended in 1999. However, during this time \ssltwo was designed and deprecated,
+SSLv3 was created and then renamed to TLS and moved into the purview of the
+IETF, which standardized TLSv1.0 in 1999. All three of these protocols
+contained compliance mechanisms for ``export cryptography''.
+
+\subsection{Attacks on Diffie-Hellman}
+
+Diffie-Hellman key exchange is one of the most common public-key
+cryptographic methods in use in the Internet. In finite field Diffie-Hellman,
+Alice and Bob agree on a large prime $p$ and an integer $g$ modulo $p$. Alice
+chooses a secret integer $x_a$ and transmits a public value $g^{x_a} \bmod
+p$; Bob chooses a secret integer $x_b$ and transmits his public value
+$g^{x_b} \bmod p$. Both Alice and Bob can reconstruct a shared secret $g^{x_a
+x_b} \bmod p$, but the best known way for a passive eavesdropper to
+reconstruct this secret is to compute the discrete log of either Alice or
+Bob's public value. Specifically, given $g$, $p$, and $g^x \bmod p$, an
+attacker must calculate $x$.
+
+We uncovered several weaknesses in how finite-field Diffie-Hellman key
+exchange was deployed, which drastically affected the cost of decrypting
+large amounts of TLS traffic. The algorithmic complexity of calculating
+discrete log is exponential, but the bulk of this computation is dependent
+solely on $p$, not the individual secrets $a$ and $b$ chosen by each party.
+If many hosts use the same groups, then the precomputation cost may be
+amortized across all the connections across these hosts, rather than
+requiring core-centuries per observed key exchange. This raise an obvious
+empirical question: do many hosts share the same set of Diffie-Hellman
+parameters, and what is the strength of the parameters?
 
 The TLS protocol contains ``export-grade'' Diffie-Hellman ciphers which use
 short 512-bit groups. We show that there is a protocol vulnerability in TLS,
@@ -151,7 +158,17 @@ been a trend towards elliptic curve cryptography, prime-field based
 Diffie-Hellman remained common in TLS until 2016, when both Firefox and Chrome
 removed it from their default cipher suites as a result of our work.
 
-\section{Cross-Protocol Attacks}
+\subsection{Cross-Protocol Attacks}
+
+Reusing TLS keys across multiple protocols, such as HTTPS, SMTP, and IMAP,
+leads to an increased attack surface. Empirical methods allow us to understand
+the attack surface increase from key reuse. Furthermore, specific
+vulnerabilities in the TLS protocol and older implementations can be utilized
+in a cross-protocol context to attack users of a web service without explicitly
+compromising the private key. This is best shown by the DROWN vulnerability, in
+which the mere existence of an \ssltwo host that shared a key with a TLS host
+enabled decryption of otherwise secure TLS connections using modern
+cryptography.
 
 The DROWN attack further exploited export-grade cryptography with an additional
 novel insight: Bleichenbacher oracles need not be present in the target
@@ -181,20 +198,7 @@ traditional software exploitation. We can place an upper bound on the increased
 attack surface, by measuring key and name reuse across TLS in different
 application-layer protocols on different ports.
 
-\section{Weaknesses from Export Cryptography}
-
-Cryptography has been a regulated as part of the International Traffic in Arms
-Regulations (ITAR), for decades. In the 1990s, the Department of State chose to
-implement these regulations by limiting any ``exported'' cryptography to
-40-bits of security for symmetric ciphers, and 512-bits for security for
-public-key cryptography. Authentication strength (\eg MAC length), was not
-regulated. After several court cases started in 1995 surrounding Daniel J.
-Bernstein's ``Snuffle'' cryptosystem, the regulations were weakened and moved
-from the Department of State to the Department of Commerce. The litigation
-ended in 1999. However, during this time \ssltwo was designed and deprecated,
-SSLv3 was created and then renamed to TLS and moved into the purview of the
-IETF, which standardized TLSv1.0 in 1999. All three of these protocols
-contained compliance mechanisms for ``export cryptography''.
+\subsection{Weaknesses from Export Cryptography}
 
 As shown by Freak, Logjam, and DROWN, the security of TLS and export
 cryptography are fundamentally linked. Export cryptography is a unique
@@ -212,6 +216,40 @@ cryptography have been broken: export RSA key exchange was broken by FREAK,
 export Diffie-Hellman key exchange was broken by Logjam, and export symmetric
 ciphers were broken by DROWN. In all cases, empirical research enabled the full
 understanding of the effects and impacts of these issues.
+
+\section{Fragile Cryptographic Ecosystems}
+
+Often, cryptographers are aware of attacks for decades, but there is a
+knowledge gap between the implementers and researchers. A specific example of
+this is prime-field based Diffie-Hellman key exchange, in which
+implementation and hosts often use groups which unnecessarily open up the
+likelihood of small-subgroup confinement and key recovery
+attacks~\cite{subgroup-2017}. I used empirical techniques provide insight
+into the Diffie-Hellman group selection at Internet-scale, showing that while
+a common recommendation is that $p$ should be a ``safe'' prime such that $p =
+2q+1$ for some prime $q$, many implementations instead use non-safe ``DSA''
+parameters with potentially unsafe subgroups of order $q$. Several standards,
+including NIST~SP~800-56A~\cite{sp800} and RFC~5114~\cite{rfc5114}, advocate
+the use of these parameters for Diffie-Hellman key exchange, and while it is
+possible to use such parameters securely, additional validation checks are
+necessary to prevent small-subgroup attacks.
+
+We measured the prevalence of these parameter choices in the wild for HTTPS,
+POP3S, SMTP with STARTTLS, SSH, IKEv1, and IKEv2, finding millions of hosts
+using DSA and other non-``safe'' primes for Diffie-Hellman key exchange, many
+of them in combination with potentially vulnerable behaviors. Beyond simply
+using DSA primes, small subgroup attacks require a number of complex, special
+conditions to go wrong in order to be feasible, described in
+\S\ref{chapter:subgroup}. While seems unlikely that any implementation would
+satisfy enough of these requirements to be vulnerable to an attack, it also
+seemed unlikely that implementations would use non-safe primes for key
+exchange in the first place. Empirical methods did not reveal an
+Internet-wide vulnerability, but rather an Internet-wide case of accidental
+complexity and fragility. Given the amount of complexity exposed by the
+underlying cryptographic APIs for Diffie-Hellman, it is remarkable that any
+implementation was safe. Understanding the root causes of this complexity and
+confusion enables better protocol design in the future.
+
 
 % CONCLUSION THOUGHTS
 % 

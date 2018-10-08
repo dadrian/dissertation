@@ -1,4 +1,3 @@
-%% STOLEN FROM ZAKIR DURUMERIC PROPOSAL
 %%
 %% This is the file thesis-umich.cls.
 %% It provides a LaTeX class that is consistent with the guidelines
@@ -266,8 +265,10 @@
 
 %% ---- TITLE PAGE -----------------------------------------------------
 % The fields to be used for the title page
-\renewcommand{\@title}{Understanding Cryptography with Large-Scale Empiriscism}
+\renewcommand{\@title}{Understanding Cryptography through Large-Scale Empiricism}
 \renewcommand{\@author}{David Adrian}
+\newcommand{\@email}{davadria@umich.edu}
+%\newcommand{\@orchidid}{0000-0002-9647-4192}
 \newcommand{\@degree}{Doctor of Philosophy}
 \newcommand{\@department}{Computer Science and Engineering}
 \newcommand{\@committee}{
@@ -282,6 +283,8 @@ Assistant Professor Florian Schaub\\
 % Commands to set the titlepage fields
 \renewcommand{\title}[1]{\renewcommand{\@title}{#1}}
 \renewcommand{\author}[1]{\renewcommand{\@author}{#1}}
+\newcommand{\email}[1]{\renewcommand{\@email}{#1}}
+%\newcommand{\orchidid}[1]{\renewcommand{\@orchidid}{#1}}
 \newcommand{\degree}[1]{\renewcommand{\@degree}{#1}}
 \newcommand{\department}[1]{\renewcommand{\@department}{#1}}
 \newcommand{\committee}[1]{\renewcommand{\@committee}{#1}}
@@ -296,6 +299,8 @@ Assistant Professor Florian Schaub\\
 \newcommand{\insertcommittee}{\@committee}
 \newcommand{\insertchair}{\@chair}
 \newcommand{\insertcochair}{\@cochair}
+\newcommand{\insertemail}{\@email}
+%\newcommand{\insertorchidid}{\@orchidid}
 \newcommand{\insertyear}{\number\year}
 
 % This redefines the title page to automatically have all of the
@@ -396,12 +401,17 @@ Assistant Professor Florian Schaub\\
  \begin{center} %
   % Vertical rubber space
   \ \vfill %
+  % Author Name
+  %\spacing{1.5}
+  {
+	  \doublespacing
+  \insertauthor\\
+  \insertemail\\
+  %ORCID iD: \insertorchidid\\
+  \vspace{25pt}
   % Insert the frontispiece.
-  \copyright \insertcopyrightholder \\[1ex] %
-  % Horizontal line
-  \rule[0.5ex]{5in}{1pt} \\[1ex] %
-  % The year of publication
-  \number\year %
+  \copyright\xspace \insertcopyrightholder \xspace \number\year
+  }
   % Vertical rubber space
   \vfill %
  \end{center} %
@@ -636,7 +646,7 @@ Assistant Professor Florian Schaub\\
 % Command that sets the acknowledgments style
 \newcommand{\@acknowledgmentsstyle}{\@frontpagestyle}
 % Command that sets the width of the acknowledgments text area
-\newcommand{\@acknowledgments@width}{0.66}
+\newcommand{\@acknowledgments@width}{1}
 
 % Command to change it from the default
 \newcommand{\acknowledgments}[2][]{ %
@@ -661,11 +671,12 @@ Assistant Professor Florian Schaub\\
 \newcommand*{\acknowledgmentspage}{ %
  % Set the page formatting.
  \frntpg %
+ \setcounter{page}{2}
  % Add this page to the table of contents.
  \phantomsection\addcontentsline{toc}{chapter}{Acknowledgments}
  % Insert the text and formatting.
  \insertfront{\@acknowledgments %
-  }{\@acknowledgmentsstyle}{Acknowledgments}{\@acknowledgments@width}
+ }{\@acknowledgmentsstyle}{\normalfont{\textbf{\large ACKNOWLEDGMENTS}}}{\@acknowledgments@width}
 }
 
 
@@ -1469,4 +1480,3 @@ Assistant Professor Florian Schaub\\
   \twocolumn %
  \fi %
 }
-

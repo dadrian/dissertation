@@ -1,20 +1,20 @@
 % !TEX root = subgroup.tex
 
-\section{Introduction}
+%\section{Introduction}
+%
+%Diffie-Hellman key exchange is one of the most common public-key cryptographic
+%methods in use in the Internet. It is a fundamental building block for IPsec,
+%SSH, and TLS\@. In the textbook presentation of finite field Diffie-Hellman,
+%Alice and Bob agree on a large prime $p$ and an integer $g$ modulo $p$. Alice
+%chooses a secret integer $x_a$ and transmits a public value $g^{x_a} \bmod p$;
+%Bob chooses a secret integer $x_b$ and transmits his public value $g^{x_b}
+%\bmod p$. Both Alice and Bob can reconstruct a shared secret $g^{x_a x_b} \bmod
+%p$, but the best known way for a passive eavesdropper to reconstruct this
+%secret is to compute the discrete log of either Alice or Bob's public value.
+%Specifically, given $g$, $p$, and $g^x \bmod p$, an attacker must calculate
+%$x$.
 
-Diffie-Hellman key exchange is one of the most common public-key cryptographic
-methods in use in the Internet. It is a fundamental building block for IPsec,
-SSH, and TLS\@. In the textbook presentation of finite field Diffie-Hellman,
-Alice and Bob agree on a large prime $p$ and an integer $g$ modulo $p$. Alice
-chooses a secret integer $x_a$ and transmits a public value $g^{x_a} \bmod p$;
-Bob chooses a secret integer $x_b$ and transmits his public value $g^{x_b}
-\bmod p$. Both Alice and Bob can reconstruct a shared secret $g^{x_a x_b} \bmod
-p$, but the best known way for a passive eavesdropper to reconstruct this
-secret is to compute the discrete log of either Alice or Bob's public value.
-Specifically, given $g$, $p$, and $g^x \bmod p$, an attacker must calculate
-$x$.
-
-In order for the discrete log problem to be hard, Diffie-Hellman parameters
+In order for the discrete log problem $\bmod p$ to be hard, Diffie-Hellman parameters
 must be chosen carefully. A typical recommendation is that $p$ should be a
 ``safe'' prime, that is, that $p = 2q+1$ for some prime $q$, and that $g$
 should generate the group of order $q$ modulo $p$. For $p$ that are not safe,
