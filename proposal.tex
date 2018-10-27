@@ -1,10 +1,38 @@
-\include{includes/thesis-headers}
+\documentclass[doublespace]{styles/rackham-thesis}
 
+\usepackage[linktocpage=true]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm, xfrac}
+\usepackage{booktabs}
+\usepackage{lipsum}
+\usepackage{flafter}
+
+\include{includes/thesis-headers}
 
 \begin{document}
 
+\title{Using Large-Scale Empirical Methods to Understand Fragile Cryptographic Ecosystems}
+\author{David Adrian}
+\degree{Doctor of Philosophy}
+\department{Computer Science and Engineering}
+\committee{
+  Professor J.~Alex Halderman, Chair\\
+  Research Professor Peter Honeyman\\
+  Associate Professor Chris Peikert\\
+  Assistant Professor Florian Schaub\\
+}
+
+\maketitle
+
 \input{dedication}
 \input{acknowledgements}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\listofappendices
+
+\input{abstract}
 
 \chapter{Introduction}
 \input{proposal/intro}
