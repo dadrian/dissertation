@@ -167,19 +167,19 @@
   \vfill
 }
 
-\newcommand\dedication[1]{
-  \cleardoublepage
-  \@startfrontnums
-  \@phantomsection
-  \addcontentsline{toc}{chapter}{\@texorpdfstring{DEDICATION}{Dedication}}
-  \hbox{ }
-  \vertadjust
-  \vfill
-  \begin{center}
-    \textit{#1}
-  \end{center}
-  \vfill
-}
+%\newcommand\dedication[1]{
+%  \cleardoublepage
+%  \@startfrontnums
+%  \@phantomsection
+%  \addcontentsline{toc}{chapter}{\@texorpdfstring{DEDICATION}{Dedication}}
+%  \hbox{ }
+%  \vertadjust
+%  \vfill
+%  \begin{center}
+%    \textit{#1}
+%  \end{center}
+%  \vfill
+%}
 
 \newcommand\@frontsec[1]{
   \cleardoublepage
@@ -192,7 +192,7 @@
   \vspace{0.7in}
 }
 
-\newcommand\acknowledgments{\@frontsec{Acknowledgments}}
+\newcommand\dedication{\@frontsec{Dedication}}
 \newcommand\acknowledgements{\@frontsec{Acknowledgements}}
 \newcommand\preface{\@frontsec{Preface}}
 \renewcommand\abstract{\@frontsec{Abstract}}

@@ -241,7 +241,12 @@ TSWLatexianTemp*
 # generated if using elsarticle.cls
 *.spl
 
+# who even knows?
+*.loap
+
 # Outputs
 proposal.pdf
 dissertation.pdf
 !pdfs/*.pdf
+
+
