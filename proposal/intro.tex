@@ -21,19 +21,34 @@ Unfortunately, the state of the art in cryptography engineering remains
 considerably behind the state of art in research.
 
 To understand where mistakes are being made, and understand where complexity
-arises from, we must understand how cryptography is actually being used. To
-better use cryptography to secure the Internet, we must first under how
-cryptography is being used. Examining CVE databases and trawling through
-cryptographic code provides one lens into real-world deployments of
-cryptography, but it does not necessarily reflect the state of the Internet.
+arises from, we must understand the ecosystems in which cryptography is
+deployed. To better use cryptography to secure the Internet, we must first
+understand how cryptography is being used on the Internet. Examining CVE databases
+and trawling through cryptographic code provides one lens into real-world
+deployments of cryptography, but does not necessarily reflect the state of
+the Internet.
 
-Large-scale empirical methods allow us to characterize how cryptography is
-being used on the Internet, today. Although cryptography is a formal and
-mathematical science, empirical methods provide additional insight into the
-fundamental nature of the use of cryptography to secure communication. We have
-already used empirical methods to make a tangible and measurable impact on the
-security of the Internet today. We can further use the insights gained from
-empirical methods to better secure the Internet in the future. 
+Large-scale empirical methods allow us to observe the fragility in how
+cryptography is being used on the Internet, today. Although cryptography is a
+formal and mathematical science, empirical methods provide additional insight
+into the fundamental nature of the use of cryptography to secure
+communication.
+
+We have already used empirical methods to make a tangible and
+measurable impact on the security of the Internet today. We can further use
+the insights gained from empirical methods to better secure the Internet in
+the future.
+
+In this dissertation I show contributions made to the measurement field itself,
+and show three different cases where empiricism enabled additional insight when
+combined with other methods cryptography research.
+
+\section{Empirical Methods in Cryptography}
+
+Empirical evidence is gathered via observation and experimentation, and is a
+key component of the scientific method. Cryptography is a formal field 
+
+The observable parts are the fragile parts.
 
 Applying empirical methods to cryptography requires solving engineering
 challenges. A fundamental methodology underlying the empirical study of
@@ -47,11 +62,10 @@ from a single scan often approaches one terabyte in size, and correlating
 across multiple scans may involve processing billions of application-layer
 handshakes.
 
-In this dissertation I show contributions made to the measurement field itself,
-and show three different cases where empiricism enabled additional insight when
-combined with other methods cryptography research.
+- Identify problems at scale that are not otherwise visible
+- Understand sources and solutions to fragility
 
-\section{Faster Internet-Wide Scanning}
+\paragraph{Internet-Wide Scanning}
 
 I first discuss contributions to the measurement field, which underlies
 cryptographic empiricisim. There is an abundance of tooling for both active and
