@@ -1,3 +1,4 @@
+% !TEX root = ../../../proposal.tex
 
 %An attacker can also use a Bleichenbacher-type attack to compute valid RSA signatures on arbitrary messages.  Mathematically, RSA signing and decryption are identical.  Such an attack could theoretically be used to forge a signed Server Key Exchange message for Diffie-Hellman cipher suites, thus allowing an attacker to perform a man-in-the-middle attack against all TLS versions up to TLSv1.3.~\cite{tls-quic-pkcs-2015}  Since the server key exchange message includes the client and server randoms, the attacker must forge the signature online before the handshake times out. We are not able to use all of our optimizations for signature forgery, so such an attack does not seem feasible without additional improvements, even for special DROWN.
 
