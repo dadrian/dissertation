@@ -1,3 +1,5 @@
+% !TEX root = ../../../proposal.tex
+
 %\begin{abstract}
 We introduce optimizations to the ZMap network scanner that achieve a 10-fold
 increase in maximum scan rate. By parallelizing address generation,
@@ -242,7 +244,7 @@ between lookup speed and memory usage.
 Despite ZMap's use of raw Ethernet sockets, sending each probe packet is an
 expensive operation, as it involves a context switch for the \texttt{sendto}
 system call and requires the scan packet to be transferred through kernel
-space to the NIC~\cite{pfring-original, ten-gig-commodity}. Even with our
+space to the NIC~\cite{pfring-2004, ten-gig-commodity}. Even with our
 other enhancements, the high cost of these in-kernel operations prevented
 ZMap from reaching above 2\,Gbps. To reduce these costs, we reimplemented
 ZMap's network functionality using the PF\_RING ZC
