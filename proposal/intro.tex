@@ -6,45 +6,57 @@ protocols, given some set of assumptions. Cryptography is one of the only
 components of security that can be provably secure. As such, cryptography is
 often considered to be one of the strongest components of security.
 
-Yet historically, cryptography has been one of the most fragile aspects of
-security. This is not because of issues with the underlying math or the
-underlying primitives being insecure, but is instead security that is lost in
-translation between the cryptographers and the implementers.
-
-The process of going from paper to program, or from proof-of-concept to
-production, introduces mistakes and misunderstandings, which leads to
+Yet historically, cryptography has been one of the most \textit{fragile}
+aspects of security. This fragility is often not because the underlying math
+was incorrect, or because the fundamental cryptographic primitives were
+insecure, but because a single mistake in the implementation, configuration,
+or protocol can have catastrophic effects on security. Security is lost in
+translation between the cryptographers and protocol designers, and between
+protocol designers and implementers. The process of going from paper to
+program, or from proof-of-concept to production, introduces mistakes and
+misunderstandings and reveals incorrect assumptions. This leads to
 cryptographic failures and insecurity.
 
-To address this, the cryptographic
-research community is beginning to introduce and study new concepts such as
-misuse-resistant cryptography, and simplified cryptographic APIs.
-Unfortunately, the state of the art in cryptography engineering remains
-considerably behind the state of art in research.
+%To address this, the cryptographic research community is beginning to
+%introduce and study new concepts such as misuse-resistant cryptography, and
+%simplified cryptographic APIs. Unfortunately, the state of the art in
+%cryptography engineering remains considerably behind the state of art in
+%research.
 
-To understand where mistakes are being made, and understand where complexity
-arises from, we must understand the ecosystems in which cryptography is
-deployed. To better use cryptography to secure the Internet, we must first
-understand how cryptography is being used on the Internet. Examining CVE databases
-and trawling through cryptographic code provides one lens into real-world
-deployments of cryptography, but does not necessarily reflect the state of
-the Internet.
+Cryptography is a key component in the security of the Internet.
+Unfortunately, the fragile nature of cryptography can be compounded by the
+large-scale, distributed, and diverse nature of the Internet. Any protocol
+can have many implementations, each of which may implement different subsets
+of the protocol, or support different configurations. Many protocols are
+designed for ``cryptographic agility'', and so identical implementations may
+support different sets of underlying algorithms. Devices that support modern
+cryptography may also support decades-old broken cryptography.This leads to
+an Internet of fragile cryptographic ecosystems, consisting of diverse sets
+of clients and servers \todo{define this more}.
 
-Large-scale empirical methods allow us to observe the fragility in how
-cryptography is being used on the Internet, today. Although cryptography is a
-formal and mathematical science, empirical methods provide additional insight
-into the fundamental nature of the use of cryptography to secure
-communication.
+%To better use cryptography to secure the Internet, we must first
+%understand how cryptography is being used on the Internet. Examining CVE databases
+%and trawling through cryptographic code provides one lens into real-world
+%deployments of cryptography, but does not necessarily reflect the state of
+%the Internet.
 
-We have already used empirical methods to make a tangible and
-measurable impact on the security of the Internet today. We can further use
-the insights gained from empirical methods to better secure the Internet in
-the future.
+To better use cryptography to secure the Internet, we need to understand what
+types of cryptography are being used, and where mistakes are being made. We
+must understand which cryptographic ecosystems are fragile, and which are
+resiliant. Large-scale empirical methods allow us to observe the fragility in
+how cryptography is being used on the Internet, identify new vulnerabilites,
+and better secure the Internet in the future.
 
-In this dissertation I show contributions made to the measurement field itself,
-and show three different cases where empiricism enabled additional insight when
-combined with other methods cryptography research.
+In this dissertation, I show how empirical measurements collected using
+Internet-wide scanning provides insight into how cryptography is used to
+secure the Internet. First, I show contributions made to the field of
+Internet measurement field itself via improved Internet-wide scanning.
+Second, I measure the Internet's resiliancy to small subgroup attacks in
+finite-field Diffie-Hellman, and find a fragile state of affairs. Third, I
+use empirical methods to show how 1990s-era export-grade encryption harmed
+the security of the Internet for two decades.
 
-\section{Empirical Methods in Cryptography}
+\section{Techniques for Measuring Internet Cryptography}
 
 Empirical evidence is gathered via observation and experimentation, and is a
 key component of the scientific method. Cryptography is a formal field 
