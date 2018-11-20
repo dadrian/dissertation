@@ -119,7 +119,42 @@ shape of the Internet as a whole, improvements in measurement-collection begin
 to move the field towards being able to continuously understand the behavior of
 individual hosts, but at global scale.
 
-\section{Cost-Effective Global Attacks}
+\section{Measuring Diffie-Hellman}
+
+There is a knowledge gap between implementers and researchers. Cryptographers
+can be aware of attacks for decades, but this doesn't necessarily translate
+into concrete steps that implementers can take to avoid vulnerability. A
+specific example of this is prime-field based Diffie-Hellman key exchange, in
+which implementation and hosts often use groups which unnecessarily open up
+the likelihood of small-subgroup confinement and key recovery
+attacks~\cite{subgroup-2017}. I used empirical techniques to provide insight
+into the Diffie-Hellman group selection at Internet-scale, showing that while
+a common recommendation is that $p$ should be a ``safe'' prime such that $p =
+2q+1$ for some prime $q$, many implementations instead use non-safe ``DSA''
+parameters with potentially unsafe subgroups of order $q$. Several standards,
+including NIST~SP~800-56A~\cite{sp800} and RFC~5114~\cite{rfc5114}, advocate
+the use of these parameters for Diffie-Hellman key exchange, and while it is
+possible to use such parameters securely, additional validation checks are
+necessary to prevent small-subgroup attacks.
+
+We measured the prevalence of these parameter choices in the wild for HTTPS,
+POP3S, SMTP with STARTTLS, SSH, IKEv1, and IKEv2, finding millions of hosts
+using DSA and other non-``safe'' primes for Diffie-Hellman key exchange, many
+of them in combination with potentially vulnerable behaviors. Beyond simply
+using DSA primes, small subgroup attacks require a number of complex, special
+conditions to go wrong in order to be feasible, described in
+\S\ref{chapter:subgroup}. While seems unlikely that any implementation would
+satisfy enough of these requirements to be vulnerable to an attack, it also
+seemed unlikely that implementations would use non-safe primes for key
+exchange in the first place. Empirical methods did not reveal an
+Internet-wide vulnerability, but rather an Internet-wide case of accidental
+complexity and fragility. Given the amount of complexity exposed by the
+underlying cryptographic APIs for Diffie-Hellman, it is remarkable that any
+implementation was safe. Understanding the root causes of this complexity and
+confusion, and understanding how it manifests on the Internet, enables better
+protocol design in the future.
+
+\section{Measuring Export Cryptography}
 
 Discrete-log and factoring based attacks are generally considered out of reach
 of attackers.  However, informing such attacks with measurement data allows for
@@ -127,8 +162,6 @@ cost-effective attacks that leverage a single, expensive pre-computation to
 cheaply attack TLS connections. Furthermore, when combined with broad support
 for cryptography that was assumed to be “dead”, these attacks become even
 cheaper.
-
-
 
 \paragraph{Export Cryptography}
 Cryptography has been a regulated as part of the International Traffic in Arms
@@ -249,37 +282,6 @@ ciphers were broken by DROWN. In all cases, empirical research enabled the full
 understanding of the effects and impacts of these issues.
 
 \section{Fragile Cryptographic Ecosystems}
-
-Often, cryptographers are aware of attacks for decades, but there is a
-knowledge gap between the implementers and researchers. A specific example of
-this is prime-field based Diffie-Hellman key exchange, in which
-implementation and hosts often use groups which unnecessarily open up the
-likelihood of small-subgroup confinement and key recovery
-attacks~\cite{subgroup-2017}. I used empirical techniques provide insight
-into the Diffie-Hellman group selection at Internet-scale, showing that while
-a common recommendation is that $p$ should be a ``safe'' prime such that $p =
-2q+1$ for some prime $q$, many implementations instead use non-safe ``DSA''
-parameters with potentially unsafe subgroups of order $q$. Several standards,
-including NIST~SP~800-56A~\cite{sp800} and RFC~5114~\cite{rfc5114}, advocate
-the use of these parameters for Diffie-Hellman key exchange, and while it is
-possible to use such parameters securely, additional validation checks are
-necessary to prevent small-subgroup attacks.
-
-We measured the prevalence of these parameter choices in the wild for HTTPS,
-POP3S, SMTP with STARTTLS, SSH, IKEv1, and IKEv2, finding millions of hosts
-using DSA and other non-``safe'' primes for Diffie-Hellman key exchange, many
-of them in combination with potentially vulnerable behaviors. Beyond simply
-using DSA primes, small subgroup attacks require a number of complex, special
-conditions to go wrong in order to be feasible, described in
-\S\ref{chapter:subgroup}. While seems unlikely that any implementation would
-satisfy enough of these requirements to be vulnerable to an attack, it also
-seemed unlikely that implementations would use non-safe primes for key
-exchange in the first place. Empirical methods did not reveal an
-Internet-wide vulnerability, but rather an Internet-wide case of accidental
-complexity and fragility. Given the amount of complexity exposed by the
-underlying cryptographic APIs for Diffie-Hellman, it is remarkable that any
-implementation was safe. Understanding the root causes of this complexity and
-confusion enables better protocol design in the future.
 
 
 % CONCLUSION THOUGHTS
