@@ -43,7 +43,7 @@ of clients and servers \todo{define this more}.
 To better use cryptography to secure the Internet, we need to understand what
 types of cryptography are being used, and where mistakes are being made. We
 must understand which cryptographic ecosystems are fragile, and which are
-resiliant. Large-scale empirical methods allow us to observe the fragility in
+resiliant. Large-scale empirical methods allow us to observe fragility in
 how cryptography is being used on the Internet, identify new vulnerabilites,
 and better secure the Internet in the future.
 
@@ -52,50 +52,54 @@ Internet-wide scanning provides insight into how cryptography is used to
 secure the Internet. First, I show contributions made to the field of
 Internet measurement field itself via improved Internet-wide scanning.
 Second, I measure the Internet's resiliancy to small subgroup attacks in
-finite-field Diffie-Hellman, and find a fragile state of affairs. Third, I
-use empirical methods to show how 1990s-era export-grade encryption harmed
-the security of the Internet for two decades.
+finite-field Diffie-Hellman. Third, I use empirical methods to show how
+1990s-era export-grade encryption harmed the security of the Internet for two
+decades.
 
 \section{Techniques for Measuring Internet Cryptography}
 
-Empirical evidence is gathered via observation and experimentation, and is a
-key component of the scientific method. Cryptography is a formal field 
+Internet-wide scanning is a fundmental technique used for empirical study of
+cryptography. Large-scale, horizontal port scanners such as
+ZMap~\cite{zmap-2013} drastically reduce the barrier to entry to leveraging
+network scan data at Internet scale, however port scanning alone is not a
+complete solution. Using Internet-wide scanning to measure cryptography is a
+three step process:
+\begin{enumerate}
+  \item \textbf{Identify Hosts.}
+    There are $\sim$4B possible IPv4 addresses, however only a subset are
+    listening on any given L4 port. A single scan by ZMap or another
+    large-scale, asynchronous L3/L4 scanner identifies which hosts have an
+    input port open. For example, only $\sim$50M hosts respond on TCP port 443
+    (HTTPS).
+  \item \textbf{Measure Hosts.}
+    ZMap provides no application-layer information about a host. Furthermore,
+    hosts that respond on a standard port for some application-layer protocol
+    might not actually be configured to speak that protocol. For example,
+    only $\sim$38M of the $\sim$50M hosts with TCP port 443 open are TLS
+    servers. To collect cryptographic data, an application-layer scanner such
+    as ZGrab~\cite{zgrab-github} must connect to all hosts found by ZMap and
+    attempt a protocol handshake that records the cryptographic state used
+    for the connection.
+  \item \textbf{Answer Questions.}
+    As is the case in any empirical science, the measurement data is analyzed
+    to answer questions such as ``What percentage of TLS servers support
+    512-bit Diffie-Hellman?''. Tools such as Censys~\cite{censys} allow
+    researchers to ask questions about Internet-wide scan data much faster
+    and easier than by trawling through results from individual scans, each
+    of which can generate terabytes of data.
+\end{enumerate}
 
-The observable parts are the fragile parts.
-
-Applying empirical methods to cryptography requires solving engineering
-challenges. A fundamental methodology underlying the empirical study of
-cryptography is Internet-wide scanning. While tooling such as ZMap drastically
-reduced the barrier to entry, Internet-wide scanning still requires additional
-application-layer tooling to be useful to study cryptography (e.g. the ability
-to perform large numbers of TLS handshakes), as well as careful experimental
-design to extract the necessary information from every web server on the
-Internet, in a systematic, repeatable and consistent method. Data collected
-from a single scan often approaches one terabyte in size, and correlating
-across multiple scans may involve processing billions of application-layer
-handshakes.
-
-- Identify problems at scale that are not otherwise visible
-- Understand sources and solutions to fragility
-
-\paragraph{Internet-Wide Scanning}
-
-I first discuss contributions to the measurement field, which underlies
-cryptographic empiricisim. There is an abundance of tooling for both active and
-passive network measurement. It is tempting to assume that the tools required
-to study cryptography at Internet-scale already exist, however this is often
-not the case. If the tooling does exist, it often requires herculean effort to
-answer simple questions, such as ``how many HTTPS hosts still support 512-bit
-key Diffie-Hellman key exchange?''. While often overlooked, understanding,
-contributing, and building tooling is a key aspect of participating in
-empirical cryptographic research.
-
-As a single example of contributions in this space, in \S\ref{chapter:zippier},
-I show improvements to the ZMap scanner which enable it to operate at a full
-10Gbps line rate~\cite{zippier-zmap-2014}.  While ZMap enabled the use of
-Internet-wide scanning accessible as a measurement method, this work moves
-towards enabling hourly or real-time measurement of the cryptographic behavior
-of all Internet-connected systems.
+With current technology, Internet-wide scanning is useful for creating an
+aggregate understanding of the Internet over time. However, it is not yet
+able to provide a global understanding of \textit{individual} hosts and
+networks. I first discuss contributions to Internet-wide scanning that
+provide a foundation to build a more accurate and complete picture of the
+Internet in \S\ref{chapter:zippier}. I show improvements to the ZMap scanner
+which enable it to operate at a full 10Gbps line
+rate~\cite{zippier-zmap-2014}. While ZMap enabled the use of Internet-wide
+scanning accessible as a measurement method, this work moves towards enabling
+hourly or real-time measurement of the cryptographic behavior of all
+Internet-connected systems.
 
 When originally introduced, ZMap was capable of saturating a 1Gbps uplink from
 a single host, enabling an Internet-wide TCP SYN scan of IPv4 to be performed
