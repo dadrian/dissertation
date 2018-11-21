@@ -156,26 +156,44 @@ protocol design in the future.
 
 \section{Measuring Export Cryptography}
 
-Discrete-log and factoring based attacks are generally considered out of reach
-of attackers.  However, informing such attacks with measurement data allows for
-cost-effective attacks that leverage a single, expensive pre-computation to
-cheaply attack TLS connections. Furthermore, when combined with broad support
-for cryptography that was assumed to be “dead”, these attacks become even
-cheaper.
+%Discrete-log and factoring based attacks are generally considered out of reach
+%of attackers.  However, informing such attacks with measurement data allows for
+%cost-effective attacks that leverage a single, expensive pre-computation to
+%cheaply attack TLS connections. Furthermore, when combined with broad support
+%for cryptography that was assumed to be “dead”, these attacks become even
+%cheaper.
 
-\paragraph{Export Cryptography}
-Cryptography has been a regulated as part of the International Traffic in Arms
-Regulations (ITAR), for decades. In the 1990s, the Department of State chose to
-implement these regulations by limiting any ``exported'' cryptography to
-40-bits of security for symmetric ciphers, and 512-bits for security for
-public-key cryptography. Authentication strength (\eg MAC length), was not
-regulated. After several court cases started in 1995 surrounding Daniel J.
-Bernstein's ``Snuffle'' cryptosystem, the regulations were weakened and moved
-from the Department of State to the Department of Commerce. The litigation
-ended in 1999. However, during this time \ssltwo was designed and deprecated,
-SSLv3 was created and then renamed to TLS and moved into the purview of the
-IETF, which standardized TLSv1.0 in 1999. All three of these protocols
-contained compliance mechanisms for ``export cryptography''.
+%\paragraph{Export Cryptography}
+
+The Department of State regulated cryptography in the United States during
+the 1990s. Cryptography was covered by the Internation Traffic in Arms
+Regulations (ITAR), which broadly limited the ability for US persons to
+``export'' cryptography. Beginning in 1995, these regulations were challenged
+in court by Daniel J. Bernstein, who was attempting to publish the
+``Snuffle'' cryptosystem. The regulations were moved in 1996 from ITAR to the
+Export Administration Regulations (EAR), under the control of the Department
+of Commerce~\cite{djb-case-status}. Under EAR, ``exported'' cryptography was
+limited to 40-bits of security for symmetric ciphers, and 512-bits for
+security for public-key cryptography. Authentication strength (\eg MAC
+length), was not regulated~\cite{ear-2001-cat-5}. Despite these limitations,
+there were major advances in secure channel protocol development during this time.
+\ssltwo was designed and deprecated~\cite{sslv2} in 1995. SSLv3 was created and
+standardized~\cite{rfc6101} by 1998, and subsequently renamed to TLS and
+moved into the purview of the IETF in 1999~\cite{rfc2246}. All three of these
+protocol versions contained compliance mechanisms for the export regulations,
+where the protocol was capable of negotiating the use of short
+``export-grade'' parameters instead of ``modern'' cryptography.
+
+Following further litigation in \textit{Bernstein vs United States}, the key
+length limitations from the export regulations were removed in 1999, and
+future versions of TLS deprecated the process for using ``export-grade''
+cryptography.
+
+\subsection{Attacks on RSA}
+
+\todo{freak}
+
+\todo{freak measurements}
 
 \subsection{Attacks on Diffie-Hellman}
 
@@ -280,9 +298,6 @@ cryptography have been broken: export RSA key exchange was broken by FREAK,
 export Diffie-Hellman key exchange was broken by Logjam, and export symmetric
 ciphers were broken by DROWN. In all cases, empirical research enabled the full
 understanding of the effects and impacts of these issues.
-
-\section{Fragile Cryptographic Ecosystems}
-
 
 % CONCLUSION THOUGHTS
 % 
