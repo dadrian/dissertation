@@ -184,16 +184,33 @@ protocol versions contained compliance mechanisms for the export regulations,
 where the protocol was capable of negotiating the use of short
 ``export-grade'' parameters instead of ``modern'' cryptography.
 
-Following further litigation in \textit{Bernstein vs United States}, the key
+Following further litigation in \textit{Bernstein v. United States}, the key
 length limitations from the export regulations were removed in 1999, and
 future versions of TLS deprecated the process for using ``export-grade''
 cryptography.
 
 \subsection{Attacks on RSA}
 
-\todo{freak}
+In early verions of TLS, export compliance when using RSA key exchange was
+implemented by limiting the length of the server-provided RSA key to
+512-bits. In TLS, the RSA key used for key exchange is usually extracted from
+the X.509 certificate used to authenticate the server. However, this key is
+also used for non-export cryptography, and so is longer than the max 512-bits
+required to comply with the export regulations. To indicate an
+export-complaint connection, TLS introduced the \rsaexp{} ciphers. These
+ciphers indicate that the server must provide an additional ``export-grade''
+RSA key to be used for key exchange.
 
-\todo{freak measurements}
+Beurdouche et al.\ showed that many TLS implementations incorrectly accepted
+a server-provided \rsaexp{} key on non-export \rsa{}
+ciphers~\cite{freak-attack-2015}, leading to a downgrade attack against
+servers that support \rsaexp{}, denoted FREAK. We measured support for
+\rsaexp{}, and found that 36.7\% of HTTPS servers with trusted certificates
+still supports \rsaexp{} cipers and were vulnerable to FREAK. This was
+unexpected, since no modern web client has offered export-grade ciphers in
+its default configuration for over a decade. Prior to measuring support for
+export-grade RSA, the FREAK attack seemed far less impactful, since
+conventional wisdom was that no server supported export-grade cryptography.
 
 \subsection{Attacks on Diffie-Hellman}
 
