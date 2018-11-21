@@ -1,0 +1,63 @@
+\textit{This is an outline}
+
+List of how the empirical methods discussed earlier had impact
+(pull-out relevant results).
+
+Did any of this research go anywhere beyond that? Yes, it had a clear impact
+on TLS 1.3.
+
+\section{TLS 1.3}
+
+Point out that the ``informing future protocol design'' is effectively
+``making TLS 1.3 better''. This is the ``improve the security of the Internet
+in the future'' part.
+
+Call out explicit TLS 1.3 design decisions based on results described in this
+dissertation. Perhaps some of this should be interleaved into the earlier
+sections?
+
+\section{Engineering Challenges}
+
+For not being a ``systems'' field, there is still an absurd amount of
+engineering that largely goes unacknowledged, in order to write good
+measurement papers. Discuss some of these examples.
+
+Is this a fundamental state of being of the methodology, or are we doing something wrong?
+
+\section{Broader applicability of empirical methods}
+
+Security driven by data. Is any of this relevant to users who are just trying
+to secure this own networks?
+
+Extending measurement from aggregations and ecosystems to behavior of
+individual hosts at global scale. Can we track individual hosts appearing and
+disappearing, and map changes to configuration in real-time?
+
+Should empiricism be part of more traditional cryptography education and research?
+
+Some word of warning about how measurement doesn't solve all our problems,
+and how measuring the wrong things makes things worse, \eg Robert McNamera's
+use of body count as a metric during the Vietnam War.
+
+% What the fuck does anything have to do with Vietnam?
+
+
+\section{Weaknesses from Export Cryptography}
+
+As shown by Freak, Logjam, and DROWN, the security of TLS and export
+cryptography are fundamentally linked. Export cryptography is a unique
+constraint with a fundamentally dangerous goal: weaken cryptography, without
+weakening cryptography. Internet measurement techniques show us that the export
+regulations weakened protocol design to the point where the regulations are
+directly harmful to the security of the Internet today. These empirical
+techniques show that these attacks are not theoretical, leveraging protocols
+that have long-since disappeared, but instead are a dark side of backwards
+compatibility, harming real users today. Although the regulations went out of
+effect by 1999, the cryptography remains. At their respective times of
+disclosure, 36.7\% of IPv4 HTTPS hosts were vulnerable to FREAK, 4.9\% were
+vulnerable to Logjam, and 26\% were vulnerable to DROWN. All forms of export
+cryptography have been broken: export RSA key exchange was broken by FREAK,
+export Diffie-Hellman key exchange was broken by Logjam, and export symmetric
+ciphers were broken by DROWN. In all cases, empirical research enabled the full
+understanding of the effects and impacts of these issues.
+

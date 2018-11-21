@@ -299,25 +299,6 @@ traditional software exploitation. We can place an upper bound on the increased
 attack surface, by measuring key and name reuse across TLS in different
 application-layer protocols on different ports.
 
-\subsection{Weaknesses from Export Cryptography}
-
-As shown by Freak, Logjam, and DROWN, the security of TLS and export
-cryptography are fundamentally linked. Export cryptography is a unique
-constraint with a fundamentally dangerous goal: weaken cryptography, without
-weakening cryptography. Internet measurement techniques show us that the export
-regulations weakened protocol design to the point where the regulations are
-directly harmful to the security of the Internet today. These empirical
-techniques show that these attacks are not theoretical, leveraging protocols
-that have long-since disappeared, but instead are a dark side of backwards
-compatibility, harming real users today. Although the regulations went out of
-effect by 1999, the cryptography remains. At their respective times of
-disclosure, 36.7\% of IPv4 HTTPS hosts were vulnerable to FREAK, 4.9\% were
-vulnerable to Logjam, and 26\% were vulnerable to DROWN. All forms of export
-cryptography have been broken: export RSA key exchange was broken by FREAK,
-export Diffie-Hellman key exchange was broken by Logjam, and export symmetric
-ciphers were broken by DROWN. In all cases, empirical research enabled the full
-understanding of the effects and impacts of these issues.
-
 % CONCLUSION THOUGHTS
 % 
 % ENGINERING?
