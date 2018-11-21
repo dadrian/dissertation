@@ -150,15 +150,15 @@ but this has not translated into reliable and consistent defenses being built
 into protocols and implementations, likely due to the complexity of the
 trade-offs surrounding finite-field parameter selection.
 
-We measured vulnerability to small subgroup attacks in the wild for HTTPS,
-POP3S, SMTP with STARTTLS, SSH, IKEv1, and IKEv2, finding millions of hosts
-using DSA and other non-``safe'' primes for Diffie-Hellman key exchange, many
-of them in combination with potentially vulnerable behaviors. Beyond simply
-using DSA primes, small subgroup attacks require a number of complex, special
-conditions to go wrong in order to be feasible, described in
-\S\ref{chapter:subgroup}. While seems unlikely that any implementation would
-satisfy enough of these requirements to be vulnerable to an attack, it also
-seemed unlikely that implementations would use non-safe primes for key
+In \S\ref{chapter:subgroup}, I discuss how we measured vulnerability to small
+subgroup attacks in the wild for HTTPS, POP3S, SMTP with STARTTLS, SSH,
+IKEv1, and IKEv2, finding millions of hosts using DSA and other non-``safe''
+primes for Diffie-Hellman key exchange, many of them in combination with
+potentially vulnerable behaviors. Beyond simply using DSA primes, small
+subgroup attacks require a number of complex, special conditions to go wrong
+in order to be feasible. While it seems unlikely that any implementation
+would satisfy enough of these requirements to be vulnerable to an attack, it
+also seemed unlikely that implementations would use non-safe primes for key
 exchange in the first place. Empirical methods did not reveal an
 Internet-wide vulnerability, but rather an Internet-wide case of accidental
 complexity and fragility. Given the amount of complexity exposed by the
