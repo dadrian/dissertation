@@ -121,23 +121,36 @@ individual hosts, but at global scale.
 
 \section{Measuring Diffie-Hellman}
 
-There is a knowledge gap between implementers and researchers. Cryptographers
-can be aware of attacks for decades, but this doesn't necessarily translate
-into concrete steps that implementers can take to avoid vulnerability. A
-specific example of this is prime-field based Diffie-Hellman key exchange, in
-which implementation and hosts often use groups which unnecessarily open up
-the likelihood of small-subgroup confinement and key recovery
-attacks~\cite{subgroup-2017}. I used empirical techniques to provide insight
+Diffie-Hellman key exchange is one of the most common public-key
+cryptographic methods in use in the Internet. In finite field Diffie-Hellman,
+Alice and Bob agree on a large prime $p$ and an integer $g$ modulo $p$. Alice
+chooses a secret integer $x_a$ and transmits a public value $g^{x_a} \bmod
+p$; Bob chooses a secret integer $x_b$ and transmits his public value
+$g^{x_b} \bmod p$. Both Alice and Bob can reconstruct a shared secret $g^{x_a
+x_b} \bmod p$, but the best known way for a passive eavesdropper to
+reconstruct this secret is to compute the discrete log of either Alice or
+Bob's public value. Specifically, given $g$, $p$, and $g^x \bmod p$, an
+attacker must calculate $x$.
+
+Both $g$ and $p$ must be carefully selected to ensure that the discrete
+logarithm problem remains hard, and that the key exchange is not vulnerable
+to small subgroup attacks. I used empirical techniques to provide insight
 into the Diffie-Hellman group selection at Internet-scale, showing that while
 a common recommendation is that $p$ should be a ``safe'' prime such that $p =
 2q+1$ for some prime $q$, many implementations instead use non-safe ``DSA''
-parameters with potentially unsafe subgroups of order $q$. Several standards,
-including NIST~SP~800-56A~\cite{sp800} and RFC~5114~\cite{rfc5114}, advocate
-the use of these parameters for Diffie-Hellman key exchange, and while it is
-possible to use such parameters securely, additional validation checks are
-necessary to prevent small-subgroup attacks.
+parameters with potentially unsafe subgroups of order
+$q$~\cite{subgroup-2017}. Several standards, including
+NIST~SP~800-56A~\cite{sp800} and RFC~5114~\cite{rfc5114}, advocate the use of
+these parameters for Diffie-Hellman key exchange, and while it is possible to
+use such parameters securely, additional validation checks are necessary to
+prevent small-subgroup attacks. This is further evidence of a knowledge gap
+between researchers, protocol designers, and implementers. Cryptographers
+have been aware of small subgroup attacks for two decades~\cite{lim-1997},
+but this has not translated into reliable and consistent defenses being built
+into protocols and implementations, likely due to the complexity of the
+trade-offs surrounding finite-field parameter selection.
 
-We measured the prevalence of these parameter choices in the wild for HTTPS,
+We measured vulnerability to small subgroup attacks in the wild for HTTPS,
 POP3S, SMTP with STARTTLS, SSH, IKEv1, and IKEv2, finding millions of hosts
 using DSA and other non-``safe'' primes for Diffie-Hellman key exchange, many
 of them in combination with potentially vulnerable behaviors. Beyond simply
@@ -213,17 +226,6 @@ export-grade RSA, the FREAK attack seemed far less impactful, since
 conventional wisdom was that no server supported export-grade cryptography.
 
 \subsection{Attacks on Diffie-Hellman}
-
-Diffie-Hellman key exchange is one of the most common public-key
-cryptographic methods in use in the Internet. In finite field Diffie-Hellman,
-Alice and Bob agree on a large prime $p$ and an integer $g$ modulo $p$. Alice
-chooses a secret integer $x_a$ and transmits a public value $g^{x_a} \bmod
-p$; Bob chooses a secret integer $x_b$ and transmits his public value
-$g^{x_b} \bmod p$. Both Alice and Bob can reconstruct a shared secret $g^{x_a
-x_b} \bmod p$, but the best known way for a passive eavesdropper to
-reconstruct this secret is to compute the discrete log of either Alice or
-Bob's public value. Specifically, given $g$, $p$, and $g^x \bmod p$, an
-attacker must calculate $x$.
 
 We uncovered several weaknesses in how finite-field Diffie-Hellman key
 exchange was deployed, which drastically affected the cost of decrypting
