@@ -169,15 +169,6 @@ protocol design in the future.
 
 \section{Measuring Export Cryptography}
 
-%Discrete-log and factoring based attacks are generally considered out of reach
-%of attackers.  However, informing such attacks with measurement data allows for
-%cost-effective attacks that leverage a single, expensive pre-computation to
-%cheaply attack TLS connections. Furthermore, when combined with broad support
-%for cryptography that was assumed to be “dead”, these attacks become even
-%cheaper.
-
-%\paragraph{Export Cryptography}
-
 The Department of State regulated cryptography in the United States during
 the 1990s. Cryptography was covered by the Internation Traffic in Arms
 Regulations (ITAR), which broadly limited the ability for US persons to
@@ -263,7 +254,12 @@ prime-field based Diffie-Hellman remained common in TLS until 2016, when both
 Firefox and Chrome removed it from their default cipher suites as a result of
 our work.
 
-\subsection{Cross-Protocol Attacks}
+\subsection{Attacks on Symmetric Cryptography}
+
+For export compliance in \ssltwo, rather than weaken key exchange, the
+protocol simply reduces the key length used for the symmetric encryption.
+\ssltwo contains support for export symmetric ciphers, which are seeded via
+only five bytes of key material encrypted using RSA \PKCS.
 
 Reusing TLS keys across multiple protocols, such as HTTPS, SMTP, and IMAP,
 leads to an increased attack surface. Empirical methods allow us to understand
