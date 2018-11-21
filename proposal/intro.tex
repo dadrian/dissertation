@@ -227,37 +227,41 @@ conventional wisdom was that no server supported export-grade cryptography.
 
 \subsection{Attacks on Diffie-Hellman}
 
-We uncovered several weaknesses in how finite-field Diffie-Hellman key
-exchange was deployed, which drastically affected the cost of decrypting
-large amounts of TLS traffic. The algorithmic complexity of calculating
-discrete log is exponential, but the bulk of this computation is dependent
-solely on $p$, not the individual secrets $a$ and $b$ chosen by each party.
-If many hosts use the same groups, then the precomputation cost may be
-amortized across all the connections across these hosts, rather than
-requiring core-centuries per observed key exchange. This raise an obvious
-empirical question: do many hosts share the same set of Diffie-Hellman
-parameters, and what is the strength of the parameters?
+The TLS protocol contains export-grade Diffie-Hellman ciphers, denoted
+\dheexp{}, which use short 512-bit groups~\cite{rfc2246}. In
+\S\ref{chapter:logjam}, I discuss Logjam, a protocol vulnerability in TLS,
+which allows an attacker who can calculate 512-bit discrete logs to downgrade
+connections to export-grade Diffie-Hellman ciphers, and decrypt them. Similar
+to the FREAK attack~\cite{freak-attack-2015}, the Logjam attack is only
+possible when the server supports \dheexp{} ciphers. We used Internet-wide
+scanning to determine support for these ciphers.
 
-The TLS protocol contains ``export-grade'' Diffie-Hellman ciphers which use
-short 512-bit groups. We show that there is a protocol vulnerability in TLS,
-named Logjam, which allows an attacker who can calculate 512-bit discrete logs
-to downgrade connections to export-grade Diffie-Hellman ciphers, and decrypt
-them. If a TLS session were to use 512-bit Diffie-Hellman, it may first appear
-that individual connections could be broken in 60,000 core-hours, or 120 hours
-in parallel on commodity hardware. While this is certainly insecure, at first
-glance it would appear these connections have a small amount forward secrecy,
-by virtue of using ephemeral Diffie-Hellman key, e.g. each connection would
-require another 120 hours to be decrypted. This slow process would prohibit
-active attacks and limit the risk to passive decryption after the fact. This
-again falls prey to precomputation: if many hosts were to support the same weak
-parameters, then the computation could be amortized, and individual connections
-could be broken in real-time, enabling active attacks. In fact, shared sets of
-parameters is what enables the downgrade. In this case, empirical measurement
-showed that 80\% of vulnerable hosts used the same set of parameters, moving
-this attack from the theoretical to the practical. While recently there has
-been a trend towards elliptic curve cryptography, prime-field based
-Diffie-Hellman remained common in TLS until 2016, when both Firefox and Chrome
-removed it from their default cipher suites as a result of our work.
+An individual TLS session using 512-bit Diffie-Hellman could be broken in
+60,000 core-hours, or 120 hours in parallel on commodity hardware simply by
+calculating a discrete log~\cite{logjam-2015}. While this is certainly
+insecure, at first glance it appears these connections have a small amount
+forward secrecy, by virtue of using ephemeral Diffie-Hellman key, e.g. each
+connection would require another 120 hours to be decrypted. This slow process
+would prohibit active attacks and limit the risk to passive decryption after
+the fact.
+
+In practice, while the algorithmic complexity of calculating discrete log is
+exponential, the bulk of this computation is dependent solely on $p$, not
+the individual secrets $x_a$ and $x_b$ chosen by each party. If many hosts use
+the same groups, then the precomputation cost may be amortized across all the
+connections across these hosts, rather than requiring core-centuries per
+observed key exchange. This raise an obvious empirical question: do many
+hosts share the same set of Diffie-Hellman parameters, and what is the
+strength of the parameters? If many hosts were to support the same weak
+parameters, then the computation could be amortized, and individual
+connections could be broken in real-time, enabling active attacks. In fact,
+shared sets of parameters is what enables the downgrade. In this case,
+empirical measurement showed that 80\% of vulnerable hosts used the same set
+of parameters, moving the Logjam attack from the theoretical towards the
+practical. While there is a recent trend towards elliptic curve cryptography,
+prime-field based Diffie-Hellman remained common in TLS until 2016, when both
+Firefox and Chrome removed it from their default cipher suites as a result of
+our work.
 
 \subsection{Cross-Protocol Attacks}
 
