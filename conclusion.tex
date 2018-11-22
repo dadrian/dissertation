@@ -103,26 +103,31 @@ on an open Internet.
 
 \section{Generalizing DROWN}
 
+The DROWN attack further exploited export-grade cryptography with an
+additional novel insight: Bleichenbacher oracles need not be present in the
+target protocol under attack, so long as the key is shared between the two
+protocols. Modern TLS servers were at risk if they shared a key with an
+\ssltwo server. While DROWN was caused by export cryptography, and uses a
+cryptographic vulnerability in one protocol to attack another protocol, the
+cross-protocol methodology can be extended to other TLS attacks, and to
+simple key compromise.
+
 Reusing TLS keys across multiple protocols, such as HTTPS, SMTP, and IMAP,
-leads to an increased attack surface. Empirical methods allow us to understand
-the attack surface increase from key reuse. Furthermore, specific
-vulnerabilities in the TLS protocol and older implementations can be utilized
-in a cross-protocol context to attack users of a web service without explicitly
-compromising the private key. This is best shown by the DROWN vulnerability, in
-which the mere existence of an \ssltwo host that shared a key with a TLS host
-enabled decryption of otherwise secure TLS connections using modern
-cryptography.
+leads to an increased attack surface. Beyond DROWN, the TLS protocol has a
+fundamentally cross-protocol attack surface. X.509 certificates are not bound
+to any particular protocol or port. A key compromised on a single protocol
+can be utilized to attack other protocols. The compromise need not be due to
+a TLS protocol vulnerability, and could simply be due to a remote code
+execution exploit. 
 
-The DROWN attack further exploited export-grade cryptography with an additional
-novel insight: Bleichenbacher oracles need not be present in the target
-protocol under attack, so long as the key is shared between the two protocols.
-Specifically, DROWN shows how to use protocol vulnerabilities in \ssltwo to
-attack TLS 1.2. The \ssltwo protocol includes support export symmetric ciphers
-which are seeded via only five bytes of key material encrypted using RSA \PKCS.
+Beyond key compromise, specific vulnerabilities in the TLS protocol and older
+implementations can be utilized in a cross-protocol context to attack users
+of a web service without explicitly compromising the private key. This is
+best shown by the DROWN vulnerability, in which the mere existence of an
+\ssltwo host that shared a key with a TLS host enabled decryption of
+otherwise secure TLS connections using modern cryptography.
 
-Beyond DROWN, the TLS protocol has a fundamentally cross-protocol attack
-surface. X.509 certificates are not bound to any particular protocol or port.
-Furthermore, even if distinct services, such as mail and web servers, use
+Even if distinct services, such as mail and web servers, use
 different keys, so long as they share any name on the certificate, the
 transport-layer security of all connections to that name are limited to the
 security of the weakest TLS implementation or configuration. Even traditionally
@@ -130,12 +135,18 @@ web-based padding oracle attacks, such as POODLE, or the AES-NI padding-oracle
 in OpenSSL, non-web servers can be exploited by active attackers targeting web
 users. The attacker can rewrite the TCP connection to an alternative port, and
 fill-in any pre-handshake protocol dialogue (e.g. by sending an EHLO or
-STARTTLS command in SMTP). Ignoring vulnerabilities in TLS itself, an unpatched
-piece of software with a known RCE using the same key as a well-configured and
-up to date web server places web clients, should the key be stolen via
-traditional software exploitation. We can place an upper bound on the increased
-attack surface, by measuring key and name reuse across TLS in different
-application-layer protocols on different ports.
+STARTTLS command in SMTP).
+
+Examing vulnerabilites in a cross-protocol context increases attack surface.
+Using Internet-wide scanning to measure the prevalence of key and name reuse
+between HTTPS and non-web TLS protocols on different ports would allow us to
+empircally bound this risk. Wildcard certificates slightly complicate this
+process; an exploitable wildcard certificate could be used to attack multiple
+names.
+
+\section{Empirical Pitfalls}
+
+\todo{finish things out with a word of warning}
 
 Security driven by data. Is any of this relevant to users who are just trying
 to secure this own networks?
