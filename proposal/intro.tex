@@ -257,47 +257,19 @@ our work.
 \subsection{Attacks on Symmetric Cryptography}
 
 For export compliance in \ssltwo, rather than weaken key exchange, the
-protocol simply reduces the key length used for the symmetric encryption.
+protocol reduces the key length used for the symmetric encryption.
 \ssltwo contains support for export symmetric ciphers, which are seeded via
-only five bytes of key material encrypted using RSA \PKCS.
-
-Reusing TLS keys across multiple protocols, such as HTTPS, SMTP, and IMAP,
-leads to an increased attack surface. Empirical methods allow us to understand
-the attack surface increase from key reuse. Furthermore, specific
-vulnerabilities in the TLS protocol and older implementations can be utilized
-in a cross-protocol context to attack users of a web service without explicitly
-compromising the private key. This is best shown by the DROWN vulnerability, in
-which the mere existence of an \ssltwo host that shared a key with a TLS host
-enabled decryption of otherwise secure TLS connections using modern
-cryptography.
-
-The DROWN attack further exploited export-grade cryptography with an additional
-novel insight: Bleichenbacher oracles need not be present in the target
-protocol under attack, so long as the key is shared between the two protocols.
-Specifically, DROWN shows how to use protocol vulnerabilities in \ssltwo to
-attack TLS 1.2. The \ssltwo protocol includes support export symmetric ciphers
-which are seeded via only five bytes of key material encrypted using RSA \PKCS.
-The \ssltwo protocol also requires the server to send data to the client that is
+only five bytes of key material encrypted using RSA \PKCS. In
+\S\ref{chapter:drown}, I introduce the DROWN attack, which exploits protocol
+vulnerabilites in \ssltwo surrounding export-grade cryptography to attack
+TLS~\cite{drown-2016}. To be vulnerable to DROWN, a TLS server must share a
+key with an SSLv2 server, or share a name with an SSLv2 server that has not
+patched the ``extra-clear'' vulnerablity~\cite{drown-2016,cve-2016-0701}.
+The \ssltwo protocol requires the server to send data to the client that is
 derived from the shared secret, without first verifying that the client has
-possession of the secret. When combined with the malleability of RSA,
-culminates in a Bleichenbacher oracle that can be used to attack TLS 1.2
-
-Beyond DROWN, the TLS protocol has a fundamentally cross-protocol attack
-surface. X.509 certificates are not bound to any particular protocol or port.
-Furthermore, even if distinct services, such as mail and web servers, use
-different keys, so long as they share any name on the certificate, the
-transport-layer security of all connections to that name are limited to the
-security of the weakest TLS implementation or configuration. Even traditionally
-web-based padding oracle attacks, such as POODLE, or the AES-NI padding-oracle
-in OpenSSL, non-web servers can be exploited by active attackers targeting web
-users. The attacker can rewrite the TCP connection to an alternative port, and
-fill-in any pre-handshake protocol dialogue (e.g. by sending an EHLO or
-STARTTLS command in SMTP). Ignoring vulnerabilities in TLS itself, an unpatched
-piece of software with a known RCE using the same key as a well-configured and
-up to date web server places web clients, should the key be stolen via
-traditional software exploitation. We can place an upper bound on the increased
-attack surface, by measuring key and name reuse across TLS in different
-application-layer protocols on different ports.
+possession of the secret. When combined with the malleability of RSA, and a
+shortened five byte secret, this culminates in a Bleichenbacher oracle that
+can be used to attack TLS 1.2.
 
 % CONCLUSION THOUGHTS
 % 
