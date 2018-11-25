@@ -210,22 +210,58 @@ empircally bound this risk. Wildcard certificates slightly complicate this
 process; an exploitable wildcard certificate could be used to attack multiple
 names.
 
-\section{Empirical Pitfalls}
+\section{Applicability of Empirical Methods}
 
-\todo{finish things out with a word of warning}
+Empirical methods provide a way to answer questions and work towards
+solutions of problems that were previously left unsolvable under the guise of
+``backwards compatability''. Beyond this disseration, measurements from
+Chrome influenced the design of version negotiation for TLS
+1.3~\cite{why-tls-13-browsers-cloudflare}, measurements of \starttls support
+lead to new techniques for mail transport
+security~\cite{google-email-transparency-report,mail-2015,rfc8461}, and
+studying browser HTTPS errors led to increased proportions of successful
+connections~\cite{wild-warnings-2017}.
 
-Security driven by data. Is any of this relevant to users who are just trying
-to secure this own networks?
+However, empirical cryptography, and more broadly, empirical security, is
+often out of reach of non-researchers. Security analysts and system
+administrators can leverage Internet-wide scanning data and certificate
+transparency logs (the same data used for empirical cryptography) to identify
+their own assets, track bad actors, and monitor for phishing sites. However,
+collecting this data is often out of reach, due to the quantity and velocity
+of the data. Access to a full Internet-wide perspective if often limited to
+large organizations with large security teams.
 
-Extending measurement from aggregations and ecosystems to behavior of
-individual hosts at global scale. Can we track individual hosts appearing and
-disappearing, and map changes to configuration in real-time?
+As empirical techniques such as Internet-wide scanning and passive network
+monitoring improve, can we extend measurement from aggregations and
+ecosystems to understanding the behavior of individual hosts at global scale?
+Can we track individual hosts appearing and disappearing, and map changes to
+configuration in real-time?
 
-Should empiricism be part of more traditional cryptography education and research?
+As we approch being able to index devices in the same way we can index web
+pages, the barrier to entry for utilizing a global perspective to empirically
+study cryptography will decrease, and this decrease will come with improved
+access to network security data. For cryptography, this means future
+protocols can be designed to solve problems experienced by current protocols,
+with a turnaround time of less than the decade it took to design TLS 1.3. For
+security, it means an increase in the use of data to show that an
+organizations security posture is improving or degrading, and the ability for
+all defenders to have the same network perspective and data as a targeted
+attacker. Fully understanding an organizations exposure requires strong
+empirical techniques. An attacker only needs to leverage an Internet-wide
+perspective once to find a vulnerable asset, but defenders need to constantly
+understand their exposure. You cannot improve cryptography that you do not
+know is in use. You cannot defend what you do not know you own.
 
-Some word of warning about how measurement doesn't solve all our problems,
-and how measuring the wrong things makes things worse, \eg Robert McNamera's
-use of body count as a metric during the Vietnam War.
+Empirical techniques inform defenders about the existence and scale of
+problems, but they are no substitute for preventing problems before they
+happen in the first place. Leveraging secure development practices,
+secure-by-default APIs, and systems with isolation as first-class concepts 
+will push the envelope towards more secure systems, and we should work towards
+improving security in all ways, not just in ways we know how to measure.
+
+% Some word of warning about how measurement doesn't solve all our problems,
+% and how measuring the wrong things makes things worse, \eg Robert McNamera's
+% use of body count as a metric during the Vietnam War.
 
 % What the fuck does anything have to do with Vietnam?
 
