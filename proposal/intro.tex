@@ -32,7 +32,8 @@ designed for ``cryptographic agility'', and so identical implementations may
 support different sets of underlying algorithms. Devices that support modern
 cryptography may also support decades-old broken cryptography. This leads to
 an Internet of fragile cryptographic ecosystems, consisting of diverse sets
-of clients and servers using vulnerable or close-to-vulnerable cryptography.
+of clients and servers, many of which use vulnerable or close-to-vulnerable
+cryptography.
 
 %To better use cryptography to secure the Internet, we must first
 %understand how cryptography is being used on the Internet. Examining CVE databases
@@ -43,9 +44,12 @@ of clients and servers using vulnerable or close-to-vulnerable cryptography.
 To better use cryptography to secure the Internet, we need to understand what
 types of cryptography are in use, and where mistakes are being made. We must
 understand which cryptographic ecosystems are fragile, and which are
-resiliant. Large-scale empirical methods allow us to observe fragility in how
-cryptography is being used on the Internet, identify new vulnerabilites, and
-better secure the Internet in the future.
+resiliant. To deploy new and stronger cryptography, we need to validate our
+assumptions about the current cryptographic behavior of devices on the
+Internet, so that we can identify which probems need to be solved, and
+prioritize their solutions. Large-scale empirical methods allow us to observe
+fragility in how cryptography is being used on the Internet, identify new
+vulnerabilites, and better secure the Internet in the future.
 
 In this dissertation, I show how empirical measurements collected using
 Internet-wide scanning provides insight into how cryptography is used to
@@ -92,9 +96,9 @@ three step process:
 With current technology, Internet-wide scanning is useful for creating an
 aggregate understanding of the Internet over time. However, it is not yet
 able to provide a global understanding of \textit{individual} hosts and
-networks. I first discuss contributions to Internet-wide scanning that
-provide a foundation to build a more accurate and complete picture of the
-Internet in \S\ref{chapter:zippier}. I show improvements to the ZMap scanner
+networks. In \S\ref{chapter:zippier}, I discuss contributions to
+Internet-wide scanning that provide a foundation to build a more accurate and
+complete picture of the Internet and I show improvements to the ZMap scanner
 which enable it to operate at a full 10Gbps line
 rate~\cite{zippier-zmap-2014}. While ZMap enabled the use of Internet-wide
 scanning accessible as a measurement method, this work moves towards enabling
@@ -107,9 +111,9 @@ in forty-five minutes. However, when used with a 10Gbps network interface, ZMap
 reached barely above the 1Gbps mark. The required thread synchronization during
 address generation restricted the performance benefit of threading, and limited
 the ability to leverage multi-core systems. Furthermore, the copy from user
-space to kernel memory when sending a packet limited total throughput. Scanning
-a 10Gbps requires sending nearly 15 million packets per second continuously,
-which allows for only 200 cycles per packet on a 3 GHz system.
+space to kernel memory when sending a packet limited total throughput.
+Scanning at 10Gbps requires sending nearly 15 million packets per second
+continuously, which allows for only 200 cycles per packet on a 3 GHz system.
 
 I introduced performance improvements to address both of these constraints, and
 enable ZMap to fully utilize a 10Gbps network link, bringing the total time for
@@ -225,19 +229,19 @@ Interestingly, only 26.3\% of all (trusted and untrusted) HTTPS servers were
 vulnerable overall, meaning FREAK was more common among trusted hosts than
 untrusted hosts. FREAK saw a fast patch rate, dropping to only 6.5\% among
 trusted servers, and 11.8\% among untrusted servers on March 10, 2015, one
-week after disclosure. In May 2016, vulnerability to FREAK is only 1.68\%
-among trusted hosts.
+week after disclosure. In May 2016, vulnerability to FREAK among hosts with
+trusted certificates was only 1.68\%.
 
 We instrumented \url{freakattack.com} with a browser-check tool that tested
 users browsers for vulnerability to FREAK. To do so, we first implemented a
-variant of the attack consist- ing of a single test server that would
-negotiate a non-export RSA cipher, but send an export RSA ServerKeyExchange
+variant of the attack consisting of a single test server that would
+negotiate a non-export RSA cipher, but send an export RSA \textsf{ServerKeyExchange}
 message. We created this implementation by extending our modifications to
 ZGrab. We added Javascript to the FREAK website that attempted to connect to
 a subdomain running the test server, and logged if the connection was
 successfully created. Between March 4 and March 7, 2015, we logged 1,260,951
-test connections, of which 223,481 (17.7\%) were vulnerable to FREAK. We note
-that this population is limited to people who visited the FREAK disclosure
+test connections, of which 223,481 (17.7\%) were vulnerable to FREAK. This
+client population is limited to people who visited the FREAK disclosure
 website, and is therefore likely biased towards the technology and security
 community, and is not representable of all Internet users. However, these
 results did show that even though Mozilla NSS was not vulnerable to FREAK, of
@@ -310,7 +314,12 @@ The \ssltwo protocol requires the server to send data to the client that is
 derived from the shared secret, without first verifying that the client has
 possession of the secret. When combined with the malleability of RSA, and a
 shortened five byte secret, this culminates in a Bleichenbacher oracle that
-can be used to attack TLS 1.2.
+can be used to attack TLS 1.2. The \ssltwo oracle need not be on the same
+host, or even the same protocol as the target---a mail server that supports
+\starttls can be used to attack an HTTPS server. I further discuss
+measurements for \ssltwo support among both web and non-web protocols, and
+characterize the amplified DROWN attack surface that stems from the
+cross-protocol nature of the attack.
 
 % CONCLUSION THOUGHTS
 %
