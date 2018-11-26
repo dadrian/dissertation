@@ -203,18 +203,57 @@ also used for non-export cryptography, and so is longer than the max 512-bits
 required to comply with the export regulations. To indicate an
 export-complaint connection, TLS introduced the \rsaexp{} ciphers. These
 ciphers indicate that the server must provide an additional ``export-grade''
-RSA key to be used for key exchange.
+RSA key to be used for key exchange. In 2015, Beurdouche et al.\ showed that
+many TLS implementations incorrectly accepted a server-provided \rsaexp{} key
+on non-export \rsa{} ciphers~\cite{freak-attack-2015}, leading to a downgrade
+attack against servers that support \rsaexp{}, denoted FREAK.
 
-Beurdouche et al.\ showed that many TLS implementations incorrectly accepted
-a server-provided \rsaexp{} key on non-export \rsa{}
-ciphers~\cite{freak-attack-2015}, leading to a downgrade attack against
-servers that support \rsaexp{}, denoted FREAK. We measured support for
-\rsaexp{}, and found that 36.7\% of HTTPS servers with trusted certificates
-still supports \rsaexp{} cipers and were vulnerable to FREAK. This was
+We modified the ZMap~\cite{zmap-2013} and ZGrab~\cite{zgrab-github} toolchain
+to be able to scan for HTTPS servers that support export RSA ciphers. To
+identify these servers, we implemented export RSA key exchange in ZGrab. We
+then sent a \textsf{ClientHello} containing only \rsaexp{} ciphers to
+identify servers capable of completing the handshake. At the time of
+disclosure on March 3, 2015, we found that 36.7\% of HTTPS servers with
+browser-trusted certificates supported \rsaexp{} ciphers. This was
 unexpected, since no modern web client has offered export-grade ciphers in
 its default configuration for over a decade. Prior to measuring support for
 export-grade RSA, the FREAK attack seemed far less impactful, since
 conventional wisdom was that no server supported export-grade cryptography.
+Interestingly, only 26.3\% of all (trusted and untrusted) HTTPS servers were
+vulnerable overall, meaning FREAK was more common among trusted hosts than
+untrusted hosts. FREAK saw a fast patch rate, dropping to only 6.5\% among
+trusted servers, and 11.8\% among untrusted servers on March 10, 2015, one
+week after disclosure. In May 2016, vulnerability to FREAK is only 1.68\%
+among trusted hosts.
+
+We instrumented \url{freakattack.com} with a browser-check tool that tested
+users browsers for vulnerability to FREAK. To do so, we first implemented a
+variant of the attack consist- ing of a single test server that would
+negotiate a non-export RSA cipher, but send an export RSA ServerKeyExchange
+message. We created this implementation by extending our modifications to
+ZGrab. We added Javascript to the FREAK website that attempted to connect to
+a subdomain running the test server, and logged if the connection was
+successfully created. Between March 4 and March 7, 2015, we logged 1,260,951
+test connections, of which 223,481 (17.7\%) were vulnerable to FREAK. We note
+that this population is limited to people who visited the FREAK disclosure
+website, and is therefore likely biased towards the technology and security
+community, and is not representable of all Internet users. However, these
+results did show that even though Mozilla NSS was not vulnerable to FREAK, of
+the 223,481 vulnerable clients, 15,591 (7.0\%) identified as Firefox based on
+user-agent strings. This is likely due to anti-virus or other endpoint
+security software that acts as a man-in-the-middle for all TLS traffic being
+built against a vulnerable TLS library. We experimentally confirmed with
+packet traces that enabling Avast Free Antivirus caused Firefox to become
+vulnerable to FREAK. Later work by Durumeric~et~al showed systemic
+vulnerability to patched TLS attacks among various client-side TLS
+interception products~\cite{tls-interception-2017}. This phenomenon was
+further observed when attempting to distrust certificates signed with SHA-1.
+When Firefox stopped trusted certificates signed using SHA-1 issued more
+recently than Dec 31, 2015, many users behind client-side TLS interception
+software were unable to access the Internet, as the interception software was
+issuing SHA-1 certificates locally to be able to inspect TLS
+connections~\cite{firefox-undo-sha1}.
+
 
 \subsection{Attacks on Diffie-Hellman}
 
