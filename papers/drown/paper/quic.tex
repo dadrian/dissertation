@@ -22,15 +22,11 @@ A QUIC client receives a ``server config'' message, signed by the server's publi
 %\paragraph{Unauthenticated QUIC discovery.}
 The attacker needs to present a forged QUIC config to the client in order to carry out a successful attack.  This is straightforward, since QUIC discovery may happen over non-encrypted HTTP~\cite{QUICDiscovery}.  The server does not even need to support QUIC at all: an attacker could impersonate the attacked server over an unencrypted HTTP connection and falsely indicate that the server supports QUIC\@. The next time the client connects to the server, it will attempt to connect using QUIC, allowing the attacker to present the forged ``server config'' message and execute the attack~\cite{tls-quic-pkcs-2015}.
 
-\begin{table}[t]
-  \centering
-% The resizing seems to be minimal, but necessary. This is allowed, right?
-\resizebox{\columnwidth}{!}{
-	\begin{tabular}{rrrrrrr}
+\begin{table*}[t]
+  \centering\small
+	\begin{tabularx}{\linewidth}{Xrrrrrr}
 	\toprule
-	\textbf{Pro-}   & \textbf{Attack}  & \textbf{Oracle}   & \textbf{\ssltwo} & \textbf{Offline} & \textbf{See}                     \\
-        \textbf{tocol}  & \textbf{type}    &                   & \textbf{connec-} & \textbf{work}    & \textbf{\S}                    \\
-                        &                  &                   & \textbf{tions}   &                  &                     \\
+	\textbf{Protocol}   & \textbf{Attack Type}  & \textbf{Oracle}   & \textbf{\ssltwo Connections} & \textbf{Offline Work} & \textbf{See} \S \\
 	\midrule
 	TLS             & Decrypt          & \ssltwo           &         $41,081$ & $2^{50}$      & \ref{sec:bb-performance}         \\
         TLS             & Decrypt          & Special           &          $7,264$ & $2^{51}$         & \ref{sec:special_drown_summary}  \\
@@ -39,17 +35,16 @@ The attacker needs to present a forged QUIC config to the client in order to car
 	QUIC            & MITM             & Special           &         $2^{25}$ & $2^{25}$         & \ref{sec:quic_special_drown}     \\
 	QUIC            & MITM             & Special           &         $2^{17}$ & $2^{58}$         & \ref{sec:quic_special_drown}     \\
 	\bottomrule
-	\end{tabular}
-}
-        \caption{\textbf{Summary of attacks}\,---\,%
-		``Oracle'' denotes the oracle required to mount each attack,
-		which also implies the vulnerable set of \ssltwo implementations.
-		\ssltwo denotes any \ssltwo implementation,
-		while ``Special'' denotes an OpenSSL version vulnerable to
-		special DROWN.\@
-        }
-        \label{tab:attacks_summary}
-\end{table}
+	\end{tabularx}
+	\caption{\textbf{Summary of attacks}\,---\,%
+	``Oracle'' denotes the oracle required to mount each attack,
+	which also implies the vulnerable set of \ssltwo implementations.
+	\ssltwo denotes any \ssltwo implementation,
+	while ``Special'' denotes an OpenSSL version vulnerable to
+	special DROWN.\@
+	}
+	\label{tab:attacks_summary}
+\end{table*}
 
 \subsection{QUIC signature forgery attack based on general DROWN}
 \label{sec:quic_general_drown}

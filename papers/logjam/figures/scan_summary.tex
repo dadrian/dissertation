@@ -1,7 +1,8 @@
+\begin{landscape}
 \begin{table*}[t]
 \small
 \centering
-\begin{tabular}{lrrrr}
+\begin{tabularx}{\linewidth}{lrrrr}
 \toprule
               & \multicolumn{4}{c}{\emph{Vulnerable servers, if the attacker can precompute for \ldots}} \\
 \cmidrule{2-5}
@@ -17,10 +18,11 @@ IKEv2 IPv4  & -- & 66,000 (5.8\%) & 726,000 (63.9\%) & 726,000 (63.9\%)\medskip 
 SSH   IPv4  & -- & -- & 3,600,000 (25.7\%) & 3,600,000 (25.7\%) \\
 \bottomrule
 
-\end{tabular}
+\end{tabularx}
 \caption{\textbf{Estimated impact of Diffie-Hellman attacks in early 2015}\,---\,%
 We used Internet-wide scanning to estimate the number of real-world servers for which 
 typical connections could be compromised by attackers with various levels of computational
 resources. For HTTPS, we provide figures with and without downgrade attacks on the chosen ciphersuite. All others are passive attacks.
 }
 \end{table*}
+\end{landscape}

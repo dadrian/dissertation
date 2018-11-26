@@ -1,6 +1,7 @@
+\begin{landscape}
 \begin{table*}
 \centering\small
-\begin{tabular}{rrrrrrl@{}}
+\begin{tabularx}{\linewidth}{rrrrrrl@{}}
 \toprule
   & \multicolumn{2}{c}{Sieving} & \multicolumn{2}{c}{Linear Algebra} & \multicolumn{1}{c}{Descent} \\
  \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(){6-6}
@@ -42,7 +43,7 @@
    40 & $\approx$5,000,000 & $\approx$0.8B & $\approx$1,100,000 & 30\,days
 & \scriptsize\quad Crude estimate based on formula and our experiments. \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 
 \caption{\textbf{Estimating costs for factoring and discrete log}\,---\,%
 For sieving, we give one important parameter, which is the number of bits of the
@@ -54,4 +55,5 @@ divided by 6.4 for 1024 bits, 4.8 for 768 bits, and 3.2 for 512 bits.}
 
 \label{tab:costs}
 \end{table*}
+\end{landscape}
 
