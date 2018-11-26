@@ -346,9 +346,10 @@
 }
 
 \newcommand{\TLSLibraryTable}{
+  \begin{landscape}
   \begin{table*}[t]
     \centering\small
-    \begin{tabularx}{\textwidth}{Xlllll}
+    \begin{tabularx}{\linewidth}{Xlllll}
         \toprule
         \textbf{Implementation} & \textbf{RFC 5114 Support} & \textbf{Allows Short Exponents} &
         \textbf{Reuses Exponents} & \textbf{Validates Subgroup} &  \\
@@ -382,7 +383,8 @@
     their own parameters.
     }
     \label{tab:tls-implementations}
-\end{table*}
+  \end{table*}
+  \end{landscape}
 }
 
 \newcommand{\GroupOrderFactorization}{
