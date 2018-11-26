@@ -38,7 +38,7 @@ The most computationally expensive part of our general DROWN attack is breaking 
 \label{sec:gpu_brief}
 
 We obtained our improvements through a number of optimizations.  For example, our original implementation ran into a communication bottleneck in the PCI-E bus in transmitting candidate keys from CPU to GPU, so we removed this bottleneck by generating key candidates on the GPU itself.  We optimized memory management, including storing candidate keys and the RC2 permutation table in constant memory, which is almost as fast as a register, instead of slow global memory. 
-\ifext  We optimized the cryptographic checks themselves by rewriting the RC2 implementation to use 32-bit instructions, removing unnecessary RC2 keysize checks, dropping unused ADD instructions during MD5, and manually shifting input bytes into the MD5 input registers to avoid loop branches.  We describe these optimizations in further detail in Appendix~\ref{sec:gpu}. \fi
+\ifext  We optimized the cryptographic checks themselves by rewriting the RC2 implementation to use 32-bit instructions, removing unnecessary RC2 keysize checks, dropping unused ADD instructions during MD5, and manually shifting input bytes into the MD5 input registers to avoid loop branches.  We describe these optimizations in further detail in \S\ref{sec:gpu}. \fi
 
 We experimentally evaluated our optimized implementation on a local cluster and in the cloud.
 We used it to execute a full attack of $2^{49.6}$ tested keys on each platform.
@@ -67,9 +67,8 @@ We also ran our optimized GPU code on the Amazon Elastic Compute Cloud (EC2) ser
 When we ran our experiments in January 2016, the average spot rates we paid were \$0.09/hr and \$0.83/hr respectively.  
 %The 150 \texttt{g2.2xlarge} nodes finished after 6h26m, while the \texttt{g2.8xlarge} finished after 7h41m.  $7.2\%$ of the jobs that we expected to complete failed due to overheating GPUs.  The attack was successful despite the failed jobs, so we did not rerun them.  
 Our full attack finished in under 8 hours including startup and shutdown for a cost of \$440.  
-\ifext See Appendix~\ref{sec:ec2-details} for more details. \fi
+\ifext See \S\ref{sec:ec2-details} for more details. \fi
 \fi
-
 
 \subsection{OpenSSL SSLv2 cipher suite selection bug}
 

@@ -103,7 +103,7 @@ If we choose $u \approx t$, and multiply the original message by $u \cdot t^{-1}
 This method gives a good chance of generating a new \sslconform message. 
 Let $c_0$ be an intercepted \tlsconform RSA ciphertext, and let $m_0 = c_0^d \bmod N$ be the \ifext corresponding \fi plaintext.  We select a multiplier $s = u/t \bmod N = u t^{-1} \bmod N$ where $u$ and $t$ are coprime, compute the value $c_1 = c_0 s^e \bmod N$, and query $\Oracle(c_1)$.  We will receive a response if $m_1 = m_0 \cdot u/t$ is \sslconform.  
 
-As an example, let us assume a 2048-bit RSA ciphertext with $\ell_k = 5$, and consider the fraction $u = 7, t = 8$.  The probability that $c_0 \cdot u/t$ will be \sslconform is 1/7,774, so we expect to make 7,774 oracle queries before obtaining a positive response from $\Oracle$. Appendix~\ref{sec:fraction-probability} gives more details on computing these probabilities.
+As an example, let us assume a 2048-bit RSA ciphertext with $\ell_k = 5$, and consider the fraction $u = 7, t = 8$.  The probability that $c_0 \cdot u/t$ will be \sslconform is 1/7,774, so we expect to make 7,774 oracle queries before obtaining a positive response from $\Oracle$. \S\ref{sec:fraction-probability} gives more details on computing these probabilities.
 
 \subsubsection{Shifting known plaintext bytes}
 \label{sec:rotations}
@@ -118,7 +118,7 @@ m_1 \cdot R^{-1} \bmod N = \tilde{m_1} \cdot R^{-1} + PS \bmod N.
 \]
 The value of $PS$ is unknown and consists of $\ell_m-\ell_k-3$ bytes.  This means that the known value $\tilde{m_1} \cdot R^{-1}$ shares most of its $\ell_k+3$ most significant bytes with $m_1 \cdot R^{-1}$.
 
-Furthermore, we can iterate this process by finding a new multiplier $s$ such that $m_2 = s \cdot m_1 \cdot R^{-1} \bmod N$ is also \sslconform.  A randomly chosen $s < 2^{30}$ will work with probability $2^{-25.4}$.  We can take use the bytes we have already learned about $m_1$ to efficiently compute such an $s$ with only 678 oracle queries in expectation for a 2048-bit RSA modulus.   Appendix~\ref{sec:rotation-details} gives more details.
+Furthermore, we can iterate this process by finding a new multiplier $s$ such that $m_2 = s \cdot m_1 \cdot R^{-1} \bmod N$ is also \sslconform.  A randomly chosen $s < 2^{30}$ will work with probability $2^{-25.4}$.  We can take use the bytes we have already learned about $m_1$ to efficiently compute such an $s$ with only 678 oracle queries in expectation for a 2048-bit RSA modulus.   \S\ref{sec:rotation-details} gives more details.
 
 \subsubsection{Adapted Bleichenbacher iteration}
 \label{sec:bb-iteration}
@@ -173,7 +173,7 @@ If the server does not support 40-bit export ciphers, the attack can also be mou
 \ifsubmit\relax\else
 \subsection{OpenSSL special DROWN oracle}
 
-We discovered a vulnerability present in OpenSSL versions prior to March 4, 2015 that allows a client to improperly provide cleartext key bytes for non-export ciphers.  Affected servers will substitute these bytes for bytes from the encrypted key.  This allows a client to successively learn a byte at a time of an encrypted key by brute forcing only 256 possibilities for each query. For a non-export 128-bit cipher suite such as \texttt{SSL\_RC4\_WITH\_MD5}, the attacker learns 19 bytes of the decrypted message.  We describe this vulnerability in more detail in Appendix~\ref{sec:clear-key-vuln}.  A client can then construct a Bleichenbacher oracle from this behavior by validating the \texttt{ServerVerify} message against the candidate key provided in the \texttt{clear\_key\_data}, resulting in no brute-force computation.
+We discovered a vulnerability present in OpenSSL versions prior to March 4, 2015 that allows a client to improperly provide cleartext key bytes for non-export ciphers.  Affected servers will substitute these bytes for bytes from the encrypted key.  This allows a client to successively learn a byte at a time of an encrypted key by brute forcing only 256 possibilities for each query. For a non-export 128-bit cipher suite such as \texttt{SSL\_RC4\_WITH\_MD5}, the attacker learns 19 bytes of the decrypted message.  We describe this vulnerability in more detail in \S~\ref{sec:clear-key-vuln}.  A client can then construct a Bleichenbacher oracle from this behavior by validating the \texttt{ServerVerify} message against the candidate key provided in the \texttt{clear\_key\_data}, resulting in no brute-force computation.
 \fi
 
 \subsection{TLS decryption attack}
@@ -227,7 +227,7 @@ consisting of several distinct phases:
 	$c_1 = m_1^e$, they use the shifting technique explained in
 	Section~\ref{sec:rotations} to find an integer $s_1$ such that
 	$m_2 = m_1 \cdot 2^{-40} \cdot s_1$ is also \sslconform.
-	Appendix~\ref{sec:general-rotations} contains more details on this step.
+	\S~\ref{sec:general-rotations} contains more details on this step.
 
 	\item The attacker then applies the shifting technique again to find
 	another integer $s_2$ such that $m_3 = m_2 \cdot 2^{-40} \cdot s_2$
@@ -254,7 +254,7 @@ However, the original algorithm expects $s_1$ to be of size about $2^{24}$. This
 Therefore, our approach is to find a conformant message for which we know the 5 most significant bytes; this will happen after multiple rotations and
 this message will be $m_3$.
 After finding such a message, finding $s_3$ such that $m_4 = m_3 \cdot s_3$ is also conformant becomes trivial.
-From there, we can finally apply the adapted Bleichenbacher iteration technique as described in Appendix~\ref{sec:general-bleichenbacher}.
+From there, we can finally apply the adapted Bleichenbacher iteration technique as described in \S\ref{sec:general-bleichenbacher}.
 
 \begin{table}[t]
   \centering

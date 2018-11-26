@@ -30,43 +30,33 @@
 \section{Breaking TLS with SSLv2}
 \input{\DrownPaper/attack}
 
-\subsection{Implementing general DROWN with GPUs} 
-\input{\DrownPaper/results}
-
 \section{Special DROWN}
 \input{\DrownPaper/clear}
 \input{\DrownPaper/leaky}
 \input{\DrownPaper/quic}
 
+\section{Adaptations to Bleichenbacher's attack}
+\input{\DrownPaper/adapting-bleichenbacher}
+
+\subsection{Implementing general DROWN with GPUs} 
+\input{\DrownPaper/results}
+
 \section{Measurements}
 \input{\DrownPaper/statistics}
 
-\section{Related work}
-\input{\DrownPaper/related}
-
-\section{Discussion}
-\input{\DrownPaper/discussion}
-
-%\ifblind
-%\else
-%\section*{Acknowledgements}
-%
-%The authors thank team Hashcat for making their GPUs available for the execution of the attack,
-%Ralph Holz for providing early scan data, Adam Langley for insights about QUIC, Graham Steel for insights about TLS False Start, the OpenSSL team for their help with disclosure, Ivan Ristic for comments on session resumption in a BEAST-styled attack, and Tibor Jager and Christian Mainka for further helpful comments. %The authors also would like to thank Sarah Madden for DROWN logo and web site design and Christian Dresen for additional website development.
-%We thank the exceptional sysadmins at the University of Michigan for their help
-%and support throughout this project, including Chris Brenner, Kevin Cheek,
-%Laura Fink, Dan Maletta, Jeff Richardson, Donald Welch, Don Winsor, and others
-%from ITS, CAEN, and DCO.
-%
-%This material is based upon work supported by the U.S. National Science Foundation under Grants No.\@ CNS-1345254, CNS-1408734, CNS-1409505, CNS-1505799, CNS-1513671, and CNS-1518888, an AWS Research Education grant, a scholarship from the Israeli Ministry of Science, Technology and Space, a grant from the Blavatnik Interdisciplinary Cyber Research Center (ICRC) at Tel Aviv University, a gift from Cisco, and an Alfred P. Sloan Foundation research fellowship.
-%%Any opinions, findings, and conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the U.S. National Science Foundation. % Removed, since not required after peer review
-%\fi
-
-\section{Public key reuse}
+\subsection{Public key reuse}
 \label{sec:pub_key_reuse}
 
-Reuse of RSA keys among different services was identified as a huge amplification to the number of services vulnerable to DROWN\@. Table~\ref{amount_shared_keys} describes the number of reused RSA keys among different protocols. The two clusters 110-143 and 993-995 stick out as they share the majority of public keys. This is expected, as most of these ports are served by the same IMAP/POP3 daemon. 
-The rest of the ports also share a substantial fraction of public keys, usually between 21\% and 87\%. The numbers for HTTPS (port 443) differ as there are four times as many public keys in HTTPS as in the second largest protocol.
+Reuse of RSA keys among different services was identified as a huge
+amplification to the number of services vulnerable to DROWN\@.
+Table~\ref{amount_shared_keys} describes the number of reused RSA keys among
+different protocols. The two clusters 110-143 and 993-995 stick out as they
+share the majority of public keys. This is expected, as most of these ports
+are served by the same IMAP/POP3 daemon. The rest of the ports also share a
+substantial fraction of public keys, usually between 21\% and 87\%. The
+numbers for HTTPS (port 443) differ as there are four times as many public
+keys in HTTPS as in the second largest protocol.
+
 \begin{table*}[th]
 \centering\footnotesize
  \begin{tabular}{rrrrrrrrr} 
@@ -90,6 +80,28 @@ The rest of the ports also share a substantial fraction of public keys, usually 
  \label{amount_shared_keys}
 \end{table*}
 
+\section{Related work}
+\input{\DrownPaper/related}
+
+\section{Discussion}
+\input{\DrownPaper/discussion}
+
+%\ifblind
+%\else
+%\section*{Acknowledgements}
+%
+%The authors thank team Hashcat for making their GPUs available for the execution of the attack,
+%Ralph Holz for providing early scan data, Adam Langley for insights about QUIC, Graham Steel for insights about TLS False Start, the OpenSSL team for their help with disclosure, Ivan Ristic for comments on session resumption in a BEAST-styled attack, and Tibor Jager and Christian Mainka for further helpful comments. %The authors also would like to thank Sarah Madden for DROWN logo and web site design and Christian Dresen for additional website development.
+%We thank the exceptional sysadmins at the University of Michigan for their help
+%and support throughout this project, including Chris Brenner, Kevin Cheek,
+%Laura Fink, Dan Maletta, Jeff Richardson, Donald Welch, Don Winsor, and others
+%from ITS, CAEN, and DCO.
+%
+%This material is based upon work supported by the U.S. National Science Foundation under Grants No.\@ CNS-1345254, CNS-1408734, CNS-1409505, CNS-1505799, CNS-1513671, and CNS-1518888, an AWS Research Education grant, a scholarship from the Israeli Ministry of Science, Technology and Space, a grant from the Blavatnik Interdisciplinary Cyber Research Center (ICRC) at Tel Aviv University, a gift from Cisco, and an Alfred P. Sloan Foundation research fellowship.
+%%Any opinions, findings, and conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the U.S. National Science Foundation. % Removed, since not required after peer review
+%\fi
+
+
 % \begin{figure*}[th]
 % \small
 %  \begin{tabular}{r|rr|rr} 
@@ -111,9 +123,6 @@ The rest of the ports also share a substantial fraction of public keys, usually 
 %  \label{amount_cve_2015_3197}
 %  \caption{\textbf{Hosts vulnerable to OpenSSL's cipher suite selection bug (CVE 2015-3197)}}
 % \end{figure*}
-
-\section{Adaptations to Bleichenbacher's attack}
-\input{\DrownPaper/adapting-bleichenbacher}
 
 %\balance
 
