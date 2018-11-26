@@ -191,7 +191,9 @@ where the protocol was capable of negotiating the use of short
 Following further litigation in \textit{Bernstein v. United States}, the key
 length limitations from the export regulations were removed in 1999, and
 future versions of TLS deprecated the process for using ``export-grade''
-cryptography.
+cryptography. In \S\ref{chapter:logjam} and \S\ref{chapter:drown}, I discuss
+how measuring support for obsolete cryptography that was designed to comply
+with these export regulations lead to vulnerabilites in modern web browsers.
 
 \subsection{Attacks on RSA}
 
@@ -311,9 +313,9 @@ shortened five byte secret, this culminates in a Bleichenbacher oracle that
 can be used to attack TLS 1.2.
 
 % CONCLUSION THOUGHTS
-% 
+%
 % ENGINERING?
-% 
+%
 % Applying empirical measurement techniques accurately requires careful
 % application of the scientific method and experiment design. However, the field
 % of Internet-measurement has strong engineering underpinnings which are often
