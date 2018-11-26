@@ -3,9 +3,10 @@
 \newlength{\nswidth}\newcommand{\ns}[1][1]{\settowidth{\nswidth}{0}\hspace{#1\nswidth}}
 
 \newcommand{\tabDrownAll}{
+  \begin{landscape}
   \begin{table*}[t]
   \centering\small
-  \begin{tabularx}{\textwidth}{Xrrrrrrr} 
+  \begin{tabularx}{\linewidth}{Xrrrrrrr} 
   \toprule
   & & \multicolumn{3}{c}{\it Any certificate} & \multicolumn{3}{c}{\it Trusted certificates} \\
   \cmidrule(lr){3-5} \cmidrule(lr){6-8}
@@ -35,12 +36,14 @@
    }
    \label{table:general}
   \end{table*}
+  \end{landscape}
 }
 
 \newcommand{\tabSpecialAll}{
+\begin{landscape}
 \begin{table*}[t]
   \centering\small
-  \begin{tabularx}{\textwidth}{Xrrrrrrr}
+  \begin{tabularx}{\linewidth}{Xrrrrrrr}
     \toprule
     & & \multicolumn{3}{c}{\it Any certificate} & \multicolumn{3}{c}{\it Trusted certificates} \\
     \cmidrule(lr){3-5} \cmidrule(lr){6-8}
@@ -62,5 +65,6 @@
    A server is vulnerable to special DROWN if its key is exposed by a host with the CVE-2016-0703 bug. Since the attack is fast enough to enable man-in-the-middle attacks, a server is also vulnerable (to impersonation) if any name in its certificate is found in any trusted certificate with an exposed key.}
    \label{table:special}
 \end{table*}
+\end{landscape}
 }
 

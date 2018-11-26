@@ -258,10 +258,9 @@ From there, we can finally apply the adapted Bleichenbacher iteration technique 
 
 \begin{table}[t]
   \centering
-	\begin{tabular}{rrrrrr}
+	\begin{tabularx}{\linewidth}{Xrrrrr}
 	\toprule
-	\textbf{Optimizing} & \textbf{Cipher-} & \textbf{$|F|$}     & \textbf{\ssltwo}  & \textbf{Offline} \\
-        \textbf{for}        & \textbf{texts}   &           & \textbf{connections} & \textbf{work} \\
+	\textbf{Optimizing For} & \textbf{Ciphertexts} & \textbf{$|F|$}     & \textbf{\ssltwo Connections}  & \textbf{Offline Work} \\
 	\midrule
 	offline work        &           12,743 &          1 &            50,421  & $2^{49.64}$ \\
         offline work        &            1,055 &         10 &              46,042  & $2^{50.63}$ \\
@@ -270,7 +269,7 @@ From there, we can finally apply the adapted Bleichenbacher iteration technique 
 	online work         &            2,321 &          3 &              38,866  & $2^{51.99}$ \\
 	online work         &              906 &          8 &              39,437  & $2^{52.25}$ \\
 	\bottomrule
-	\end{tabular}
+	\end{tabularx}
 		\caption{\textbf{2048-bit Bleichenbacher attack complexity}\,---\,%
 		The cost to decrypt one ciphertext can be adjusted by choosing the set of
         fractions $F$ the attacker applies to each of the passively collected
@@ -283,10 +282,9 @@ From there, we can finally apply the adapted Bleichenbacher iteration technique 
 \end{table}
 
 \begin{table}[t]
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}\hskip\tabcolsep}rrrrr}
+\begin{tabularx}{\linewidth}{Xrrrr}
 \toprule
-\textbf{Key size}    & \textbf{Phase 1} & \textbf{Phases 2--5} & \textbf{Total}   & \textbf{Offline} \\
-                     &                 &                 & \textbf{queries} & \textbf{work}    \\
+\textbf{Key size}    & \textbf{Phase 1} & \textbf{Phases 2--5} & \textbf{Total Queries}   & \textbf{Offline Work} \\
 \midrule
 % This is all when using 4/5, which has a maximal "native probability" of 0.1.
 % Offline work is always step1 * 2**38
@@ -299,8 +297,8 @@ From there, we can finally apply the adapted Bleichenbacher iteration technique 
 %              4096 & (0.1 * 0.14 * 1/256)**(-1)   & + 2**8 / 0.14 * 2 + 2/0.14 + 4096 * 2 / 0.14
                4096 &  18,286  &  62,185 & 80,471 & $2^{52.16}$ \\
 \bottomrule
-\end{tabular*}
-	\caption{\textbf{Oracle queries required by our attack}\,---\,%
+\end{tabularx}
+	\caption{\textbf{Required oracle queries}\,---\,%
 	In Phase 1, the attacker queries the oracle until an \ssltwo conformant
 	ciphertext is found. In Phases 2--5, the attacker decrypts this ciphertext
 	using leaked plaintext. These numbers minimize total queries. In our attack,

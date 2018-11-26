@@ -57,9 +57,10 @@ substantial fraction of public keys, usually between 21\% and 87\%. The
 numbers for HTTPS (port 443) differ as there are four times as many public
 keys in HTTPS as in the second largest protocol.
 
-\begin{table*}[th]
+\begin{landscape}
+\begin{table*}[t]
 \centering\footnotesize
- \begin{tabular}{rrrrrrrrr} 
+\begin{tabularx}{\linewidth}{Xrrrrrrrr} 
 \toprule
 
 \textbf{Port} & \textbf{25 (SMTP)} & \textbf{110 (POP3)} & \textbf{143 (IMAP)} & \textbf{443 (HTTPS)} & \textbf{465 (SMTPS)} & \textbf{587 (SMTP)} & \textbf{993 (IMAPS)} & \textbf{995 (POP3S)}\smallskip\\
@@ -73,16 +74,17 @@ keys in HTTPS as in the second largest protocol.
 \textbf{995} &    321 (29\%) &           877 (84\%) &       755 (75\%) &       151 (3\%) &        364 (42\%) &       229 (36\%) &       859 (76\%) &     1,010 (100\%) \\
 
 \bottomrule
- \end{tabular}
- \caption{\textbf{Impact of key reuse across ports}\,---\,%
-    Number of shared public keys among two ports, in thousands. Each column
-    states what number and percentage of keys from the port in the header row
-    are used on other ports. For example, 18\% of keys used on port 25 are
-    also used on port 443, but only 4\% of keys used on port 443 are also
-    used on port 25.
- }
- \label{amount_shared_keys}
+\end{tabularx}
+\caption{\textbf{Impact of key reuse across ports}\,---\,%
+   Number of shared public keys among two ports, in thousands. Each column
+   states what number and percentage of keys from the port in the header row
+   are used on other ports. For example, 18\% of keys used on port 25 are
+   also used on port 443, but only 4\% of keys used on port 443 are also
+   used on port 25.
+}
+\label{amount_shared_keys}
 \end{table*}
+\end{landscape}
 
 \section{Related work}
 \input{\DrownPaper/related}
