@@ -32,8 +32,9 @@ exchange in SSH~\cite{rfc4253}, the \textsf{CertificateVerify} contains a
 signature over the protocol transcript from the long-term private key of the
 remote peer extracted from the X.509 certificate for that peer. This
 explicitly binds the state of the connection to key. Had a similar mechanism
-been present in TLS 1.2 and earlier, the FREAK and Logjam attacks would not
-have been possible.
+been present in TLS 1.2 and earlier, attacks such as FREAK and Logjam, where
+the attacker breaks the session secret without compromising the long-term
+secret, would not be possible.
 
 \paragraph{New Dangers.}
 DROWN oracles were only possible in \ssltwo because, unlike TLS, the server
@@ -47,8 +48,9 @@ application data before receiving the \textsf{ClientFinished} message. As
 noted in the RFC, this is not forward secret and provides no anti-replay
 guarantees~\cite{rfc8446}. While this clearly has application layer concerns,
 if an application is vulnerable to replay attacks, it is also one of several
-necessary conditions for DROWN. This will likely be a source of vulnerability
-in the future, however the extent of the vulnerability remains to be seen.
+necessary conditions for DROWN-like attacks. This will likely be a source of
+vulnerability in the future, however the extent of the vulnerability remains
+to be seen.
 
 \if0
 Recommendations from earlier sections:
@@ -188,31 +190,31 @@ fundamentally cross-protocol attack surface. X.509 certificates are not bound
 to any particular protocol or port. A key compromised on a single protocol
 can be utilized to attack other protocols. The compromise need not be due to
 a TLS protocol vulnerability, and could simply be due to a remote code
-execution exploit. 
+execution exploit.
 
 Beyond key compromise, specific vulnerabilities in the TLS protocol and older
 implementations can be utilized in a cross-protocol context to attack users
 of a web service without explicitly compromising the private key. This is
 best shown by the DROWN vulnerability, in which the mere existence of an
 \ssltwo host that shared a key with a TLS host enabled decryption of
-otherwise secure TLS connections using modern cryptography.
+otherwise secure TLS connections using modern cryptography. Even if distinct
+services, such as mail and web servers, use different keys, so long as they
+share any name on the certificate, the transport-layer security against
+active attackers for all connections to that name are limited to the weakest
+TLS implementation or configuration for that name. Wildcard certificates
+slightly complicate this process; an exploitable wildcard certificate could
+be used to attack multiple names.
 
-Even if distinct services, such as mail and web servers, use
-different keys, so long as they share any name on the certificate, the
-transport-layer security of all connections to that name are limited to the
-security of the weakest TLS implementation or configuration. Even traditionally
-web-based padding oracle attacks, such as POODLE, or the AES-NI padding-oracle
-in OpenSSL, non-web servers can be exploited by active attackers targeting web
-users. The attacker can rewrite the TCP connection to an alternative port, and
-fill-in any pre-handshake protocol dialogue (e.g. by sending an EHLO or
-STARTTLS command in SMTP).
-
-Examing vulnerabilites in a cross-protocol context increases attack surface.
-Using Internet-wide scanning to measure the prevalence of key and name reuse
-between HTTPS and non-web TLS protocols on different ports would allow us to
-empircally bound this risk. Wildcard certificates slightly complicate this
-process; an exploitable wildcard certificate could be used to attack multiple
-names.
+Traditionally web-based padding oracle attacks, such as
+POODLE~\cite{poodle-2014}, or the AES-NI padding-oracle in
+OpenSSL~\cite{cve-2016-2107}, non-web servers can be further exploited by
+active attackers targeting web users. The attacker can rewrite the TCP
+connection to an alternative port, and fill-in any pre-handshake protocol
+dialogue (e.g. by sending an EHLO or STARTTLS command in SMTP). Future work
+can use Internet-wide scanning to determine the prevalence of key and name
+reuse between HTTPS and non-web TLS protocols. This would be an empirical
+upper bound for the increase in attack surface from considering TLS exploits
+in a cross-protocol context.
 
 \section{Applicability of Empirical Methods}
 
@@ -226,14 +228,14 @@ security~\cite{google-email-transparency-report,mail-2015,rfc8461}, and
 studying browser HTTPS errors led to increased proportions of successful
 connections~\cite{wild-warnings-2017}.
 
-However, empirical cryptography, and more broadly, empirical security, is
-often out of reach of non-researchers. Security analysts and system
+Unfortunately, empirical cryptography, and more broadly, empirical security,
+is often out of reach of non-researchers. Security analysts and system
 administrators can leverage Internet-wide scanning data and certificate
 transparency logs (the same data used for empirical cryptography) to identify
-their own assets, track bad actors, and monitor for phishing sites. However,
-collecting this data is often out of reach, due to the quantity and velocity
-of the data. Access to a full Internet-wide perspective if often limited to
-large organizations with large security teams.
+their own assets, track bad actors, and monitor for phishing sites, but
+collecting this data is often out of reach, due to the quantity, velocity,
+and cost of collecting the data. Access to a full Internet-wide perspective
+if often limited to large organizations with large security teams.
 
 As empirical techniques such as Internet-wide scanning and passive network
 monitoring improve, can we extend measurement from aggregations and
@@ -258,10 +260,18 @@ know is in use. You cannot defend what you do not know you own.
 
 Empirical techniques inform defenders about the existence and scale of
 problems, but they are no substitute for preventing problems before they
-happen in the first place. Leveraging secure development practices,
-secure-by-default APIs, and systems with isolation as first-class concepts 
-will push the envelope towards more secure systems, and we should work towards
-improving security in all ways, not just in ways we know how to measure.
+happen in the first place. Any cryptographic parameter that can be measured
+in a handshake is a parameter that could be wrong and a source of
+vulnerability. Protocols such as Wireguard~\cite{wireguard-2017} have no
+cryptographic configuration beyond the key in use. If a peer presents the
+wrong key, the connection will fail to open. Beyond key generation, there is
+no way to misconfigure the cryptographic security of a Wireguard host. This
+suggests that cryptography that is easily examined via Internet-wide scanning
+may be some of the most \textit{fragile} cryptography.
+Ultimately, leveraging secure development practices and building
+security-by-default into more systems will push the envelope towards a more
+secure Internet. We should work towards improving security on all fronts, not
+just in ways we know how to measure.
 
 % Some word of warning about how measurement doesn't solve all our problems,
 % and how measuring the wrong things makes things worse, \eg Robert McNamera's
