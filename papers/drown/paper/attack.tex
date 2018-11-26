@@ -149,7 +149,6 @@ For a 2048-bit modulus, the total expected number of queries when using this tec
 In this section, we describe how to use any correct \ssltwo implementation accepting export-grade cipher suites as a padding oracle.  We then show how to adapt the techniques described in Section~\ref{sec:adapted-bb-compact} to decrypt TLS RSA ciphertexts.
 
 \subsection{The SSLv2 export padding oracle} 
-\label{vulnerability}
 \ssltwo is vulnerable to a direct message side channel vulnerability exposing a Bleichenbacher oracle to the attacker.
 The vulnerability follows from three properties of \ssltwo.  First, the server immediately responds with a \texttt{ServerVerify} message after receiving the \texttt{ClientMasterKey} message, which includes the RSA ciphertext, without waiting for the \texttt{ClientFinished} message that proves the client knows the RSA plaintext.  Second, when choosing 40-bit export RC2 or RC4 as the symmetric cipher, only 5 bytes of the \texttt{master\_key} ($mk_{secret}$) are sent encrypted using RSA, and the remaining 11 bytes are sent in cleartext.  Third, a server
 implementation that correctly implements the anti-Bleichenbacher countermeasure 
