@@ -12,9 +12,9 @@
 %          \startappendices was modified to work
 %          with the New Font Selection Scheme.
 %          Further (similar) changes may be needed for other macros.
-% Modified Sep. 2008 by Jason Gilbert: Obsolete code removed or updated to 
-%          better conform to LaTeX2e, list of abbreviations added, 
-%          made copyright page cleaner, fixed Appendices, Bibliography, 
+% Modified Sep. 2008 by Jason Gilbert: Obsolete code removed or updated to
+%          better conform to LaTeX2e, list of abbreviations added,
+%          made copyright page cleaner, fixed Appendices, Bibliography,
 %          margins, title page, frontispiece, bottom-center page numbers,
 %          two-side printing, added in-dissertation abstract and abstract
 %          that prints separately at the end.
@@ -158,10 +158,10 @@
     \@author\\
     #2\\
     ORCID iD: #3%
-    \IfStrEq{#1}{copyright}{
-      \\[\baselineskip] \copyright\ \@author\ \number\year
+    \IfStrEq{#1}{}{
+      % Do nothing if omitted
     }{
-      \IfStrEq{#1}{}{}{\ClassError{rackham-thesis}{Identifier page must have optional "copyright" or nothing, got "#1"}{}}
+      \\[\baselineskip] \copyright\ \@author\ #1
     }
   \end{center}
   \vfill
@@ -236,7 +236,7 @@
   \vspace{0.7in}
   \begin{singlespace}
     \@starttoc{toc}\if@restonecol\twocolumn\fi
-  \end{singlespace} 
+  \end{singlespace}
 }
 
 % Various lists
@@ -274,7 +274,7 @@
     \begin{acronym}
       \input{abbr}
     \end{acronym}
-  \end{singlespace} 
+  \end{singlespace}
 }
 
 %-- Start chapters --
@@ -387,7 +387,7 @@
   \def\thefigure{{\rm \theappendix}.\@arabic\c@figure}
   \def\thetable{{\rm \theappendix}.\@arabic\c@table}
   \def\themap{{\rm \theappendix}.\@arabic\c@map}
- 
+
   \setcounter{chapter}{0}
   \setcounter{section}{0}
   \def\@chapapp{APPENDIX}
