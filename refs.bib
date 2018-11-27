@@ -866,37 +866,42 @@
 
 @Misc{openswan,
   title = {{Openswan}},
+  key = {zzz openswan},
   note = {\url{https://www.openswan.org/}},
   year = 2016
 }
 
 @Misc{strongswan,
   title = {{strongSwan}},
+  key = {zzz strongswan},
   note = {\url{https://www.strongswan.org/}},
   year = 2016
 }
 
 @Misc{freeswan,
   title = {{FreeS/WAN}},
+  key = {zzz freeswam},
   note = {\url{http://www.freeswan.org/}},
   year = 2016
 }
 
 @Misc{libreswan,
   title = {{Libreswan}},
+  key = {zzz libreswan},
   note = {\url{https://libreswan.org/}},
   year = 2016
 }
 
-@misc{ssleay,
-    title={{SSLeay}},
-    author={Eric, Young},
-    year=1995,
-    note={\url{ftp://ftp.pl.vim.org/vol/rzm1/replay.old/libraries/SSL.eay/SSLeay-0.5.1a.tar.gz}}
+@Misc{ssleay,
+  title={{SSLeay}},
+  author={Eric, Young},
+  year=1995,
+  note={\url{ftp://ftp.pl.vim.org/vol/rzm1/replay.old/libraries/SSL.eay/SSLeay-0.5.1a.tar.gz}}
 }
 
 @Misc{amazon-elb,
   title = {{Amazon Elastic Load Balancer}},
+  author = {Amazon},
   note = {\url{https://aws.amazon.com/elasticloadbalancing/}},
   year = 2016
 }
@@ -910,39 +915,42 @@
 
 @Misc{botan-double,
   title = {Botan},
+  key = {zzz botan},
   note = {\url{https://github.com/randombit/botan}},
   year = 2016
 }
 
 @misc{openssl-changelog-102,
   title = {{OpenSSL} Changes},
+  key = {zzz openssl changes},
   note={\url{https://www.openssl.org/news/cl102.txt}},
-  month = jan,
   year = 2015,
 }
 
 @misc{openssl-secadv-subgroup,
   title = {{OpenSSL} Security Advisory {[28th Jan 2016]}},
-  month = jan,
+  key = {zzz openssl security advisory 28 jan 2016},
   note = {\url{https://www.openssl.org/news/secadv/20160128.txt}},
   year = 2016
 }
 
 @Misc{openssl-test-code,
   title = {{OpenSSL} ssltest.c},
+  author = {{OpenSSSL Team}},
   note = {\url{https://github.com/openssl/openssl/blob/master/test/ssltest.c}},
   year = 2016
 }
 
 @Misc{nss-overview,
   title = {Overview of {NSS}},
-  month = sep,
+  key = {zzz overview nss},
   note = {\url{https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/Overview}},
   year = 2015
 }
 
 @Misc{nss-code-secret-not-one,
   title = {{Mozilla} bug tracker},
+  key = {zzz mozilla bug tracker},
   note = {\url{https://bugzilla.mozilla.org/show_bug.cgi?id=1160139}},
   month = nov,
   year = 2015
@@ -950,6 +958,8 @@
 
 @Misc{nss-line-of-code,
   title = {{NSS dh.c}},
+  author = {{NSS Team}},
+  year = 2016,
   note = {\url{https://hg.mozilla.org/projects/nss/file/tip/lib/freebl/dh.c}}
 }
 
@@ -962,6 +972,7 @@
 
 @misc{nistffcsamples,
   title = {Finite Field Cryptography based Samples},
+  author = {{NIST}},
   note = {\url{http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/KS_FFC_All.pdf}}
 }
 
@@ -986,12 +997,6 @@
   year = 2015,
   howpublished = {OpenSSL patch},
   note={\url{https://github.com/openssl/openssl/commit/86f8fb0e344d62454f8daf3e15236b2b59210756}}
-}
-
-@Misc{CVE-2015-0293,
-  title={{CVE-2015-0293}},
-  key={cve-2015-0293},
-  note={\url{https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-0293}}
 }
 
 @misc{quic-langley-2014,
@@ -1053,6 +1058,7 @@
 
 @Misc{amazon-10g,
     title = {Amazon {EC2} {I}nstance {T}ypes},
+    author = {Amazon},
     note = {\url{http://aws.amazon.com/ec2/instance-types/}}
 }
 
@@ -1140,7 +1146,7 @@
 }
 
 @Misc{nsa-suiteb,
-  author = {National Cryptographic Solutions Management Office},
+  author = {{National Cryptographic Solutions Management Office}},
   title = {Cryptography Today},
   note = {\url{https://web.archive.org/web/20150905185709/https://www.nsa.gov/ia/programs/suiteb_cryptography/}},
   month = aug,
@@ -1202,7 +1208,16 @@
   note={\url{https://bugs.exim.org/show_bug.cgi?id=1837}}
 }
 
+@Misc{CVE-2015-0293,
+  key = {cve 2015 0293},
+  title={{CVE}-2015-0293},
+  howpublished={MITRE {CVE-ID} {CVE}-2015-0293.},
+  year = 2015,
+  note = {\url{https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-0293}}
+}
+
 @Misc{cve-2015-3240,
+  key = {cve 2015 3240},
   title={{CVE}-2015-3240},
   howpublished={MITRE {CVE-ID} {CVE}-2015-3240.},
   year=2015,
@@ -1210,6 +1225,7 @@
 }
 
 @Misc{cve-2016-0701,
+  key = {cve 2016 0701},
   title={{CVE}-2016-0701},
   howpublished={MITRE {CVE-ID} {CVE}-2016-0701.},
   year=2016,
@@ -1217,7 +1233,7 @@
 }
 
 @Misc{cve-2016-0703,
-  title={{CVE}-2016-0703},
+  key = {cve 2016 0703},
   howpublished={MITRE {CVE-ID} {CVE}-2016-0703.},
   month=jan,
   year=2016,
@@ -1225,6 +1241,7 @@
 }
 
 @Misc{cve-2016-2107,
+  key = {cve 2016 2107},
   title={{CVE}-2016-2107},
   howpublished={MITRE {CVE-ID} {CVE}-2016-2107.},
   year=2016,
@@ -1259,6 +1276,7 @@
 @Misc{ear-2001-cat-5,
   title = {Category 5 - {T}elecommunications and {``Information Security
   ''}},
+  key = {zzz ear},
   note = {\url{https://cr.yp.to/export/ear2001/ccl5-pt2.pdf}}
 }
 
@@ -1489,11 +1507,9 @@
 }
 
 @Misc{ietf-quic-transport-15,
-  note = {\url{https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-15}},
   title = {{QUIC: A UDP-Based Multiplexed and Secure Transport}},
   author = {Jana Iyengar and Martin Thomson},
   howpublished = {{IETF Internet Draft}},
-  number = 15,
   year = 2018
 }
 
