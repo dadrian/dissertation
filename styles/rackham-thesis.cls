@@ -68,6 +68,9 @@
 \newcommand\committee[1]{\renewcommand\@committee{#1}}
 \newcommand\@committee{\@latex@error{No \noexpand\committee given}\@ehc}
 
+\newcommand\dissertationyear[1]{\renewcommand\@dissertationyear{#1}}
+\newcommand\@dissertationyear{\@latex@error{No \noexpand\dissertationyear given}\@ehc}
+
 \renewcommand\maketitle{
   \cleardoublepage
   \setcounter{page}{1}
@@ -83,7 +86,7 @@
       \end{onehalfspacing}
       \vfill
       \@titlecommand \\
-      \the\year \\
+      \@dissertationyear \\
     \end{center}
     \vfill
     Doctoral Committee: \\[2ex]
