@@ -1,3 +1,4 @@
+% !TEX root = ../../../proposal.tex
 \subsection{The OpenSSL ``extra clear'' oracle}
 
 %\subsubsection{A key recovery attack on SSLv2 handshakes}
@@ -10,30 +11,25 @@ the server substitutes them for bytes from the
 encrypted key. For example, consider the case that the client chooses a 128-bit cipher and sends a 16-byte
 encrypted key $k\pos{1}, k\pos{2}, \ldots, k\pos{16}$ but, contrary to the protocol specification, includes 4
 null bytes of \texttt{clear\_key\_data}. Vulnerable OpenSSL versions will
-construct the following \texttt{master\_key}:\smallskip
+construct the following \texttt{master\_key}:
 
-\small\noindent\quad\quad $[00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}\ k\pos{3}\ k\pos{4}\ \dots\ k\pos{9}\ k\pos{10}\ k\pos{11}\ k\pos{12}]$\normalsize\vspace{-12pt}
-\smallskip
+\small $[00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}\ k\pos{3}\ k\pos{4}\ \dots\ k\pos{9}\ k\pos{10}\ k\pos{11}\ k\pos{12}]$\normalsize
 
 This enables a straightforward key recovery attack against such versions.
 An attacker that has intercepted an \ssltwo connection takes the RSA
 ciphertext of the encrypted key and replays it in non-export handshakes to
 the server with varying lengths of \texttt{clear\_key\_data}. For a 16-byte
 encrypted key, the attacker starts with 15 bytes of clear key, causing the server to use the \texttt{master\_key}:
-\smallskip
 
-\small\noindent\quad\quad $[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}]$\normalsize
-\smallskip
+\small$[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}]$\normalsize
 
 The attacker can brute force the first byte of the encrypted key by
 finding the matching \texttt{ServerVerify} message among 256
 possibilities. Knowing $k\pos{1}$, the attacker makes another
 connection with the same RSA ciphertext but 14 bytes of clear key,
 resulting in the \texttt{master\_key}:
-\smallskip
 
-\small\noindent\quad\quad $[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}]$\normalsize
-\smallskip
+\small $[00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ 00\ k\pos{1}\ k\pos{2}]$\normalsize
 
 % Note: The number below is 15, since you the original intercepted connection
 % servers as the case with 0 bytes of clear_key_data.
