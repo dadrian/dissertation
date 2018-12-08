@@ -10,6 +10,9 @@
 @String{imc = {ACM Internet Measurement Conference (IMC)}}
 @String{woot = {{USENIX} Workshop on Offensive Technologies ({WOOT})}},
 
+@String{fips = {{F}ederal {I}nformation {P}rocessing {S}tandards Publications ({FIPS PUBS})}}
+@String{nist_org = {{National Institute of Standards and Technology ({NIST}}}}
+
 @Article{lll,
 	title = {Factoring polynomials with rational coefficients},
 	author = {Lenstra, A. K. and Lenstra, H. W. and Lov{\'a}sz, L.},
@@ -899,7 +902,7 @@
 
 @Misc{amazon-elb,
   title = {{Amazon Elastic Load Balancer}},
-  author = {Amazon},
+  key = {zzz amazon},
   note = {\url{https://aws.amazon.com/elasticloadbalancing/}},
   year = 2016
 }
@@ -934,7 +937,7 @@
 
 @Misc{openssl-test-code,
   title = {{OpenSSL} ssltest.c},
-  author = {{OpenSSSL Team}},
+  key = {zzz openssl team},
   note = {\url{https://github.com/openssl/openssl/blob/master/test/ssltest.c}},
   year = 2016
 }
@@ -970,7 +973,8 @@
 
 @misc{nistffcsamples,
   title = {Finite Field Cryptography based Samples},
-  author = {{NIST}},
+  key = {zzz nist finite field cryptography based samples},
+  howpublished = {{NIST} Cryptographic Standards and Guidelines},
   note = {\url{http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/KS_FFC_All.pdf}}
 }
 
@@ -1005,14 +1009,14 @@
 }
 
 @Misc{openssl-changelog,
-  key = {zzz openssl},
+  key = {zzz openssl change log},
   title = {{OpenSSL} Change log},
   note = {\url{https://www.openssl.org/news/changelog.html#x0}}
 }
 
 @Misc{hashcat,
   title = {Hashcat},
-  key = {hashcat},
+  key = {zzz hashcat},
   note = {\url{http://hashcat.net}}
 }
 
@@ -1039,30 +1043,28 @@
 @Misc{masscan-10g,
   title = {Masscan: {T}he entire {I}nternet in 3 minutes},
   author={Robert Graham},
-  year=2013,
-  month=sep,
-  howpublished={Errata Security blog},
+  year = 2013,
   note = {\url{http://blog.erratasec.com/2013/09/masscan-entire-internet-in-3-minutes.html}}
 }
 
 @Misc{masscan-rng,
   title = {Masscan: {D}esigning my own crypto},
   author = {Robert Graham},
-  year=2013,
-  month=dec,
-  howpublished={Errata Security blog},
+  year = 2013,
   note = {\url{http://blog.erratasec.com/2013/12/masscan-designing-my-own-crypto.html}}
 }
 
 @Misc{amazon-10g,
     title = {Amazon {EC2} {I}nstance {T}ypes},
-    author = {Amazon},
+    key = {zzz amazon ec2 instance types},
+    year = 2016,
     note = {\url{http://aws.amazon.com/ec2/instance-types/}}
 }
 
 @Misc{iana,
     author={IANA},
     title={{IPv4} Address Space Registry},
+    year = 2014,
     note={\url{http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml}}
 }
 
@@ -1077,13 +1079,13 @@
     title={Paketto Simplified {(1.0)}},
     author = {Kaminsky, Dan},
     year=2002,
-    month=nov,
     note = {\url{http://dankaminsky.com/2002/11/18/77/}}
 }
 
 @Misc{unicornscan,
     title={Unicornscan},
     author={Lee, Robert E.},
+    year = 2014,
     note = {\url{http://unicornscan.org}}
 }
 
@@ -1103,14 +1105,16 @@
 
 @Misc{fips186,
   title = {{FIPS PUB 186-4}: Digital Signature Standard},
-  author= {{NIST}},
-  year = 2013
+  author= nist_org,
+  year = 2013,
+  howpublished = fips
 }
 
 @Misc{fips180,
   title = {{FIPS PUB 180-4}: Secure Hash Standard ({SHS})},
-  author = {{National Institute of Standards and Technology}},
-  year = 2012
+  author = nist_org,
+  year = 2012,
+  howpublished = fips
 }
 
 @Misc{dlp180,
@@ -1120,18 +1124,17 @@
   year = 2014
 }
 
-@Misc{crime-attack,
+@InProceedings{crime-attack,
   title = {The {CRIME} attack},
   author = {Rizzo, Juliano and Duong, Thai},
-  howpublished = {{EKOparty} Security Conference},
+  booktitle = {{EKOparty} Security Conference},
   year = 2012
 }
 
 @Misc{cado-nfs-2.3,
     author= {The {CADO-NFS} Development Team},
-    title={{CADO-NFS}, An Implementation of the Number Field Sieve Algorithm},
-    note = {Release 2.3.0},
-    howpublished = {\url{http://cado-nfs.gforge.inria.fr/}},
+    title={{CADO-NFS}, An Implementation of the Number Field Sieve Algorithm ({Release 2.3.0})},
+    note = {\url{http://cado-nfs.gforge.inria.fr/}},
     year = 2017
 }
 
@@ -1147,7 +1150,6 @@
   author = {{National Cryptographic Solutions Management Office}},
   title = {Cryptography Today},
   note = {\url{https://web.archive.org/web/20150905185709/https://www.nsa.gov/ia/programs/suiteb_cryptography/}},
-  month = aug,
   year = 2015
 }
 
@@ -1235,7 +1237,6 @@
 @Misc{cve-2016-0703,
   key = {cve 2016 0703},
   howpublished={MITRE {CVE-ID} {CVE}-2016-0703.},
-  month=jan,
   year=2016,
   note={\url{http://cve.mitre.org/cgi-bin/cvename.cgi?name=2016-0703}}
 }
@@ -1258,24 +1259,28 @@
 @Misc{zgrab-github,
   key = {zzz zgrab},
   title = {{ZGrab}},
+  year = 2014,
   note = {\url{https://github.com/zmap/zgrab}}
 }
 
 @Misc{djb-regulation-summary,
  author = {Daniel J. Bernstein},
  title = {Summary of the Regulations},
+ year = 2016,
  note = {\url{https://cr.yp.to/export/regs.html}}
 }
 
 @Misc{djb-case-status,
   author = {Daniel J. Bernstein},
   title = {Summary of the case status},
+  year = 2016,
   note = {\url{https://cr.yp.to/export/status.html}}
 }
 
 @Misc{ear-2001-cat-5,
   title = {Category 5 - {T}elecommunications and {``Information Security
   ''}},
+  year = 2001,
   key = {zzz ear},
   note = {\url{https://cr.yp.to/export/ear2001/ccl5-pt2.pdf}}
 }
