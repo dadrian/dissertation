@@ -2,6 +2,14 @@
 
 @Preamble {"All URLs avialable in the Wayback Machine on December 5, 2018 or earlier"}
 
+@String{ndss = {{N}etwork and {D}istributed {S}ystem {S}ecurity Symposium ({NDSS})}}
+@String{usenix = {{USENIX} Security Symposium}}
+@String{oakland = {{IEEE} Symposium on Security and Privacy ({O}akland)}}
+@String{ccs = {ACM Conference on Computer and Communications Security ({CCS})}}
+@String{crypto = {International Cryptology Conference ({CRYPTO})}}
+@String{imc = {ACM Internet Measurement Conference (IMC)}}
+@String{woot = {{USENIX} Workshop on Offensive Technologies ({WOOT})}},
+
 @Article{lll,
 	title = {Factoring polynomials with rational coefficients},
 	author = {Lenstra, A. K. and Lenstra, H. W. and Lov{\'a}sz, L.},
@@ -195,14 +203,14 @@
 @InProceedings{bleichenbacher-1998,
   title = {Chosen ciphertext attacks against protocols based on the {RSA} encryption standard {PKCS} \#1},
   author = {Bleichenbacher, Daniel},
-  booktitle = {International Cryptology Conference ({CRYPTO})},
+  booktitle = crypto,
   year = 1998
 }
 
 @InProceedings{censys,
   author = {Zakir Durumeric and David Adrian and Ariana Mirian and Michael Bailey and J. Alex Halderman},
   title = {A Search Engine Backed by {I}nternet-Wide Scanning},
-  booktitle = {ACM Conference on Computer and Communications Security ({CCS})},
+  booktitle = ccs,
   year = 2015
 }
 
@@ -224,13 +232,13 @@
   title={{DROWN}: Breaking {TLS} with {SSLv2}},
   author={Nimrod Aviram and Sebastian Schinzel and Juraj Somorovsky and Nadia Heninger and Maik Dankel and Jens Steube and Luke Valenta and David Adrian and J. Alex Halderman and Viktor Dukhovni and Emilia K{\"a}sper and Shaanan Cohney and Susanne Engels and Christof Paar and Yuval Shavitt},
   year=2016,
-  booktitle={{USENIX} Security Symposium}
+  booktitle = usenix,
 }
 
 @InProceedings{efficient-padding-oracle-2012,
   title = {Efficient padding oracle attacks on cryptographic hardware},
   author = {Bardou, Romain and Focardi, Riccardo and Kawamoto, Yusuke and Simionato, Lorenzo and Steel, Graham and Tsay, Joe-Kai},
-  booktitle = {International Cryptology Conference ({CRYPTO})},
+  booktitle = crypto,
   year = 2012,
 }
 
@@ -251,7 +259,7 @@
 @InProceedings{gutmann-2002,
   title = {Lessons Learned in Implementing and Deploying Crypto Software},
   author = {Peter Gutmann},
-  booktitle={{USENIX} Security Symposium},
+  booktitle = usenix,
   year = 2002
 }
 
@@ -273,7 +281,7 @@
 @InProceedings{heartbleed-2014,
   author = {Zakir Durumeric and Frank Li and James Kasten and Johanna Amann and Jethro Beekman and Mathias Payer and Nicolas Weaver and David Adrian and Vern Paxson and Michael Bailey and J. Alex Halderman},
   title = {The {M}atter of {H}eartbleed},
-  booktitle = {ACM Internet Measurement Conference (IMC)},
+  booktitle = imc,
   year = 2014
 }
 
@@ -293,7 +301,7 @@
 
 @InProceedings{ike-nrl-1999,
   author = {Meadows, C.},
-  booktitle = {{IEEE} Symposium on Security and Privacy ({O}akland)},
+  booktitle = oakland,
   title = {Analysis of the {I}nternet Key Exchange protocol using the {NRL} Protocol Analyzer},
   year = 1999
 }
@@ -301,7 +309,7 @@
 @InProceedings{ike-security-2002,
   author = {Ran Canetti and Hugo Krawczyk},
   title = {Security Analysis of {IKE}'s Signature-based Key-Exchange Protocol},
-  booktitle = {International Cryptology Conference ({CRYPTO})},
+  booktitle = crypto,
   year = {2002}
 }
 
@@ -315,7 +323,7 @@
 @inproceedings{kci-tls-2015,
   title = {Prying open {P}andora's box: {KCI} attacks against {TLS}},
   author = {Hlauschek, Clemens and Gruber, Markus and Fankhauser, Florian and Schanes, Christian},
-  booktitle = {{USENIX} Workshop on Offensive Technologies ({WOOT})},
+  booktitle = woot,
   year = 2015
 }
 
@@ -329,14 +337,14 @@
 @InProceedings{lim-1997,
     author={Lim, Chae Hoon and Lee, Pil Joong},
     title={A key recovery attack on discrete log-based schemes using a prime order subgroup},
-    booktitle = {International Cryptology Conference ({CRYPTO})},
+    booktitle = crypto,
     year=1997,
 }
 
 @InProceedings{logjam-2015,
   title = {Imperfect Forward Secrecy: {H}ow {D}iffie-{H}ellman Fails in Practice},
   author = {David Adrian and Karthikeyan Bhargavan and Zakir Durumeric and Pierrick Gaudry and Matthew Green and J. Alex  Halderman and Nadia Heninger and Drew Springall and Emmanuel Thom\'e and Luke Valenta and Benjamin VanderSloot and Eric Wustrow and Santiago Zanella-B\'eguelin and Paul Zimmermann},
-  booktitle = {ACM Conference on Computer and Communications Security ({CCS})},
+  booktitle = ccs,
   month = oct,
   year = 2015
 }
@@ -344,14 +352,14 @@
 @InProceedings{mail-2015,
   author = {Zakir Durumeric and David Adrian and Ariana Mirian and James Kasten and Kurt Thomas and Vijay Eranti and Nicholas Lidzborski and Elie Bursztein and Michael Bailey and J. Alex Halderman},
   title = {Neither Snow Nor Rain Nor {MITM}; {A}n Empirical Analysis of Email Delivery Security},
-  booktitle = {ACM Internet Measurement Conference (IMC)},
+  booktitle = imc,
   year = 2015
 }
 
 @InProceedings{most-dangerous-code-2012,
   title = {The Most Dangerous Code in the World: Validating {SSL} Certificates in Non-browser Software},
   author = {Georgiev, Martin and Iyengar, Subodh and Jana, Suman and Anubhai, Rishita and Boneh, Dan and Shmatikov, Vitaly},
-  booktitle = {ACM Conference on Computer and Communications Security ({CCS})},
+  booktitle = ccs,
   year = 2012
 }
 
@@ -365,7 +373,7 @@
 @InProceedings{jager-2013,
   title = {One Bad Apple: Backwards Compatibility Attacks on State-of-the-Art Cryptography},
   author = {Jager, Tibor and Paterson, Kenneth G and Somorovsky, Juraj},
-  booktitle = {{N}etwork and {D}istributed {S}ystem {S}ecurity Symposium ({NDSS})},
+  booktitle = ndss,
   year = 2013
 }
 
@@ -379,7 +387,7 @@
 @InProceedings{multi-core-network-2010,
   title = {High speed network traffic analysis with commodity multi-core systems},
   author = {Fusco, Francesco and Deri, Luca},
-  booktitle = {ACM Internet Measurement Conference (IMC)},
+  booktitle = imc,
   year = 2010,
   month = nov
 }
@@ -387,7 +395,7 @@
 @InProceedings{meyer-2014,
   title = {Revisiting {SSL/TLS} Implementations: New {B}leichenbacher Side Channels and Attacks},
   author = {Christopher Meyer and Juraj Somorovsky and Eugen Weiss and J{\"o}rg Schwenk and Sebastian Schinzel and Erik Tews},
-  booktitle = {{USENIX} Security Symposium},
+  booktitle = usenix,
   year = 2014,
 }
 
@@ -401,14 +409,14 @@
 @InProceedings{factor-rsa-768,
   title = {Factorization of a 768-bit {RSA} modulus},
   author = {Kleinjung, Thorsten and Aoki, Kazumaro and Franke, Jens and Lenstra, Arjen K and Thom{\'e}, Emmanuel and Bos, Joppe W and Gaudry, Pierrick and Kruppa, Alexander and Montgomery, Peter L and Osvik, Dag Arne and Herman te Riele and Andrey Timofeev and Paul Zimmermann},
-  booktitle = {International Cryptology Conference ({CRYPTO})},
+  booktitle = crypto,
   year = 2010,
 }
 
 @InProceedings{sloth-2016,
 	author = {Karthikeyan Bhargavan and Ga{\"e}tan Leurent},
 	title = {Transcript Collision Attacks: Breaking Authentication in {TLS}, {IKE}, and {SSH}},
-  booktitle = {{N}etwork and {D}istributed {S}ystem {S}ecurity Symposium ({NDSS})},
+  booktitle = ndss,
 	month = feb,
 	year = 2016
 }
@@ -437,7 +445,7 @@
 @InProceedings{state-of-scanning-2014,
     author = {Zakir Durumeric and Michael Bailey and J. Alex Halderman},
     title = {An {I}nternet-wide View of {I}nternet-wide Scanning},
-    booktitle = {{USENIX} Security Symposium},
+    booktitle = usenix,
     month = aug,
     year = 2014
 }
@@ -446,7 +454,7 @@
   title = {Measuring small subgroup attacks against {D}iffie-{H}ellman},
   author = {Luke Valenta and David Adrian and Antonio Sanso and Shaanan Cohney and Joshua Fried and Marcella Hastings and J. Alex Halderman and Nadia Heninger},
   year = 2017,
-  booktitle = {{N}etwork and {D}istributed {S}ystem {S}ecurity Symposium ({NDSS})}
+  booktitle = ndss,
 }
 
 @InProceedings{faas-2016,
@@ -466,70 +474,70 @@
             Pironti, Alfredo and
             Strub, Pierre-Yves and
             Zinzindohoue, Jean Karim},
-	booktitle = {{IEEE} Symposium on Security and Privacy ({O}akland)},
+	booktitle = oakland,
   year = 2015
 }
 
 @InProceedings{lucky-13-2013,
   title = {Lucky {T}hirteen: Breaking the {TLS} and {DTLS} record protocols},
   author = {Al Fardan, Nadhem J and Paterson, Kenneth G},
-  booktitle = {{IEEE} Symposium on Security and Privacy ({O}akland)},
+  booktitle = oakland,
   year = 2013,
 }
 
 @InProceedings{mail-tls-holz-2016,
   author = {Ralph Holz and Johanna Amann and Olivier Mehani and Matthias Wachs and Mohamed Ali K{\^{a}}afar},
   title = {{TLS} in the wild: an {I}nternet-wide analysis of {TLS}-based protocols for electronic communication},
-  booktitle = {{N}etwork and {D}istributed {S}ystem {S}ecurity Symposium ({NDSS})},
+  booktitle = ndss,
   year = 2016,
 }
 
 @InProceedings{mvvp-2012,
   author = {Mavrogiannopoulos, Nikos and Vercauteren, Frederik and Velichkov, Vesselin and Preneel, Bart},
   title = {A cross-protocol attack on the {TLS} protocol},
-  booktitle = {ACM Conference on Computer and Communications Security ({CCS})},
+  booktitle = ccs,
   year = 2012,
 }
 
 @InProceedings{protocol-state-fuzzing-2015,
   author = {Joeri de Ruiter and Erik Poll},
   title = {Protocol State Fuzzing of {TLS} Implementations},
-  booktitle = {{USENIX} Security Symposium},
+  booktitle = usenix,
   year = 2015,
 }
 
 @InProceedings{rc4-biases-2013,
   title = {On the Security of {RC4} in {TLS}},
   author = {AlFardan, Nadhem J and Bernstein, Daniel J and Paterson, Kenneth G and Poettering, Bertram and Schuldt, Jacob CN},
-  booktitle = {{USENIX} Security Symposium},
+  booktitle = usenix,
   year = 2013
 }
 
 @InProceedings{tls-interception-2017,
   title = {The security impact of {HTTPS} interception},
   author = {Durumeric, Zakir and Ma, Zane and Springall, Drew and Barnes, Richard and Sullivan, Nick and Bursztein, Elie and Bailey, Michael and Halderman, J. Alex and Paxson, Vern},
-  booktitle = {Network and Distributed System Security Symposium ({NDSS})},
+  booktitle = ndss,
   year = 2017
 }
 
 @InProceedings{tls-quic-pkcs-2015,
   author = {Jager, Tibor and Schwenk, J\"{o}rg and Somorovsky, Juraj},
   title = {On the Security of {TLS} 1.3 and {QUIC} Against Weaknesses in {PKCS}\#1 v1.5 Encryption},
-  booktitle = {ACM Conference on Computer and Communications Security ({CCS})},
+  booktitle = ccs,
   year = 2015,
 }
 
 @InProceedings{trapdoors-discrete-log-1992,
   title = {Designing and detecting trapdoors for discrete log cryptosystems},
   author = {Gordon, Daniel M},
-  booktitle = {International Cryptology Conference ({CRYPTO})},
+  booktitle = crypto,
   year = 1992,
 }
 
 @InProceedings{triple-handshake-2014,
   title = {Triple handshakes and cookie cutters: Breaking and fixing authentication over {TLS}},
   author = {Bhargavan, Karthikeyan and Lavaud, Antoine Delignat and Fournet, C{\'e}dric and Pironti, Alfredo and Strub, Pierre Yves},
-  booktitle = {{IEEE} Symposium on Security and Privacy ({O}akland)},
+  booktitle = oakland,
   year = 2014
 }
 
@@ -543,7 +551,7 @@
 @InProceedings{weak-keys-2012,
   author = {Nadia Heninger and Zakir Durumeric and Eric Wustrow and J. Alex Halderman},
   title = {Mining Your {P}s and {Q}s: {D}etection of Widespread Weak Keys in Network Devices},
-  booktitle = {{USENIX} Security Symposium},
+  booktitle = usenix,
   month = aug,
   year = 2012
 }
@@ -551,7 +559,7 @@
 @InProceedings{zmap-2013,
     author = {Zakir Durumeric and Eric Wustrow and J. Alex Halderman},
     title = {{ZMap}: {F}ast {I}nternet-Wide Scanning and its Security Applications},
-    booktitle = {{USENIX} Security Symposium},
+    booktitle = usenix,
     month = aug,
     year = 2013
 }
@@ -559,28 +567,28 @@
 @InProceedings{zhang-2014,
   title = {Cross-Tenant Side-Channel Attacks in {PaaS} Clouds},
   author = {Zhang, Yinqian and Juels, Ari and Reiter, Michael K. and Ristenpart, Thomas},
-  booktitle = {ACM Conference on Computer and Communications Security ({CCS})},
+  booktitle = ccs,
   year = 2014
 }
 
 @InProceedings{zippier-zmap-2014,
   author = {David Adrian and Zakir Durumeric and Gulshan Singh and J. Alex Halderman},
   title = {{Z}ippier {ZMap}: {I}nternet-Wide Scanning at {10Gbps}},
-  booktitle = {{USENIX} Workshop on Offensive Technologies ({WOOT})},
+  booktitle = woot,
   year = 2014
 }
 
 @InProceedings{wild-warnings-2017,
   author = {Acer, Mustafa Emre and Stark, Emily and Felt, Adrienne Porter and Fahl, Sascha and Bhargava, Radhika and Dev, Bhanu and Braithwaite, Matt and Sleevi, Ryan and Tabriz, Parisa},
   title = {Where the Wild Warnings Are: Root Causes of Chrome HTTPS Certificate Errors},
-  booktitle = {ACM Conference on Computer and Communications Security ({CCS})},
+  booktitle = ccs,
   year = 2017
 }
 
 @InProceedings{wireguard-2017,
   author = {Jason A. Donenfeld},
   title = {{WireGuard}: Next Generation Kernel Network Tunnel},
-  booktitle = {Network and Distributed System Security Symposium ({NDSS})},
+  booktitle = ndss,
   year = 2017
 }
 
