@@ -1,7 +1,6 @@
 % !TEX root = ../../../proposal.tex
-\ApplicationsTable
 
-\section{TLS}\label{sec:tls}
+\section{TLS}\label{sec:subgroup_tls}
 
 TLS (Transport Layer Security) is a transport layer protocol designed to provide confidentiality,
 integrity and (most commonly) one-side authentication for application sessions. 
@@ -103,8 +102,6 @@ Chinese remainder theorem to combine them modulo the product of the primes
 $q_i$.  The attacker can also use the Pollard lambda algorithm to reconstruct
 any remaining bits of the exponent~\cite{lim-1997}.
 
-
-
 We note that the TLS False Start extension allows the
 server to send application data before receiving the client's authentication~\cite{rfc7918}.
 The specification only allows this behavior for abbreviated handshakes, which
@@ -149,6 +146,8 @@ specified in a set of Diffie-Hellman parameters and setting
 Prior to this patch, any code using OpenSSL for DSA-style Diffie-Hellman
 parameters was vulnerable to small subgroup attacks by default.
 
+\ApplicationsTable
+
 Exim~\cite{exim}, a popular mail server that uses OpenSSL, provides a clear
 example of the fragile situation created by this update. By default, Exim uses
 the RFC~5114 Group 23 parameters with OpenSSL, does not set an exponent length,
@@ -167,7 +166,6 @@ $q$ as the small subgroup orders $q_i$ are all relatively prime to $q$.
 
 We looked at several other applications as well, but did not find them to be
 vulnerable to key recovery attacks (Table~\ref{tab:common-applications}).
-
 
 
 % comprising 53.62\% of all such servers~\cite{esoft2016}.
@@ -191,10 +189,6 @@ vulnerable to key recovery attacks (Table~\ref{tab:common-applications}).
 % In comparison Postfix an MX  utilized for 32.80\% of mail servers~\cite{esoft2016}
 % suggests generating a group at install time but neglects to set the single use OpenSSL option
 % and includes two hardcoded groups by default.
-
-
-
-\ScanTable
 
 \subsection{Other Implementations} \label{subsec:nss}
 
@@ -241,6 +235,8 @@ determine which primes servers were using, we sent a \texttt{ClientHello}
 message containing only ephemeral Diffie-Hellman cipher suites.  We combined
 this data with scans from Censys~\cite{censys} to determine the overall
 population.  The results are summarized in Table~\ref{tab:scandata}. 
+
+\ScanTable
 
 \TLSHostValidationTable
 
