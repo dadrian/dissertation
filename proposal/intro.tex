@@ -49,7 +49,7 @@ assumptions about the current cryptographic behavior of devices on the
 Internet, so that we can identify which probems need to be solved, and
 prioritize their solutions. Large-scale empirical methods allow us to observe
 fragility in how cryptography is being used on the Internet, identify new
-vulnerabilites, and better secure the Internet in the future.
+vulnerabilities, and better secure the Internet in the future.
 
 In this dissertation, I show how empirical measurements collected using
 Internet-wide scanning provides insight into how cryptography is used to
@@ -197,7 +197,8 @@ length limitations from the export regulations were removed in 1999, and
 future versions of TLS deprecated the process for using ``export-grade''
 cryptography. In \S\ref{chapter:logjam} and \S\ref{chapter:drown}, I discuss
 how measuring support for obsolete cryptography that was designed to comply
-with these export regulations lead to vulnerabilites in modern web browsers.
+with these export regulations led to the discovery of vulnerabilities in
+modern web browsers.
 
 \subsection{Attacks on RSA}
 
@@ -306,7 +307,7 @@ protocol reduces the key length used for the symmetric encryption.
 \ssltwo contains support for export symmetric ciphers, which are seeded via
 only five bytes of key material encrypted using RSA \PKCS. In
 \S\ref{chapter:drown}, I introduce the DROWN attack, which exploits protocol
-vulnerabilites in \ssltwo surrounding export-grade cryptography to attack
+vulnerabilities in \ssltwo surrounding export-grade cryptography to attack
 TLS~\cite{drown-2016}. To be vulnerable to DROWN, a TLS server must share a
 key with an SSLv2 server, or share a name with an SSLv2 server that has not
 patched the ``extra-clear'' vulnerablity~\cite{drown-2016,cve-2016-0701}.
