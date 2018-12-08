@@ -9,6 +9,34 @@
 
 \include{includes/thesis-headers}
 
+\renewcommand{\bibname}{\vspace{-.13in}\centerline{\large\bf BIBLIOGRAPHY}}
+
+\makeatletter
+\long\def\bibNote#1{\gdef\@bibNote{\item[]{\normalsize#1}}}
+\renewenvironment{thebibliography}[1]{%
+  \@xp\chapter\@xp*\@xp{\bibname}%
+  \normalfont\normalsize\labelsep .5em\relax
+  \renewcommand\theenumiv{\arabic{enumiv}}\let\p@enumiv\@empty
+  \list{\@biblabel{\theenumiv}}{\@bibNote\settowidth\labelwidth{\@biblabel{#1}}%
+    \leftmargin\labelwidth \advance\leftmargin\labelsep
+    \usecounter{enumiv}}%
+  \sloppy \clubpenalty\@M \widowpenalty\clubpenalty
+  \sfcode`\.=\@m
+}{%
+  \def\@noitemerr{\@latex@warning{Empty `thebibliography' environment}}%
+  \endlist
+}
+\makeatother
+
+\let\OLDthebibliography\thebibliography
+\renewcommand\thebibliography[1]{
+  \OLDthebibliography{#1}
+  \setlength{\parskip}{0pt}
+  \setlength{\itemsep}{0pt plus 0.3ex}
+}
+
+\bibNote{All URLs available on The Wayback Machine at December 5, 2018 or earlier.}
+
 \begin{document}
 
 \title{Using Large-Scale Empirical Methods to Understand Fragile Cryptographic Ecosystems}
