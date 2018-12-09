@@ -1,16 +1,15 @@
 % !TEX root = ../../../proposal.tex
 We present DROWN, a novel cross-protocol attack on TLS that uses a server
-supporting SSLv2 as an oracle to decrypt modern TLS connections.
-
-We introduce two versions of the attack. The more general form exploits
-multiple unnoticed protocol flaws in SSLv2 to develop a new and stronger
-variant of the Bleichenbacher RSA padding-oracle attack. To decrypt a
-2048-bit RSA TLS ciphertext, an attacker must observe 1,000 TLS handshakes,
-initiate 40,000 \ssltwo connections, and perform $2^{50}$ offline work. The
-victim client never initiates \ssltwo connections. We implemented the attack
-and can decrypt a TLS 1.2 handshake using 2048-bit RSA in under 8 hours, at a
-cost of \$440 on Amazon EC2\@. Using Internet-wide scans, we find that 33\%
-of all HTTPS servers and 22\% of those with browser-trusted certificates are
+supporting SSLv2 as an oracle to decrypt modern TLS connections. We introduce
+two versions of the attack. The more general form exploits multiple unnoticed
+protocol flaws in SSLv2 to develop a new and stronger variant of the
+Bleichenbacher RSA padding-oracle attack. To decrypt a 2048-bit RSA TLS
+ciphertext, an attacker must observe 1,000 TLS handshakes, initiate 40,000
+\ssltwo connections, and perform $2^{50}$ offline work. The victim client
+never initiates \ssltwo connections. We implemented the attack and can
+decrypt a TLS 1.2 handshake using 2048-bit RSA in under 8 hours, at a cost of
+\$440 on Amazon EC2\@. Using Internet-wide scans, we find that 33\% of all
+HTTPS servers and 22\% of those with browser-trusted certificates are
 vulnerable to this protocol-level attack due to widespread key and
 certificate reuse.
 

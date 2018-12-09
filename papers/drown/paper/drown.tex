@@ -22,7 +22,25 @@
 
 This chapter is adapted from a joint publication with Aviram et al.\ that
 originally appeared in the proceedings of the 25th Usenix Security Symposium
-(SEC '16)~\cite{drown-2016}.
+(SEC '16)~\cite{drown-2016}. FREAK~\cite{freak-attack-2015} and
+Logjam~\cite{logjam-2015} showed that the mere \textit{existence} of obsolete
+cryptography can harm the security of modern cryptographic clients.
+Conventional wisdom was that the server should support as much cryptography
+as possible for maximum backwards compatibility, while modern clients could
+slowly trim out obsolete and insecure algorithms. This advice appears to have
+been actively harmful.
+
+While the export-grade cryptography in TLS was limited to key exchange,
+symmetric cryptography was also limited to 40-bits of security under
+EAR~\cite{ear-2001-cat-5}. This type of export-grade symmetric cryptography
+is present in \ssltwo. However, since \ssltwo has an improperly authenticated
+handshake, it was designed, deployed, and deprecated inside of one year.
+Despite its short life, in this chapter we investigate support for \ssltwo to
+see if it is truly dead. We go on to investigate if the export-grade
+cryptography from this legacy protocol is a harmless vestige, or if it is
+actively dangerous to modern clients. We find that \ssltwo can be used to
+attack modern TLS, and we empirically show the danger of this attack.
+
 \input{\DrownPaper/abstract}
 
 \section{Introduction}
