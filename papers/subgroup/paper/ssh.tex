@@ -11,6 +11,8 @@ should use safe primes. Despite this, RFC~5114 notes that group exchange method
 allows for its DSA groups in SSH, and advocates for their immediate
 inclusion~\cite{rfc5114}.
 
+\SSHHostValidationTable
+
 In all Diffie-Hellman key agreement methods, after negotiating cipher selection and group parameters, 
 the SSH client generates a public
 key exchange value $y_c = g^{x_c} \bmod p$ and sends it to the server. The
@@ -61,11 +63,6 @@ Diffie-Hellman shared secret, an implementation using static exponents and non-s
 vulnerable to a small subgroup confinement attack would also be vulnerable to a
 mostly offline key recovery attack, as a malicious client would only need to
 send a single key exchange message per subgroup.
-
-
-\SSHHostValidationTable
-
-\ECMDistributionTable
 
 \subsection{Implementations}
 
