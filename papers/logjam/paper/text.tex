@@ -2,12 +2,19 @@
 
 This chapter is adapted from a joint publication that originally appeared in
 the proceedings of the 22nd ACM Conference on Computer and Communications
-Security (CCS~'15)~\cite{logjam-2015}.
-%\begin{abstract}
-We investigate the security of Diffie-Hellman key exchange as used in popular
-Internet protocols and find it to be less secure than widely believed. First,
-we present Logjam, a novel flaw in TLS that lets a man-in-the-middle
-downgrade connections to ``export-grade'' Diffie-Hellman. To carry out this
+Security (CCS~'15)~\cite{logjam-2015}. After the discovery of the FREAK
+attack by Beurdouche et al.~\cite{freak-attack-2015}, there were many
+questions raised about the security of other export cryptography in TLS, and
+if other types of weakened cryptography were similarly opening up modern
+clients to vulnerability. In addition to ``export-grade'' RSA, the TLS
+protocol contained export Diffie-Hellman (\dheexp{}) ciphers through version
+1.0~\cite{rfc2246}. In this chapter, we investigate the security of
+export-grade Diffie-Hellman in TLS, and measure its prevalence on the
+Internet, in order to determine if decades-old weakened cryptography remains
+relevant to the security of the Internet today.
+
+First, we present Logjam, a novel flaw in TLS that lets a man-in-the-middle
+downgrade connections to export-grade Diffie-Hellman. To carry out this
 attack, we implement the number field sieve discrete log algorithm. After a
 week-long precomputation\footnote{\small Except where otherwise noted, the
 experimental data and network measurements for this chapter were obtained in
@@ -18,16 +25,18 @@ Alexa Top Million HTTPS sites. In response, major browsers have changed to
 reject short groups.
 %\looseness=-1
 
-We go on to consider Diffie-Hellman with 768- and 1024-bit groups. We
-estimate that even in the 1024-bit case, the computations are plausible given
-nation-state resources. A small number of fixed or standardized groups are
-used by millions of servers; performing precomputation for a single 1024-bit
-group would allow passive eavesdropping on 18\% of popular HTTPS sites, and a
-second group would allow decryption of traffic to 66\% of IPsec VPNs and 26\%
-of SSH servers. A close reading of published NSA leaks shows that the
-agency's attacks on VPNs are consistent with having achieved such a break. We
-conclude that moving to stronger key exchange methods should be a priority
-for the Internet community.
+We further investigate the security of Diffie-Hellman key exchange as used in
+popular Internet protocols and find it to be less secure than widely
+believed. We go on to consider Diffie-Hellman with 768- and 1024-bit groups.
+We estimate that even in the 1024-bit case, the computations are plausible
+given nation-state resources. A small number of fixed or standardized groups
+are used by millions of servers; performing precomputation for a single
+1024-bit group would allow passive eavesdropping on 18\% of popular HTTPS
+sites, and a second group would allow decryption of traffic to 66\% of IPsec
+VPNs and 26\% of SSH servers. A close reading of published NSA leaks shows
+that the agency's attacks on VPNs are consistent with having achieved such a
+break. We conclude that moving to stronger key exchange methods should be a
+priority for the Internet community.
 %\looseness=-1
 %\end{abstract}
 
