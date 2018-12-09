@@ -7,6 +7,7 @@
 @String{crypto = {International Cryptology Conference ({CRYPTO})}}
 @String{imc = {ACM Internet Measurement Conference (IMC)}}
 @String{woot = {{USENIX} Workshop on Offensive Technologies ({WOOT})}},
+@String{fc = {Financial Cryptography and Data Security ({FC})}}
 
 @String{fips = {{F}ederal {I}nformation {P}rocessing {S}tandards Publications ({FIPS PUBS})}}
 @String{nist_org = {{National Institute of Standards and Technology ({NIST}}}}
@@ -200,6 +201,20 @@
   booktitle = {Network and Distributed System Security Symposium},
   title = {Verified Contributive Channel Bindings for Compound Authentication},
   year = 2015
+}
+
+@InProceedings{bitcoin-deanon-2014-koshy,
+  title = {An analysis of anonymity in {B}itcoin using {P2P} network traffic},
+  author = {Koshy, Philip and Koshy, Diana and McDaniel, Patrick},
+  booktitle = fc,
+  year = 2014
+}
+
+@InProceedings{bitcoin-deanon-2014-biryukov,
+  title = {Deanonymisation of clients in {B}itcoin {P2P} network},
+  author = {Biryukov, Alex and Khovratovich, Dmitry and Pustogarov, Ivan},
+  booktitle = ccs,
+  year = 2014
 }
 
 @InProceedings{bleichenbacher-1998,
@@ -462,7 +477,7 @@
 @InProceedings{faas-2016,
     title = {Factoring as a Service},
     author = {Luke Valenta and Shaanan Cohney and Alex Liao and Joshua Fried and Satya Bodduluri and Nadia Heninger},
-    booktitle = {Financial Cryptography and Data Security ({FC})},
+    booktitle = fc,
     year = 2016
 }
 
@@ -492,6 +507,20 @@
   title = {{TLS} in the wild: an {I}nternet-wide analysis of {TLS}-based protocols for electronic communication},
   booktitle = ndss,
   year = 2016,
+}
+
+@InProceedings{zlint-2018,
+  title = {Tracking Certificate Misissuance in the Wild},
+  author = {Deepak Kumar and Zhengping Wang and Matthew Hyder and Joseph Dickinson and Gabrielle Beck and David Adrian and Joshua Mason and Zakir Durumeric and J. Alex Halderman and Michael Bailey},
+  booktitle = oakland,
+  year = 2018
+}
+
+@InProceedings{new-hope-2016,
+  title = {Post-quantum Key Exchange: {A} {N}ew {H}ope},
+  author = {Alkim, Erdem and Ducas, L{\'e}o and P{\"o}ppelmann, Thomas and Schwabe, Peter},
+  booktitle = usenix,
+  year = 2016
 }
 
 @InProceedings{mvvp-2012,
@@ -565,6 +594,20 @@
   year = 2012
 }
 
+@InProceedings{zcash-2014,
+  title = {{Z}erocash: Decentralized anonymous payments from {B}itcoin},
+  author = {Sasson, Eli Ben and Chiesa, Alessandro and Garman, Christina and Green, Matthew and Miers, Ian and Tromer, Eran and Virza, Madars},
+  booktitle = oakland,
+  year = 2014
+}
+
+@InProceedings{zcash-deanon-2018,
+  title = {An Empirical Analysis of Anonymity in {Zcash}},
+  author = {Kappos, George and Yousaf, Haaroon and Maller, Mary and Meiklejohn, Sarah},
+  booktitle = usenix,
+  year = 2018
+}
+
 @InProceedings{zmap-2013,
     author = {Zakir Durumeric and Eric Wustrow and J. Alex Halderman},
     title = {{ZMap}: {F}ast {I}nternet-Wide Scanning and its Security Applications},
@@ -616,6 +659,13 @@
   author = {Ferguson, Niels and Schneier, Bruce},
   institution = {Counterpane Internet Security},
   year = 2000
+}
+
+@TechReport{frodo-kem-2017,
+  title = {{FrodoKEM}: Learning With Errors Key Encapsulation},
+  author = {Erdem Alkim and Joppe W. Bos and L\'eo Ducas and Patrick Longa and Ilya Mironov and Michael Naehrig and Valeria Nikolaenko and Chris Peikert and Ananth Raghunathan and Douglas Stebila and Karen Easterbrook and Brian LaMacchia},
+  institution = nist_org,
+  year = 2017
 }
 
 @TechReport{jefferies-report-2012,
@@ -831,6 +881,13 @@
   title = {{QUIC} Discovery},
   author = {Ryan Hamilton},
   note = {\url{https://docs.google.com/document/d/1i4m7DbrWGgXafHxwl8SwIusY2ELUe8WX258xt2LFxPM/edit#}},
+  year = 2016
+}
+
+@Misc{chrome-pqc-2016,
+  title = {Experimenting with Post-Quantum Cryptography},
+  author = {Matt Braithwaite},
+  note = {\url{https://security.googleblog.com/2016/07/experimenting-with-post-quantum.html}},
   year = 2016
 }
 

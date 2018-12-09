@@ -219,21 +219,46 @@ active attackers targeting web users. The attacker can rewrite the TCP
 connection to an alternative port, and fill-in any pre-handshake protocol
 dialogue (e.g. by sending an EHLO or STARTTLS command in SMTP). Future work
 can use Internet-wide scanning to determine the prevalence of key and name
-reuse between HTTPS and non-web TLS protocols. This would be an empirical
-upper bound for the increase in attack surface from considering TLS exploits
-in a cross-protocol context.
+reuse between HTTPS and non-web TLS protocols, and characterize
+cross-protocol vulnerability to known padding oracle attacks. This would be
+an empirical upper bound for the increase in attack surface from considering
+TLS exploits in a cross-protocol context.
 
 \section{Applicability of Empirical Methods}
 
 Empirical methods provide a way to answer questions and work towards
 solutions of problems that were previously left unsolvable under the guise of
-``backwards compatability''. Beyond this disseration, measurements from
-Chrome influenced the design of version negotiation for TLS
-1.3~\cite{why-tls-13-browsers-cloudflare}, measurements of \starttls support
-lead to new techniques for mail transport
+``backwards compatability''. Measurements from Chrome influenced the design
+of version negotiation for TLS 1.3~\cite{why-tls-13-browsers-cloudflare},
+measurements of \starttls support lead to new techniques for mail transport
 security~\cite{google-email-transparency-report,mail-2015,rfc8461}, and
 studying browser HTTPS errors led to increased proportions of successful
 connections~\cite{wild-warnings-2017}.
+
+Empirical methods can be used in cryptographic research beyond measuring the
+cryptography used for secure channels. Empirical methods allow us to
+understand if the cryptography in use is as strong as the theory says it
+should be. Monitoring of cryptocurrency networks has been to shown to be a
+reliable method for deanonymizing
+users~\cite{bitcoin-deanon-2014-koshy,bitcoin-deanon-2014-biryukov},
+including networks in which the transactions are not simply pseudonymous, but
+utilize zero-knowledge proofs for strong
+anonymity~\cite{zcash-2014,zcash-deanon-2018}. The X.509 ecosystem has come
+under greater scrutiny for misissuance under the Baseline Requirements,
+CA/Browser Forum, and Certificate Transparency~\cite{zlint-2018}. We should
+continue this trend, and measure gossip implementations for Certificate
+Transparency as they are deployed to determine their effectiveness.
+Similarly, as post-quantum cryptography is standardized, we not only have the
+opportunity to standardize cryptography that is less fragile than existing
+cryptography, but we have a new opportunity to empirically understand new
+cryptography as it is adopted. TLS 1.3 offers a similar opportunity for
+measuring the adoption of new cryptography, but is only a revision to an
+existing cryptographic protocol, rather than a new class of primitives.
+Chrome has already performed some initial measurement surrounding the
+feasibility of introducing new post-quantum key exchanges based on the New
+Hope scheme~\cite{new-hope-2016,chrome-pqc-2016}. This scheme informed the
+design of FrodoKEM~\cite{frodo-kem-2017}, which is a candidate for
+standardization by NIST.
 
 Unfortunately, empirical cryptography, and more broadly, empirical security,
 is often out of reach of non-researchers. Security analysts and system
