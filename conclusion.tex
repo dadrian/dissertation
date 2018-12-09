@@ -24,7 +24,14 @@ prime~\cite{rfc7919}.
 RSA key exchange was removed entirely. For signatures, RSA \PKCS was removed
 in favor of RSA PSS, which limits Bleichenbacher-style
 attacks~\cite{exact-security-rsa}. Removing support for malleable \PKCS
-signatures prevents DROWN-like oracles.
+signatures prevents DROWN-like oracles. In recent years, the Bleichenbacher
+attack has evolved into a \textit{class} of attacks. Within TLS, defending
+against Bleichenbacher-style attacks has evolved into a cat-and-mouse game in
+which individual vulnerabilities such as ROBOT~\cite{robot-2018} and
+CAT~\cite{cat-2018} are patched, while new ways of constructing oracles are
+discovered. It appears there simply may be no safe \PKCS implementations.
+Bleichenbacher attacks will likely continue to be discovered, but TLS 1.3
+should entirely avoid this class of vulnerability.
 
 \paragraph{Explicit Verification.}
 TLS 1.3 introduces the \textsf{CertificateVerify} message. Similar to key
