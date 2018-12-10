@@ -2,18 +2,28 @@
 \abstract{
 Cryptography is a key component of the security of the Internet.
 Unfortunately, the process of using cryptography to secure the Internet is
-fraught with failure. Cryptography is often fragile, and a single mistake can
-have devastating consequences on security. This fragility is further
-complicated by the distributed and diverse nature of the Internet, where
-rapid and wholesale changes are impossible to deploy. As a result, the
-cryptography used to secure the Internet is a vast array of algorithms,
-protocols, implementations and parameters that reflects the diverse nature of
-the Internet.
+fraught with failure. Cryptography is often fragile, as a single mistake can
+have devastating consequences on security, and this fragility is further
+complicated by the diverse and distributed nature of the Internet. This
+dissertation shows how to use empirical methods in the form of Internet-wide
+scanning to study how cryptography is deployed on the Internet, and shows
+this methodology can discover vulnerabilities and gain insights into fragile
+cryptographic ecosystems that are not possible without an empirical approach.
+I introduce improvements to ZMap, the fast Internet-wide scanner, that allow
+it to fully utilize a 10\,GigE connection, and then use Internet-wide
+scanning to measure cryptography on the Internet.
 
-This dissertation shows how to use empirical methods from large-scale network
-measurement to study how cryptography is deployed on the Internet, and shows
-this methodology can gain insights into fragile cryptographic ecosystems that
-are not possible without an empirical approach.
+First, I study how Diffie-Hellman is deployed, and show that implementations
+are fragile and not resiliant to small subgroup attacks. Next, I measure the
+prevalence of ``export-grade'' cryptography. Although regulations limiting
+the strength of cryptography that could be exported from the United States
+were lifted in 1999, Internet-wide scanning shows that support for various
+forms of export cryptography remains widespread. I show how purposefully
+weakening TLS to comply with these export regulations led to the FREAK,
+Logjam, and DROWN vulnerabilities, each of which exploits obsolete
+export-grade cryptography to attack modern clients. I conclude by discussing
+how empirical cryptography improved protocol design, and present further
+opportunities for empirical research in cryptography.
 
 \paragraph{Thesis Statement.} Large-scale empirical methods allow us to
 observe fragility in how cryptography is being used on the Internet, identify
