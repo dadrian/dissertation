@@ -82,6 +82,15 @@
 \newcommand{\TK}{{\color{red}{\textbf{TK}\xspace}}}
 \newcommand{\tk}{\TK}
 
+% Fix URLs and other hyphenation
+
+% Better URL hyphenation (AH 12/08)
+\def\UrlBreaks{\do-\do\.\do\@\do\\\do\!\do\_\do\|\do\;\do\>\do\]%
+\do\)\do\,\do\?\do\'\do+\do\=\do\#}
+\def\UrlBigBreaks{\do\:\do\/}%
+
+\hyphenation{op-tical net-works semi-conduc-tor}
+
 % Column Types
 \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 
