@@ -76,7 +76,6 @@ small subgroup. This enables the attacker to calculate a custom generator such
 that the client and server views of the shared secret are always identical,
 raising the above attack to a 100\% probability of success.
 
-\TLSLibraryTable
 
 \paragraph{Small subgroup key recovery attacks} In TLS, the client must
 authenticate the handshake before the server, by providing a valid
@@ -240,8 +239,6 @@ population.  The results are summarized in Table~\ref{tab:scandata}.
 
 \TLSHostValidationTable
 
-\PrimesAllTLS
-
 In August 2016, we conducted additional scans of a random 1\% sample
 of HTTPS hosts on the Internet.  First, we checked for nontrivial
 small subgroup attack vulnerability. For servers that sent us a prime
@@ -298,7 +295,6 @@ Table~\ref{tab:tls-group22-support}.
 
 \TLSGroupSupport
 
-
 Of the the 307\,K HTTPS hosts that both use non-safe primes and reuse
 exponents, 277\,K~(90\%) belong to hosts behind Amazon's Elastic Load
 Balancer~\cite{amazon-elb}. These hosts use a 1024-bit prime with a 160-bit
@@ -344,7 +340,10 @@ certificates, with only 652 total hosts with non-RSA or ECDSA certificates.
 
 %\TODO{classify implementations again and disclose to Cisco, etc}
 
-
+\begin{landscape}
+\TLSLibraryTable
+\PrimesAllTLS
+\end{landscape}
 
 
 
