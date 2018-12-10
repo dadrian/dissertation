@@ -46,9 +46,9 @@ cryptography.
 To better use cryptography to secure the Internet, we need to understand what
 types of cryptography are in use, and where mistakes are being made. We must
 understand which cryptographic ecosystems are fragile, and which are
-resiliant. To deploy new and stronger cryptography, we need to validate our
+resilient. To deploy new and stronger cryptography, we need to validate our
 assumptions about the current cryptographic behavior of devices on the
-Internet, so that we can identify which probems need to be solved, and
+Internet, so that we can identify which problems need to be solved, and
 prioritize their solutions. Large-scale empirical methods allow us to observe
 fragility in how cryptography is being used on the Internet, identify new
 vulnerabilities, and better secure the Internet in the future.
@@ -57,14 +57,14 @@ In this dissertation, I show how empirical measurements collected using
 Internet-wide scanning provides insight into how cryptography is used to
 secure the Internet. First, I show contributions made to the field of
 Internet measurement field itself via improved Internet-wide scanning.
-Second, I measure the Internet's resiliancy to small subgroup attacks in
+Second, I measure the Internet's resiliency to small subgroup attacks in
 finite-field Diffie-Hellman. Third, I use empirical methods to show how
 1990s-era export-grade encryption harmed the security of the Internet for two
 decades.
 
 \section{Techniques for Measuring Internet Cryptography}
 
-Internet-wide scanning is a fundmental technique used for empirical study of
+Internet-wide scanning is a fundamental technique used for empirical study of
 cryptography. Large-scale, horizontal port scanners such as
 ZMap~\cite{zmap-2013} drastically reduce the barrier to entry to leveraging
 network scan data at Internet scale, however port scanning alone is not a
@@ -101,7 +101,7 @@ able to provide a global understanding of \textit{individual} hosts and
 networks. In \S\ref{chapter:zippier}, I discuss contributions to
 Internet-wide scanning that provide a foundation to build a more accurate and
 complete picture of the Internet and I show improvements to the ZMap scanner
-which enable it to operate at a full 10Gbps line
+which enable it to operate at a full 10\,Gbps line
 rate~\cite{zippier-zmap-2014}. While ZMap enabled the use of Internet-wide
 scanning accessible as a measurement method, this work moves towards enabling
 hourly or real-time measurement of the cryptographic behavior of all
@@ -176,7 +176,7 @@ protocol design in the future.
 \section{Measuring Export Cryptography}
 
 The Department of State regulated cryptography in the United States during
-the 1990s. Cryptography was covered by the Internation Traffic in Arms
+the 1990s. Cryptography was covered by the International Traffic in Arms
 Regulations (ITAR), which broadly limited the ability for US persons to
 ``export'' cryptography. Beginning in 1995, these regulations were challenged
 in court by Daniel J. Bernstein, who was attempting to publish the
@@ -204,7 +204,7 @@ modern web browsers.
 
 \subsection{Attacks on RSA}
 
-In early verions of TLS, export compliance when using RSA key exchange was
+In early versions of TLS, export compliance when using RSA key exchange was
 implemented by limiting the length of the server-provided RSA key to
 512-bits. In TLS, the RSA key used for key exchange is usually extracted from
 the X.509 certificate used to authenticate the server. However, this key is
@@ -312,7 +312,7 @@ only five bytes of key material encrypted using RSA \PKCS. In
 vulnerabilities in \ssltwo surrounding export-grade cryptography to attack
 TLS~\cite{drown-2016}. To be vulnerable to DROWN, a TLS server must share a
 key with an SSLv2 server, or share a name with an SSLv2 server that has not
-patched the ``extra-clear'' vulnerablity~\cite{drown-2016,cve-2016-0701}.
+patched the ``extra-clear'' vulnerability~\cite{drown-2016,cve-2016-0701}.
 The \ssltwo protocol requires the server to send data to the client that is
 derived from the shared secret, without first verifying that the client has
 possession of the secret. When combined with the malleability of RSA, and a
@@ -328,7 +328,7 @@ cross-protocol nature of the attack.
 
 Large-scale empirical methods allow us to observe fragility in how
 cryptography is being used on the Internet, identify new vulnerabilities, and
-better secure the Internet in the future. In this disseration, I show how
+better secure the Internet in the future. In this dissertation, I show how
 empirical measurements collected using Internet-wide scanning provide insight
 into how cryptography is used to secure the Internet. I first show in
 Chapter~\ref{chapter:zippier} how Internet-wide scanning and related network
