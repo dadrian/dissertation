@@ -358,6 +358,16 @@ reserved allocations.
 
 \subsection{Hit-rate vs.\ Scan-rate}
 
+\begin{figure}[t]\centering
+\includegraphics[height=3in]{\ZippyFigures/norm_avg_hitrate.pdf}
+\caption{\textbf{Hit-rate vs.\ Scan-rate}\,---\,%
+ZMap's hit rate is roughly stable up to a scan rate of 4~Mpps, then declines
+linearly. This drop off may be due to upstreudegrm network congestion. Even using
+PF\_RING, Masscan is unable to achieve scan rates above 6.4~Mpps on the same
+hardware and has a much lower hit rate.}
+\label{fig:hitrate}
+\end{figure}
+
 In our original ZMap study, we experimented with various scanning speeds up
 to gigabit Ethernet line speed (1.44~Mpps) and found no significant effect on
 the number of results ZMap found~\cite{zmap-2013}. In other words, from our
@@ -375,17 +385,7 @@ network, responses dropped by the network, or packets dropped on the scan
 host due to ZMap?
 
 \begin{figure}[t]\centering
-\includegraphics[height=2.1in]{\ZippyFigures/norm_avg_hitrate.pdf}
-\caption{\textbf{Hit-rate vs.\ Scan-rate}\,---\,%
-ZMap's hit rate is roughly stable up to a scan rate of 4~Mpps, then declines
-linearly. This drop off may be due to upstreudegrm network congestion. Even using
-PF\_RING, Masscan is unable to achieve scan rates above 6.4~Mpps on the same
-hardware and has a much lower hit rate.}
-\label{fig:hitrate}
-\end{figure}
-
-\begin{figure}[t]\centering
-\includegraphics[height=2.1in]{\ZippyFigures/avg_count_recv_succs.pdf}
+\includegraphics[height=3in]{\ZippyFigures/avg_count_recv_succs.pdf}
 \caption{\textbf{Response Rate During Scans}\,---\,%
 This graph shows the rate of incoming SYN-ACKs during 50-second scans. The
 peaks at the end (after sending finishes) at rates above 7~Mpps indicate that
@@ -433,7 +433,7 @@ rate per AS and found little AS-level correlation for packets dropped by the
 our network rather than at particular distant destination networks.
 
 \begin{figure}\centering
-\includegraphics[width=\linewidth]{\ZippyFigures/split_avg_count_recv_succs.pdf}
+\includegraphics[height=3in]{\ZippyFigures/split_avg_count_recv_succs.pdf}
 \caption{\textbf{Comparing One and Two Machines}\,---\,%
 If we scan at 14~Mpps and use separate machines for the sending and receiving
 tasks, the spike in the SYN-ACK rate at 50~s disappears, indicating that
