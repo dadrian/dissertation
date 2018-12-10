@@ -10,12 +10,14 @@ Yet historically, cryptography has been one of the most \textit{fragile}
 aspects of security. This fragility is often not because the underlying math
 was incorrect, or because the fundamental cryptographic primitives were
 insecure, but because a single mistake in the implementation, configuration,
-or protocol can have catastrophic effects on security. Security is lost in
-translation between the cryptographers and protocol designers, and between
-protocol designers and implementers. The process of going from paper to
-program, or from proof-of-concept to production, introduces mistakes and
-misunderstandings and reveals incorrect assumptions. This leads to
-cryptographic failures and insecurity.
+or protocol can have catastrophic effects on security without affecting the
+functional state of the system, leading to communication channels that appear
+securely encrypted, but in fact offer little or no security over plaintext.
+Security is lost in translation between the cryptographers and protocol
+designers, and between protocol designers and implementers. The process of
+going from paper to program, or from proof-of-concept to production,
+introduces mistakes and misunderstandings and reveals incorrect assumptions.
+This leads to cryptographic failures and insecurity.
 
 %To address this, the cryptographic research community is beginning to
 %introduce and study new concepts such as misuse-resistant cryptography, and
